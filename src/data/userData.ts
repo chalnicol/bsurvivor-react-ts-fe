@@ -12,3 +12,8 @@ export const userChallengesEntries: ChallengeEntryInfo[] = [
 	{ id: 4, name: "PBA GOVERNOR'S CUP 2025", league: "NBA", result: "LIVE" },
 	{ id: 5, name: "PBA ALL-FILIPINO CUP 2025", league: "NBA", result: "FAIL" },
 ];
+
+export interface Response {
+	success: string | null;
+	error: string | null;
+}

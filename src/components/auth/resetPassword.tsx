@@ -5,40 +5,56 @@ import { useAuth } from "../../context/auth/AuthProvider";
 const resetPassword = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { resetPassword, loading, error, message, clearMessages } = useAuth(); // Destructure from context
+	const { resetPassword, isLoading, error, message, clearMessages } =
+		useAuth(); // Destructure from context
 
 	const [email, setEmail] = useState("");
 	const [token, setToken] = useState("");
 	const [password, setPassword] = useState("");
 	const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
+	const [isInvalid, setIsInvalid] = useState<boolean>(false);
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (password !== passwordConfirmation) {
-			// Set local error for mismatch before calling context
-			// (or let context handle if you want to centralize all validation feedback)
-			// For now, let's just use context's error mechanism:
-			// setError('Passwords do not match.'); // If you want to use local state
-			console.error("Passwords do not match"); // Or use a notification library
-			return;
-		}
-
-		await resetPassword(email, token, password, passwordConfirmation);
-		// console.log("wee", error);
-		// if (!error) {
-		// 	// If there's no error, assume success and navigate
-		// 	setTimeout(() => {
-		// 		navigate("/login");
-		// 	}, 3000);
+		// if (password !== passwordConfirmation) {
+		// 	// For now, let's just use context's error mechanism:
+		// 	// setError('Passwords do not match.'); // If you want to use local state
+		// 	console.error("Passwords do not match"); // Or use a notification library
+		// 	return;
 		// }
+
+		const success = await resetPassword(
+			email,
+			token,
+			password,
+			passwordConfirmation
+		);
+		if (success) {
+			setEmail("");
+			setPassword("");
+			setPasswordConfirmation("");
+			// setTimeout(() => navigate("/login"));
+		}
 	};
+
+	useEffect(() => {
+		return () => {
+			clearMessages();
+		};
+	}, []);
 
 	useEffect(() => {
 		const params = new URLSearchParams(location.search);
 		const urlToken = params.get("token");
 		const urlEmail = params.get("email");
 
+		console.log(urlToken, urlEmail);
+
+		if (!urlEmail || !urlToken) {
+			setIsInvalid(true);
+		}
 		if (urlToken) {
 			setToken(urlToken);
 		}
@@ -49,25 +65,24 @@ const resetPassword = () => {
 		return () => {
 			// clearMessages(); // Clean up messages/errors when component unmounts
 		};
-	}, [location.search, clearMessages]);
+	}, [location.search]);
 
-	if (!token || !email) {
+	if (isInvalid) {
 		return (
-			<div className="py-7">
-				<div className="border border-gray-500 p-3 rounded max-w-lg shadow-lg">
+			<div className="flex items-center justify-center min-h-[calc(100dvh-57px)]">
+				<div className="border bg-white border-gray-500 p-3 rounded max-w-lg shadow-lg mx-auto">
 					<h2 className="font-bold text-lg">Invalid Link</h2>
 					<p className="text-sm mt-2 mb-6">
 						The password reset link is invalid or has expired. Please
 						request a new one.
 					</p>
-					<div className="text-right">
-						<button
-							className="font-bold text-sm text-white bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded cursor-pointer"
-							onClick={() => navigate("/forgot-password")}
-						>
-							REQUEST NEW LINK
-						</button>
-					</div>
+
+					<button
+						className="font-bold w-full text-sm text-white bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded cursor-pointer"
+						onClick={() => navigate("/forgot-password")}
+					>
+						REQUEST NEW LINK
+					</button>
 				</div>
 			</div>
 		);
@@ -75,7 +90,7 @@ const resetPassword = () => {
 
 	return (
 		<div className="flex items-center justify-center min-h-[calc(100dvh-57px)]">
-			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md border border-gray-300">
+			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md border border-gray-400">
 				<h2 className="text-2xl font-bold mb-4 text-center">
 					Reset Password
 				</h2>
@@ -92,7 +107,7 @@ const resetPassword = () => {
 							id="email"
 							value={email}
 							disabled
-							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 						/>
 					</div>
 					<div className="mb-4">
@@ -107,9 +122,9 @@ const resetPassword = () => {
 							id="password"
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
-							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							required
-							disabled={loading}
+							disabled={isLoading}
 						/>
 					</div>
 					<div className="mb-6">
@@ -124,21 +139,21 @@ const resetPassword = () => {
 							id="password_confirmation"
 							value={passwordConfirmation}
 							onChange={(e) => setPasswordConfirmation(e.target.value)}
-							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							required
-							disabled={loading}
+							disabled={isLoading}
 						/>
 					</div>
 					<button
 						type="submit"
 						className={`w-full text-white font-bold py-2 px-4 rounded transition duration-200 ${
-							loading
-								? "bg-gray-600 opacity-90"
+							isLoading
+								? "bg-gray-600 opacity-70"
 								: "bg-gray-700 hover:bg-gray-600 cursor-pointer"
 						}`}
-						disabled={loading}
+						disabled={isLoading}
 					>
-						SUBMIT
+						UPDATE PASSWORD
 					</button>
 				</form>
 				{message && (

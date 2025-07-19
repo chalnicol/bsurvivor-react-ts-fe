@@ -1,37 +1,31 @@
 import { Link } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-	const [loading, setLoading] = useState<boolean>(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [error, setError] = useState<string | null>(null);
-	const { login } = useAuth();
+	const { login, isLoading, error, clearMessages } = useAuth();
 	const navigate = useNavigate();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setError(null); // Clear previous errors
-		setLoading(true);
-		try {
-			await login(email, password);
-
-			setLoading(false);
-			navigate("/"); // Redirect to a protected route on success
-		} catch (err: any) {
-			const message =
-				err.response?.data?.message ||
-				"Login failed. Please check your credentials.";
-			setError(message);
-			setLoading(false);
+		const success = await login(email, password);
+		if (success) {
+			navigate("/");
 		}
 	};
 
+	useEffect(() => {
+		return () => {
+			clearMessages();
+		};
+	}, []);
+
 	return (
 		<div className="flex items-center justify-center min-h-[calc(100dvh-57px)]">
-			<div className="border border-gray-300 bg-white p-8 pt-6 rounded shadow-md w-full max-w-md">
+			<div className="border border-gray-400 bg-white p-8 pt-6 rounded shadow-md w-full max-w-md">
 				<h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
 				<form onSubmit={handleSubmit}>
@@ -46,7 +40,7 @@ const Login = () => {
 							type="email"
 							id="email"
 							value={email}
-							className="w-full p-2 border border-gray-300 rounded"
+							className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							onChange={(e) => setEmail(e.target.value)}
 							required
 						/>
@@ -62,7 +56,7 @@ const Login = () => {
 							type="password"
 							id="password"
 							value={password}
-							className="w-full p-2 border border-gray-300 rounded"
+							className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							onChange={(e) => setPassword(e.target.value)}
 							required
 						/>
@@ -70,11 +64,11 @@ const Login = () => {
 					<button
 						type="submit"
 						className={`w-full  text-white py-2 rounded font-bold ${
-							loading
-								? "bg-gray-600 opacity-60"
+							isLoading
+								? "bg-gray-600 opacity-70"
 								: "bg-gray-700 hover:bg-gray-600 cursor-pointer "
 						}`}
-						disabled={loading}
+						disabled={isLoading}
 					>
 						LOGIN
 					</button>
@@ -82,12 +76,18 @@ const Login = () => {
 				{error && <p className="my-3 text-red-500">{error}</p>}
 
 				<div className="mt-3">
-					<Link
-						to="/forgot-password"
-						className="text-sm	text-blue-500 hover:underline"
-					>
-						Forgot Password?
-					</Link>
+					{isLoading ? (
+						<span className="text-sm	text-gray-700 ">
+							Forgot Password?
+						</span>
+					) : (
+						<Link
+							to="/forgot-password"
+							className="text-sm	text-gray-700 hover:underline"
+						>
+							Forgot Password?
+						</Link>
+					)}
 				</div>
 			</div>
 		</div>

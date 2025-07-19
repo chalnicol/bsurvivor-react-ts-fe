@@ -1,4 +1,5 @@
 import React from "react";
+import { type Response } from "../../data/userData";
 
 export interface User {
 	id: number;
@@ -14,22 +15,29 @@ export interface AuthContextType {
 	error: string | null;
 	message: string | null;
 	loading: boolean;
-	login: (email: string, password: string) => Promise<void>;
+	isLoading: boolean;
+	login: (email: string, password: string) => Promise<boolean>;
 	register: (
 		username: string,
 		email: string,
 		password: string,
 		password_confirmation: string
-	) => Promise<void>;
-
+	) => Promise<boolean>;
 	logout: () => Promise<void>;
-	forgotPassword: (email: string) => Promise<void>;
+	forgotPassword: (email: string) => Promise<boolean>;
 	resetPassword: (
 		email: string,
 		token: string,
 		password: string,
 		password_confirmation: string
-	) => Promise<void>;
+	) => Promise<boolean>;
+	updateProfile: (email: string, username: string) => Promise<Response | null>;
+	updatePassword: (
+		currentPassword: string,
+		password: string,
+		password_confirmation: string
+	) => Promise<Response | null>;
+	deleteAccount: () => Promise<boolean>;
 	clearMessages: () => void;
 }
 

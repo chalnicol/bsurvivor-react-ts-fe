@@ -1,9 +1,10 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
-// import { useAuth } from "../context/auth/AuthProvider";
+import { useAuth } from "../context/auth/AuthProvider";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Home = () => {
-	// const { isAuthenticated } = useAuth();
+	const { isAuthenticated } = useAuth();
 
 	return (
 		<>
@@ -52,17 +53,19 @@ const Home = () => {
 								</span> */}
 							</div>
 						</div>
-						{/* <div className="text-sm rounded text-blue-700 mt-4">
-							<FontAwesomeIcon icon="circle-info" size="sm" />{" "}
-							<Link to="/login" className="underline">
-								Login
-							</Link>
-							/
-							<Link to="/register" className="underline">
-								Register
-							</Link>{" "}
-							<span>to join bracket challenges!</span>
-						</div> */}
+						{!isAuthenticated && (
+							<div className="text-sm rounded text-gray-700 mt-4">
+								<FontAwesomeIcon icon="circle-info" />{" "}
+								<Link to="/login" className="hover:underline">
+									Login
+								</Link>
+								/
+								<Link to="/register" className="hover:underline">
+									Register
+								</Link>{" "}
+								<span>to join bracket challenges!</span>
+							</div>
+						)}
 
 						<hr className="mt-4 mb-3 border-gray-400" />
 					</div>

@@ -25,12 +25,26 @@ import {
 	faGear,
 	faCaretDown,
 	faCircleInfo,
+	faBasketball,
+	faBars,
+	faXmark,
+	faCaretUp,
 } from "@fortawesome/free-solid-svg-icons";
 import BracketEntries from "./pages/user/bracketEntries";
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 
 // Add the imported icons/styles to the library
-library.add(faCoffee, faCheckSquare, faGear, faCaretDown, faCircleInfo);
+library.add(
+	faCoffee,
+	faCheckSquare,
+	faGear,
+	faCaretDown,
+	faCaretUp,
+	faCircleInfo,
+	faBasketball,
+	faBars,
+	faXmark
+);
 
 function App() {
 	return (

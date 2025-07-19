@@ -4,16 +4,13 @@ const BracketEntries = () => {
 	return (
 		<div className="py-7 min-h-[calc(100dvh-57px)]">
 			<div>
-				<h1 className="font-semibold text-lg">
-					Bracket Challenges Entries
-				</h1>
+				<h1 className="font-bold text-lg">Bracket Challenges Entries</h1>
 
-				<div className="w-full lg:flex gap-x-4 space-y-4 mt-3">
+				<div className="w-full lg:grid grid-cols-2 gap-x-4 space-y-4 mt-3">
 					{/* nba */}
-					<div className="flex-1 relative overflow-hidden">
-						<h3 className="font-bold px-2 bg-red-600 text-white py-0.5">
-							NBA
-						</h3>
+					<div className="overflow-hidden border rounded p-3 shadow-lg h-full">
+						<h3 className="font-bold text-lg">NBA</h3>
+						<hr className="border-0 border-b border-gray-400 my-2" />
 						<div>
 							<div className="flex gap-x-2 items-center even:bg-gray-200 py-1 px-2">
 								<p className="flex-2 font-medium">NBA 2025</p>
@@ -24,7 +21,7 @@ const BracketEntries = () => {
 								</div>
 								<Link
 									to="/nba"
-									className="bg-gray-600 hover:bg-gray-500 p-1 w-18 text-xs font-semibold text-white rounded text-center"
+									className="bg-gray-600 block hover:bg-gray-500 p-1 w-18 text-xs font-semibold text-white rounded text-center"
 								>
 									VIEW
 								</Link>
@@ -60,10 +57,9 @@ const BracketEntries = () => {
 						</div>
 					</div>
 					{/* pba */}
-					<div className="flex-1 relative overflow-hidden">
-						<h3 className="font-bold px-2 bg-blue-800 text-white py-0.5">
-							PBA
-						</h3>
+					<div className="overflow-hidden border rounded p-3 shadow-lg h-full">
+						<h3 className="font-bold text-lg">PBA</h3>
+						<hr className="border-0 border-b border-gray-400 my-2" />
 						<div>
 							<div className="flex gap-x-2 items-center even:bg-gray-200 py-1 px-2">
 								<p className="flex-2 font-medium">
