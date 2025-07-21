@@ -23,7 +23,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		if (token) {
 			try {
 				const response = await api.get("/user"); // Protected route to get user details
-				setUser(response.data);
+				setUser(response.data.data);
 			} catch (error) {
 				console.error("Failed to fetch user:", error);
 				localStorage.removeItem("token"); // Clear invalid token
@@ -327,6 +327,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setMessage(null);
 	};
 
+	// Check if user has a specific role
+	const hasRole = (role: string): boolean => {
+		return user?.roles?.includes(role) || false;
+	};
+
+	// Check if user has a specific permission
+	const can = (permission: string): boolean => {
+		return user?.permissions?.includes(permission) || false;
+	};
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -344,6 +354,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				updatePassword,
 				deleteAccount,
 				clearMessages,
+				hasRole,
+				can,
 				loading,
 				isLoading,
 			}}

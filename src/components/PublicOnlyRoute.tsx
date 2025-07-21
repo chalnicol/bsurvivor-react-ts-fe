@@ -8,7 +8,11 @@ const PublicOnlyRoute: React.FC = () => {
 	// If still loading auth state, render nothing or a loader
 	// This prevents flickering or premature redirection
 	if (loading) {
-		return <div className="py-3">Loading authentication...</div>; // Or any spinner/loader component
+		return (
+			<div className="py-7 min-h-[calc(100dvh-57px)] flex items-center justify-center">
+				<p className="font-medium xl:text-lg">Loading Authentication...</p>
+			</div>
+		);
 	}
 
 	// If authenticated, redirect to the home page (or dashboard)

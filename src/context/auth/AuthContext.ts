@@ -5,6 +5,11 @@ export interface User {
 	id: number;
 	username: string;
 	email: string;
+	email_verified_at: string | null;
+	created_at: string;
+	updated_at: string;
+	roles: string[]; // Array of role names
+	permissions: string[]; // Array of permission names
 	// Add other user properties you expect from your API
 }
 
@@ -39,6 +44,8 @@ export interface AuthContextType {
 	) => Promise<Response | null>;
 	deleteAccount: () => Promise<boolean>;
 	clearMessages: () => void;
+	hasRole: (role: string) => boolean;
+	can: (permission: string) => boolean;
 }
 
 export const AuthContext = React.createContext<AuthContextType | undefined>(

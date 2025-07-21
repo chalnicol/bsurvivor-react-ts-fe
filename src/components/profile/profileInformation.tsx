@@ -33,7 +33,7 @@ const ProfileInformation = () => {
 	};
 
 	return (
-		<div className="p-6 rounded-lg shadow border border-gray-300">
+		<div className="p-6 rounded-lg shadow border border-gray-400">
 			<div className="max-w-lg">
 				<h1 className="text-lg font-bold">Profile Information</h1>
 				<hr className="my-2 border-gray-400 shadow-lg" />

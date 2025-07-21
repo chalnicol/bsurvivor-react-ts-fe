@@ -1,18 +1,22 @@
 // import { useState } from "react";
 import Navbar from "./components/navbar";
 import Home from "./pages/home";
-import ProfilePage from "./pages/user/profile";
 
 import Register from "./components/auth/register";
 import Login from "./components/auth/login";
 import ForgotPassword from "./components/auth/forgotPassword";
 import ResetPassword from "./components/auth/resetPassword";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicOnlyRoute from "./components/PublicOnlyRoute";
+import Unauthorized from "./components/Unauthorized";
+import PageNotFound from "./components/PageNotFound";
 
 import About from "./pages/about";
 import NBAPage from "./pages/leagues/nba";
 import PBAPage from "./pages/leagues/pba";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicOnlyRoute from "./components/PublicOnlyRoute";
+import ProfilePage from "./pages/user/profile";
+
+import CreateBracketChallenge from "./pages/admin/createBracketChallenge";
 
 import { Routes, Route } from "react-router-dom";
 
@@ -29,6 +33,10 @@ import {
 	faBars,
 	faXmark,
 	faCaretUp,
+	faUser,
+	faPlus,
+	faCircleCheck,
+	faXmarkCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import BracketEntries from "./pages/user/bracketEntries";
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
@@ -43,7 +51,11 @@ library.add(
 	faCircleInfo,
 	faBasketball,
 	faBars,
-	faXmark
+	faXmark,
+	faUser,
+	faPlus,
+	faCircleCheck,
+	faXmarkCircle
 );
 
 function App() {
@@ -58,7 +70,9 @@ function App() {
 						<Route path="/about" element={<About />} />
 						<Route path="/nba" element={<NBAPage />} />
 						<Route path="/pba" element={<PBAPage />} />
-
+						<Route path="/unauthorized" element={<Unauthorized />} />{" "}
+						{/* Unauthorized page */}
+						{/* Public routes */}
 						<Route element={<PublicOnlyRoute />}>
 							<Route path="/register" element={<Register />} />
 							<Route path="/login" element={<Login />} />
@@ -71,18 +85,24 @@ function App() {
 								element={<ResetPassword />}
 							/>
 						</Route>
-
-						{/* <Route path="/contact" element={<Contact />} /> */}
 						{/* Optional: A "Not Found" route */}
-						<Route path="*" element={<h2>404 - Not Found</h2>} />
-
+						<Route path="*" element={<PageNotFound />} />
 						<Route element={<ProtectedRoute />}>
 							<Route path="/profile" element={<ProfilePage />} />
 							<Route path="/entries" element={<BracketEntries />} />
 
-							{/* <Route path="/dashboard" element={<Dashboard />} /> */}
+							<Route element={<ProtectedRoute requiredRoles="admin" />}>
+								<Route
+									path="/create-bracket-challenge"
+									element={<CreateBracketChallenge />}
+								/>
+							</Route>
+
+							{/* <Route element={<ProtectedRoute requiredPermissions="delete_users" />}>
+									<Route path="/user-delete-tool" element={<UserDeleteToolPage />} />
+							</Route> */}
+
 							{/* Add other routes that require authentication here */}
-							{/* Example: <Route path="/leagues" element={<LeaguesPage />} /> */}
 						</Route>
 					</Routes>
 				</div>

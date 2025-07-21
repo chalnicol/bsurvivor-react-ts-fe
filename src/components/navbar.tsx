@@ -11,7 +11,8 @@ const Navbar = () => {
 	const [showMenu, setShowMenu] = useState<boolean>(false);
 	const [showMenuDropDown, setShowMenuDropDown] = useState<boolean>(false);
 
-	const { user, isAuthenticated, logout } = useAuth();
+	const { user, isAuthenticated, hasRole, logout } = useAuth();
+
 	const navigate = useNavigate();
 
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -118,14 +119,19 @@ const Navbar = () => {
 		<nav className="bg-gray-800 h-14 sticky top-0 z-10">
 			<div className="max-w-7xl mx-auto flex justify-between items-center gap-x-6 h-full px-4">
 				<Link to="/" className="text-lg text-white font-bold">
-					{/* <FontAwesomeIcon icon="basketball" /> Survivor */}
-					Burvivor
+					<FontAwesomeIcon icon="basketball" /> Survivor
+					{/* Burvivor */}
 				</Link>
 
-				<div className="hidden lg:flex items-center text-white font-medium flex-1">
+				<div className="hidden md:flex items-center text-white font-medium flex-1">
 					<div className="flex-1 space-x-3">
 						<Link to="/">Home</Link>
 						<Link to="/about">About</Link>
+						{isAuthenticated && hasRole("admin") && (
+							<Link to="/create-bracket-challenge">
+								Create Challenge
+							</Link>
+						)}
 					</div>
 					<div className="space-x-3">
 						{isAuthenticated && user ? (
@@ -135,31 +141,33 @@ const Navbar = () => {
 									onClick={() => setShowDropdown((prev) => !prev)}
 								>
 									<div className="flex items-center">
-										<img
+										{/* <img
 											src="/user.png"
 											className="h-7 me-2"
 											alt="user"
-										/>
-										<span className="me-1">{user.username}</span>
+										/> */}
+										<FontAwesomeIcon icon="user" size="lg" />
+										<span className="ms-2 me-1">{user.username}</span>
 										<FontAwesomeIcon icon="caret-down" size="xs" />
 									</div>
 									{showDropdown && (
 										<div className="absolute bg-white rounded min-w-40 text-gray-600 shadow-lg right-0 mt-2 overflow-hidden">
 											<ul>
 												<li
-													className="text-right px-3 py-2 font-medium hover:bg-gray-100 cursor-pointer"
+													className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
 													onClick={() => navigate("/profile")}
 												>
 													My Profile
 												</li>
 												<li
-													className="text-right px-3 py-2 font-medium hover:bg-gray-100 cursor-pointer"
+													className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
 													onClick={() => navigate("/entries")}
 												>
 													My Entries
 												</li>
+
 												<li
-													className="text-right px-3 py-2 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
+													className="text-right px-3 py-1.5 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
 													onClick={handleLogout}
 												>
 													Logout
@@ -179,7 +187,7 @@ const Navbar = () => {
 				</div>
 
 				<button
-					className="lg:hidden cursor-pointer text-white border rounded font-bold px-2"
+					className="md:hidden cursor-pointer text-white border rounded font-bold px-2"
 					onClick={handleMenuOptionsClick}
 				>
 					<FontAwesomeIcon icon={showMenu ? "xmark" : "bars"} />
@@ -207,13 +215,26 @@ const Navbar = () => {
 							>
 								About
 							</button>
+
 							{isAuthenticated ? (
 								<>
+									{hasRole("admin") && (
+										<button
+											className="border-b p-2 w-full text-left"
+											onClick={() =>
+												handleMenuClick("/create-bracket-challenge")
+											}
+										>
+											Create Challenge
+										</button>
+									)}
+
 									<button
-										className="border-b p-2 w-full text-left flex gap-x-1"
+										className="border-b p-2 w-full text-left flex items-center gap-x-2"
 										onClick={handleDropdownMenuClick}
 									>
-										<img src="/user.png" className="h-6" alt="user" />
+										{/* <img src="/user.png" className="h-6" alt="user" /> */}
+										<FontAwesomeIcon icon="user" />
 										<div>
 											<span className="me-2">
 												{user ? user.username : "user"}

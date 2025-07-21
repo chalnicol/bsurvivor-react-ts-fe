@@ -1,8 +1,7 @@
-export interface NBATeamInfo {
-	id: number;
-	name: string;
-	abbr: string;
-	logo?: string; // Optional logo URL
+import { type TeamInfo } from "./adminData";
+
+export interface NBATeamInfo extends TeamInfo {
+	league: "NBA"; // Specify the league as NBA
 	conference: "EAST" | "WEST"; // Optional conference affiliation
 }
 
@@ -38,6 +37,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "ATL",
 		logo: "https://cdn.nba.com/logos/nba/1610612737/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 2,
@@ -45,6 +45,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "BOS",
 		logo: "https://cdn.nba.com/logos/nba/1610612738/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 3,
@@ -52,6 +53,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "BKN",
 		logo: "https://cdn.nba.com/logos/nba/1610612751/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 4,
@@ -59,6 +61,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "CHA",
 		logo: "https://cdn.nba.com/logos/nba/1610612766/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 5,
@@ -66,6 +69,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "CHI",
 		logo: "https://cdn.nba.com/logos/nba/1610612741/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 6,
@@ -73,6 +77,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "CLE",
 		logo: "https://cdn.nba.com/logos/nba/1610612739/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 7,
@@ -80,6 +85,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "DAL",
 		logo: "https://cdn.nba.com/logos/nba/1610612742/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 8,
@@ -87,6 +93,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "DEN",
 		logo: "https://cdn.nba.com/logos/nba/1610612743/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 9,
@@ -94,6 +101,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "DET",
 		logo: "https://cdn.nba.com/logos/nba/1610612765/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 10,
@@ -101,6 +109,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "GSW",
 		logo: "https://cdn.nba.com/logos/nba/1610612744/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 11,
@@ -108,6 +117,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "HOU",
 		logo: "https://cdn.nba.com/logos/nba/1610612745/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 12,
@@ -115,6 +125,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "IND",
 		logo: "https://cdn.nba.com/logos/nba/1610612754/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 13,
@@ -122,6 +133,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "LAC",
 		logo: "https://cdn.nba.com/logos/nba/1610612746/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 14,
@@ -129,6 +141,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "LAL",
 		logo: "https://cdn.nba.com/logos/nba/1610612747/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 15,
@@ -136,6 +149,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "MEM",
 		logo: "https://cdn.nba.com/logos/nba/1610612763/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 16,
@@ -143,6 +157,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "MIA",
 		logo: "https://cdn.nba.com/logos/nba/1610612748/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 17,
@@ -150,6 +165,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "MIL",
 		logo: "https://cdn.nba.com/logos/nba/1610612749/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 18,
@@ -157,6 +173,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "MIN",
 		logo: "https://cdn.nba.com/logos/nba/1610612750/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 19,
@@ -164,6 +181,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "NOP",
 		logo: "https://cdn.nba.com/logos/nba/1610612740/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 20,
@@ -171,6 +189,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "NYK",
 		logo: "https://cdn.nba.com/logos/nba/1610612752/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 21,
@@ -178,6 +197,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "OKC",
 		logo: "https://cdn.nba.com/logos/nba/1610612760/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 22,
@@ -185,6 +205,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "ORL",
 		logo: "https://cdn.nba.com/logos/nba/1610612753/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 23,
@@ -192,6 +213,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "PHI",
 		logo: "https://cdn.nba.com/logos/nba/1610612755/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 24,
@@ -199,6 +221,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "PHX",
 		logo: "https://cdn.nba.com/logos/nba/1610612756/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 25,
@@ -206,6 +229,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "POR",
 		logo: "https://cdn.nba.com/logos/nba/1610612757/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 26,
@@ -213,6 +237,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "SAC",
 		logo: "https://cdn.nba.com/logos/nba/1610612758/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 27,
@@ -220,6 +245,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "SAS",
 		logo: "https://cdn.nba.com/logos/nba/1610612759/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 28,
@@ -227,6 +253,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "TOR",
 		logo: "https://cdn.nba.com/logos/nba/1610612761/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 	{
 		id: 29,
@@ -234,6 +261,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "UTA",
 		logo: "https://cdn.nba.com/logos/nba/1610612762/primary/L/logo.svg",
 		conference: "WEST",
+		league: "NBA",
 	},
 	{
 		id: 30,
@@ -241,6 +269,7 @@ export const nbaTeams: NBATeamInfo[] = [
 		abbr: "WAS",
 		logo: "https://cdn.nba.com/logos/nba/1610612764/primary/L/logo.svg",
 		conference: "EAST",
+		league: "NBA",
 	},
 ];
 
