@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Create an Axios instance with a base URL
-const api = axios.create({
+const apiClient = axios.create({
 	baseURL: "http://localhost/api", // Your Laravel API base URL
 	withCredentials: true,
 	headers: {
@@ -11,7 +11,7 @@ const api = axios.create({
 });
 
 // Add a request interceptor to include the token
-api.interceptors.request.use(
+apiClient.interceptors.request.use(
 	(config) => {
 		const token = localStorage.getItem("token");
 		if (token) {
@@ -25,7 +25,7 @@ api.interceptors.request.use(
 );
 
 // Optional: Add a response interceptor for global error handling (e.g., 401 Unauthorized)
-api.interceptors.response.use(
+apiClient.interceptors.response.use(
 	(response) => response,
 	(error) => {
 		if (error.response && error.response.status === 401) {
@@ -41,4 +41,4 @@ api.interceptors.response.use(
 	}
 );
 
-export default api;
+export default apiClient;

@@ -91,7 +91,7 @@ const ChangePassword = () => {
 					<p className="my-3 text-sm text-red-500">{response.error}</p>
 				)}
 				{response?.success && (
-					<p className="my-3 text-sm text-green-500">{response.success}</p>
+					<p className="my-3 text-sm text-green-700">{response.success}</p>
 				)}
 			</div>
 		</div>

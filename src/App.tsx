@@ -6,17 +6,29 @@ import Register from "./components/auth/register";
 import Login from "./components/auth/login";
 import ForgotPassword from "./components/auth/forgotPassword";
 import ResetPassword from "./components/auth/resetPassword";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicOnlyRoute from "./components/PublicOnlyRoute";
-import Unauthorized from "./components/Unauthorized";
-import PageNotFound from "./components/PageNotFound";
+import ProtectedRoute from "./components/protectedRoute";
+import PublicOnlyRoute from "./components/publicOnlyRoute";
+import Unauthorized from "./components/unauthorized";
+import PageNotFound from "./components/pageNotFound";
+
+import AdminDashboard from "./pages/admin/adminDashboard";
 
 import About from "./pages/about";
 import NBAPage from "./pages/leagues/nba";
 import PBAPage from "./pages/leagues/pba";
 import ProfilePage from "./pages/user/profile";
 
-import CreateBracketChallenge from "./pages/admin/createBracketChallenge";
+import ViewBracketChallenges from "./pages/admin/bracketChallengers/viewBracketChalenges";
+import CreateBracketChallenge from "./pages/admin/bracketChallengers/createBracketChallenge";
+
+import ViewLeagues from "./pages/admin/leagues/viewLeagues";
+import CreateLeague from "./pages/admin/leagues/createLeague";
+
+import ViewTeams from "./pages/admin/teams/viewTeams";
+import CreateTeam from "./pages/admin/teams/createTeam";
+
+import ListUsers from "./pages/admin/users/listUsers";
+import ViewUser from "./pages/admin/users/viewUser";
 
 import { Routes, Route } from "react-router-dom";
 
@@ -37,6 +49,8 @@ import {
 	faPlus,
 	faCircleCheck,
 	faXmarkCircle,
+	faLock,
+	faCaretRight,
 } from "@fortawesome/free-solid-svg-icons";
 import BracketEntries from "./pages/user/bracketEntries";
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
@@ -55,7 +69,9 @@ library.add(
 	faUser,
 	faPlus,
 	faCircleCheck,
-	faXmarkCircle
+	faXmarkCircle,
+	faLock,
+	faCaretRight
 );
 
 function App() {
@@ -92,10 +108,35 @@ function App() {
 							<Route path="/entries" element={<BracketEntries />} />
 
 							<Route element={<ProtectedRoute requiredRoles="admin" />}>
+								<Route path="/admin" element={<AdminDashboard />} />
+
 								<Route
-									path="/create-bracket-challenge"
+									path="/admin/bracket-challenges/"
+									element={<ViewBracketChallenges />}
+								/>
+								<Route
+									path="/admin/bracket-challenges/create"
 									element={<CreateBracketChallenge />}
 								/>
+
+								<Route
+									path="/admin/leagues/"
+									element={<ViewLeagues />}
+								/>
+
+								<Route
+									path="/admin/leagues/create"
+									element={<CreateLeague />}
+								/>
+
+								<Route path="/admin/teams/" element={<ViewTeams />} />
+								<Route
+									path="/admin/teams/create"
+									element={<CreateTeam />}
+								/>
+
+								<Route path="/admin/users/" element={<ListUsers />} />
+								<Route path="/admin/users/:id" element={<ViewUser />} />
 							</Route>
 
 							{/* <Route element={<ProtectedRoute requiredPermissions="delete_users" />}>

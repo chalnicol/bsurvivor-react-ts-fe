@@ -30,13 +30,18 @@ const DeleteAccount = () => {
 				{/* {error && <p className="text-red-500 text-sm my-3">{error}</p>} */}
 				{!showConfirmation ? (
 					<button
-						className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded font-bold text-white my-4 cursor-pointer"
+						className={`mt-5 px-4 py-2 rounded text-white font-bold  ${
+							isLoading
+								? "bg-red-400 opacity-70"
+								: "bg-red-600 hover:bg-red-500 cursor-pointer"
+						}`}
 						onClick={handleDeleteClick}
+						disabled={isLoading}
 					>
 						DELETE ACCOUNT
 					</button>
 				) : (
-					<div className="p-3 border border-gray-300 mt-6 rounded bg-gray-100">
+					<div className="p-3 border border-gray-300 mt-6 rounded bg-gray-100 shadow">
 						<p>
 							Are you absolutely sure you want to delete your account?
 						</p>

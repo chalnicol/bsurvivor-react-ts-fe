@@ -88,7 +88,7 @@ const ProfileInformation = () => {
 							</p>
 						)}
 						{response?.success && (
-							<p className="my-3 text-sm text-green-500">
+							<p className="my-3 text-sm text-green-700">
 								{response.success}
 							</p>
 						)}

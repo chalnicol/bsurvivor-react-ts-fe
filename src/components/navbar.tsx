@@ -116,7 +116,7 @@ const Navbar = () => {
 	}, []);
 
 	return (
-		<nav className="bg-gray-800 h-14 sticky top-0 z-10">
+		<nav className="bg-gray-800 h-14 sticky top-0 z-50">
 			<div className="max-w-7xl mx-auto flex justify-between items-center gap-x-6 h-full px-4">
 				<Link to="/" className="text-lg text-white font-bold">
 					<FontAwesomeIcon icon="basketball" /> Survivor
@@ -127,13 +127,16 @@ const Navbar = () => {
 					<div className="flex-1 space-x-3">
 						<Link to="/">Home</Link>
 						<Link to="/about">About</Link>
-						{isAuthenticated && hasRole("admin") && (
-							<Link to="/create-bracket-challenge">
-								Create Challenge
-							</Link>
-						)}
 					</div>
-					<div className="space-x-3">
+					<div className="flex items-center space-x-3">
+						{/* {isAuthenticated && hasRole("admin") && (
+							<Link
+								to="/admin"
+								className="text-sm border rounded px-3 py-0.5"
+							>
+								Admin Dashboard
+							</Link>
+						)} */}
 						{isAuthenticated && user ? (
 							<>
 								<button
@@ -165,6 +168,15 @@ const Navbar = () => {
 												>
 													My Entries
 												</li>
+
+												{hasRole("admin") && (
+													<li
+														className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
+														onClick={() => navigate("/admin")}
+													>
+														Admin Dashboard
+													</li>
+												)}
 
 												<li
 													className="text-right px-3 py-1.5 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
@@ -218,17 +230,6 @@ const Navbar = () => {
 
 							{isAuthenticated ? (
 								<>
-									{hasRole("admin") && (
-										<button
-											className="border-b p-2 w-full text-left"
-											onClick={() =>
-												handleMenuClick("/create-bracket-challenge")
-											}
-										>
-											Create Challenge
-										</button>
-									)}
-
 									<button
 										className="border-b p-2 w-full text-left flex items-center gap-x-2"
 										onClick={handleDropdownMenuClick}
@@ -267,6 +268,16 @@ const Navbar = () => {
 											>
 												My Entries
 											</button>
+
+											{hasRole("admin") && (
+												<button
+													className="border-b p-2 w-full text-left"
+													onClick={() => handleMenuClick("/admin")}
+												>
+													Admin Dashboard
+												</button>
+											)}
+
 											<button
 												className="border-b p-2 w-full text-left"
 												onClick={() => handleLogout()}

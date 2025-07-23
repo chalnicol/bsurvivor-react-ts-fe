@@ -44,6 +44,7 @@ export interface AuthContextType {
 	) => Promise<Response | null>;
 	deleteAccount: () => Promise<boolean>;
 	clearMessages: () => void;
+	updateUser: (updatedUser: User) => void;
 	hasRole: (role: string) => boolean;
 	can: (permission: string) => boolean;
 }

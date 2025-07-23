@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import api from "../../api/axiosConfig";
-import type { nbaTeamData, pbaTeamData } from "../../data/adminData";
+import type { nbaTeamData, pbaTeamData } from "../../../data/adminData";
 import {
 	type NBATeamInfo,
 	nbaTeams as defaultNbaTeams,
-} from "../../data/nbaData";
+} from "../../../data/nbaData";
 import {
 	type PBATeamInfo,
 	pbaTeams as defaulPbaTeams,
-} from "../../data/pbaData";
+} from "../../../data/pbaData";
+import BreadCrumbs from "../../../components/breadCrumbs";
 
 type AnyTeamInfo = NBATeamInfo | PBATeamInfo;
 
@@ -129,18 +130,27 @@ const CreateBracketChallenge = () => {
 		setSearchTerm("");
 	};
 
-	const handleClearClick = useCallback(() => {
+	const handleClearClick = () => {
 		if (league === "NBA") {
-			setSelectedNbaTeamsData({
-				east: [],
-				west: [],
-			});
+			// setSelectedNbaTeamsData({
+			// 	east: [],
+			// 	west: [],
+			// });
+			if (conference === "EAST") {
+				setSelectedNbaTeamsData((prev) => {
+					return { ...prev, east: [] };
+				});
+			} else if (conference === "WEST") {
+				setSelectedNbaTeamsData((prev) => {
+					return { ...prev, west: [] };
+				});
+			}
 		} else if (league === "PBA") {
 			setSelectedPbaTeamsData({
 				teams: [],
 			});
 		}
-	}, [league]);
+	};
 
 	const handleOpenModalClick = (conference: "EAST" | "WEST" | null) => {
 		setShowAddTeamModal(true);
@@ -243,14 +253,16 @@ const CreateBracketChallenge = () => {
 	return (
 		<>
 			<div className="py-7 min-h-[calc(100dvh-57px)]">
-				<div className="p-6 rounded-lg shadow border border-gray-400">
+				<div className="p-4 md:p-6 rounded-lg shadow border border-gray-400">
+					<BreadCrumbs />
+
 					<h1 className="text-lg font-bold mb-4">
 						Create Bracket Challenge
 					</h1>
 					{/* <hr className="mt-2 mb-4 border-gray-400 shadow-lg" /> */}
 
 					<form onSubmit={handleSubmit}>
-						<div className="lg:flex gap-x-12 space-y-4 md:space-y-0">
+						<div className="md:flex gap-x-6 lg:gap-x-12 space-y-4 md:space-y-0">
 							<div className="flex-1">
 								{/* Example input fields */}
 								<div className="mb-2">
@@ -337,7 +349,7 @@ const CreateBracketChallenge = () => {
 									<label htmlFor="is_public">Is Public</label>
 								</div>
 							</div>
-							<div className="flex-1">
+							<div className="flex-1 lg:flex-2">
 								<div className="mb-6">
 									<label htmlFor="league" className="text-xs">
 										Select Teams <span>(in order)</span>
@@ -345,8 +357,8 @@ const CreateBracketChallenge = () => {
 									<hr className="border-gray-400" />
 									{league === "NBA" && (
 										<>
-											<div className="mt-1">
-												<div className="border border-gray-300 shadow-sm mt-2">
+											<div className="mt-1 lg:flex gap-x-4">
+												<div className="border border-gray-300 shadow-sm mt-2 flex-1">
 													<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
 														<h3>East Teams</h3>
 														<button
@@ -359,7 +371,7 @@ const CreateBracketChallenge = () => {
 															Change
 														</button>
 													</div>
-													<div className="h-37 overflow-y-auto">
+													<div className="h-37 lg:h-72 overflow-y-auto">
 														{selectedNBATeams?.east.length > 0 ? (
 															selectedNBATeams?.east.map(
 																(team, index) => (
@@ -378,7 +390,7 @@ const CreateBracketChallenge = () => {
 														)}
 													</div>
 												</div>
-												<div className="border border-gray-300 shadow-sm mt-2">
+												<div className="border border-gray-300 shadow-sm mt-2 flex-1">
 													<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
 														<h3>West Teams</h3>
 														<button
@@ -391,7 +403,7 @@ const CreateBracketChallenge = () => {
 															Change
 														</button>
 													</div>
-													<div className="h-37 overflow-y-auto">
+													<div className="h-37 lg:h-72 overflow-y-auto">
 														{selectedNBATeams?.west.length > 0 ? (
 															selectedNBATeams?.west.map(
 																(team, index) => (
@@ -465,7 +477,7 @@ const CreateBracketChallenge = () => {
 			</div>
 			{/* Modal for selecting teams */}
 			{showAddTeamModal && (
-				<div className="fixed top-0 left-0 w-full h-full z-10">
+				<div className="fixed left-0 bottom-0 w-full h-full z-10">
 					<div className="absolute top-0 left-0 bg-[#0a0a0a66] w-full h-full pointer-events-auto"></div>
 					<div className="absolute top-0 left-0 flex items-center justify-center h-full w-full">
 						<div className="w-11/12 max-w-xl bg-white border border-gray-300 rounded-lg p-4 shadow-lg">
@@ -516,7 +528,6 @@ const CreateBracketChallenge = () => {
 										</div>
 									))}
 							</div>
-
 							<div className="space-x-2">
 								<button
 									className="p-2 bg-red-600 text-white text-sm mt-3 w-26 rounded cursor-pointer font-bold hover:bg-red-600 transition duration-200"

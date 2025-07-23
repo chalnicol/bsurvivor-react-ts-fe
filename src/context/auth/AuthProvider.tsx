@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, type ReactNode } from "react";
 import { AuthContext, type User } from "./AuthContext";
 import { type Response } from "../../data/userData";
-import api from "../../api/axiosConfig"; // Import your configured axios instance
+import { apiClient } from "../../utils/api"; // Import your configured axios instance
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	children,
@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	const fetchUser = async () => {
 		if (token) {
 			try {
-				const response = await api.get("/user"); // Protected route to get user details
+				const response = await apiClient.get("/user"); // Protected route to get user details
 				setUser(response.data.data);
 			} catch (error) {
 				console.error("Failed to fetch user:", error);
@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setError(null);
 		setMessage(null);
 		try {
-			const response = await api.post("/login", { email, password });
+			const response = await apiClient.post("/login", { email, password });
 			const receivedToken = response.data.token;
 			const userData = response.data.user;
 			localStorage.setItem("token", receivedToken); // Store token
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setIsLoading(true);
 		setError(null);
 		try {
-			const response = await api.post("/register", {
+			const response = await apiClient.post("/register", {
 				username,
 				email,
 				password,
@@ -118,7 +118,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setIsLoading(true);
 		try {
 			if (token) {
-				await api.post("/logout"); // Invalidate token on backend
+				await apiClient.post("/logout"); // Invalidate token on backend
 			}
 		} catch (error) {
 			console.error("Logout failed on server:", error);
@@ -138,7 +138,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setError(null);
 		setMessage(null);
 		try {
-			const response = await api.post("/forgot-password", {
+			const response = await apiClient.post("/forgot-password", {
 				email: email,
 			});
 			setMessage(
@@ -176,7 +176,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setError(null);
 		setMessage(null);
 		try {
-			const response = await api.post("/reset-password", {
+			const response = await apiClient.post("/reset-password", {
 				email: email,
 				token: token,
 				password: password,
@@ -215,11 +215,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setError("");
 		setMessage("");
 		try {
-			const response = await api.put("/user/profile", {
+			const response = await apiClient.put("/user/profile", {
 				username: username,
 				email: email,
 			});
 			setUser(response.data.user);
+			console.log("re", response);
 			// setMessage(response.data.message || "Profile data has been updated.");
 			return {
 				success: response.data.message || "Profile data has been updated.",
@@ -257,7 +258,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setError("");
 		setMessage("");
 		try {
-			const response = await api.put("/user/password", {
+			const response = await apiClient.put("/user/password", {
 				current_password,
 				password,
 				password_confirmation,
@@ -297,7 +298,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setIsLoading(true); // Indicate loading for this action
 		clearMessages();
 		try {
-			await api.delete("/user");
+			await apiClient.delete("/user");
 
 			localStorage.removeItem("token"); // Clear token from storage
 			setUser(null);
@@ -337,6 +338,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		return user?.permissions?.includes(permission) || false;
 	};
 
+	//update user
+	const updateUser = (updatedUser: User) => {
+		setUser(updatedUser);
+	};
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -354,6 +360,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				updatePassword,
 				deleteAccount,
 				clearMessages,
+				updateUser,
 				hasRole,
 				can,
 				loading,
