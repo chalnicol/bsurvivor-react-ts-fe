@@ -1,31 +1,78 @@
 import { Link } from "react-router-dom";
 import BreadCrumbs from "../../../components/breadCrumbs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { type LeagueInfo } from "../../../data/adminData";
+import {
+	type LeagueInfo,
+	type MetaInfo,
+	type PaginatedResponse,
+} from "../../../data/adminData";
 import { useEffect, useState } from "react";
-import api from "../../../utils/axiosConfig";
 import Loader from "../../../components/loader";
+import { apiClient } from "../../../utils/api";
+import Pagination from "../../../components/pagination";
 
-const ViewLeagues = () => {
+// Import the custom debounce hook
+import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
+
+const ListLeagues = () => {
 	const [loading, setLoading] = useState(false);
 	// const [error, setError] = useState<string | null>(null);
 	const [leagues, setLeagues] = useState<LeagueInfo[]>([]);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [meta, setMeta] = useState<MetaInfo | null>(null);
+	const [searchTerm, setSearchTerm] = useState<string>("");
+
+	// Use the debounced value of searchTerm
+	const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
+
+	const fetchLeagues = async (page: number, term: string) => {
+		setLoading(true);
+		// setLeagues([]);
+		try {
+			// const response = await api.get(`/admin/leagues/`);
+			const response = await apiClient.get<PaginatedResponse<LeagueInfo>>(
+				`/admin/leagues?page=${page}${term ? `&search=${term}` : ""}`
+			);
+			setMeta(response.data.meta);
+			setCurrentPage(page);
+			setLeagues(response.data.data);
+		} catch (err) {
+			console.log("error", err);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	useEffect(() => {
-		const fetchLeagues = async () => {
-			setLoading(true);
-			setLeagues([]);
-			try {
-				const response = await api.get(`/admin/leagues/`);
-				setLeagues(response.data.data);
-			} catch (err) {
-				console.log("error", err);
-			} finally {
-				setLoading(false);
-			}
-		};
-		fetchLeagues();
-	}, []);
+		fetchLeagues(currentPage, debouncedSearchTerm);
+	}, [currentPage, debouncedSearchTerm]);
+
+	// Handler for react-paginate page clicks
+	// const handlePageClick = (event: { selected: number }) => {
+	// 	setCurrentPage(event.selected);
+	// };
+	const handlePageClick = (page: number) => {
+		setCurrentPage(page);
+	};
+
+	// Update searchTerm immediately on input change
+	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchTerm(e.target.value);
+		// Do NOT reset currentPage here. Reset it when the debounced search term actually triggers a fetch.
+		// If you reset currentPage here, it would reset on every keystroke, which is not what we want.
+	};
+
+	// We need a separate effect to reset the page when the debounced search term changes
+	// and it's different from the initial empty string (i.e., user actually typed something).
+	useEffect(() => {
+		// Only reset page to 1 if the debounced search term has changed
+		// and is not the initial empty string (unless you want to reset on initial load too)
+		if (debouncedSearchTerm !== searchTerm && debouncedSearchTerm !== "") {
+			setCurrentPage(1);
+		}
+		// Alternatively, just always reset to page 1 when the debounced search term changes
+		// setCurrentPage(1);
+	}, [debouncedSearchTerm]);
 
 	return (
 		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
@@ -42,7 +89,15 @@ const ViewLeagues = () => {
 					</Link>
 				</div>
 
-				<div className="mt-4 overflow-x-auto">
+				<input
+					type="search"
+					value={searchTerm}
+					onChange={handleSearchInputChange}
+					className="px-1 py-0.5 border-b border-gray-400 w-full mt-3 focus:outline-none"
+					placeholder="Search leagues here..."
+				/>
+
+				<div className="mt-3 overflow-x-auto">
 					{leagues.length > 0 ? (
 						<table className="w-full text-sm min-w-xl text-nowrap">
 							<thead className="text-white bg-gray-700 font-semibold">
@@ -78,12 +133,12 @@ const ViewLeagues = () => {
 											>
 												view
 											</Link>
-											<Link
+											{/* <Link
 												to={`/admin/leagues/${league.slug}/edit`}
 												className="block shadow cursor-pointer hover:bg-cyan-500 bg-cyan-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 											>
 												edit
-											</Link>
+											</Link>*/}
 											<button className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold">
 												delete
 											</button>
@@ -100,10 +155,15 @@ const ViewLeagues = () => {
 						</p>
 					)}
 				</div>
+				<Pagination
+					meta={meta}
+					onPageChange={handlePageClick}
+					className="mt-6"
+				/>
 			</div>
 			{loading && <Loader />}
 		</div>
 	);
 };
 
-export default ViewLeagues;
+export default ListLeagues;

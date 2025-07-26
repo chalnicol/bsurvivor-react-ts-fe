@@ -1,6 +1,7 @@
-import { nbaTeams, type NBAPlayoffsTeamInfo } from "../../data/nbaData";
+import { type NBAPlayoffsTeamInfo } from "../../data/nbaData";
 import { useContext } from "react";
 import { NBAPlayoffsContext } from "../../context/nba/NBAPlayoffsContext";
+import { useAdmin } from "../../context/admin/AdminProvider";
 
 interface NBATeamSlotProps {
 	bracket: "EAST" | "WEST" | "FINALS";
@@ -24,6 +25,7 @@ const NBATeamSlot = ({
 	placeholderText,
 }: NBATeamSlotProps) => {
 	const { updatePickedTeam } = useContext(NBAPlayoffsContext);
+	const { nbaTeams } = useAdmin();
 
 	const getImageURL = (logo: string | undefined) => {
 		//get nba logo if team logo is undefined

@@ -1,43 +1,64 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
+import AdminThumbs from "../../components/adminThumbnails";
+import { apiClient } from "../../utils/api";
+import {
+	type TotalsInfo,
+	type ResourcesResponseInfo,
+} from "../../data/adminData";
+import { useEffect, useState } from "react";
+import Loader from "../../components/loader";
 
 const AdminDashboard = () => {
+	const [totals, setTotals] = useState<TotalsInfo | null>(null);
+	// const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const fetchResourcesTotals = async () => {
+		try {
+			setTotals(null);
+			// setIsLoading(true);
+			const response = await apiClient.get<ResourcesResponseInfo>(
+				"/admin/totals"
+			);
+			setTotals(response.data.totals);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			// setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchResourcesTotals();
+	}, []);
+
 	return (
-		<div className="py-7 min-h-[calc(100dvh-57px)]">
+		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
 			<h1 className="text-2xl font-bold mb-1">Admin Dashboard</h1>
 			<p className="text-sm">Welcome to the admin dashboard!</p>
-
-			<div className="md:grid grid-cols-2 xl:grid-cols-3 space-y-3 md:space-y-0 mt-6 gap-3">
-				{/* users */}
-				<div className="p-3 border rounded-lg shadow-lg border-gray-400 bg-green-100 flex flex-col">
-					<div>
-						<h2 className="font-semibold">Users (0)</h2>
-						<p className="text-sm text-gray-500">
-							View and manage user accounts
-						</p>
-					</div>
-
-					<div className="flex-1"></div>
-					<div className="mt-5">
+			{totals ? (
+				<div className="md:grid grid-cols-2 xl:grid-cols-3 space-y-3 md:space-y-0 mt-6 gap-3">
+					{/* users */}
+					<AdminThumbs
+						title={`Users (${totals.userTotal})`}
+						description="View and manage basketball leagues"
+						bgColor="green"
+					>
 						<Link
 							to="/admin/users"
 							className="mt-2 cursor-pointer hover:bg-gray-600 bg-gray-700 text-white rounded px-3 py-1 text-xs font-bold"
 						>
 							VIEW USERS
 						</Link>
-					</div>
-				</div>
-				{/* challenges */}
-				<div className="p-3 border rounded-lg shadow-lg border-gray-400 bg-orange-100 flex flex-col">
-					<div>
-						<h2 className="font-semibold">Active Challenges (0)</h2>
-						<p className="text-sm text-gray-500">
-							View and manage bracket challenges
-						</p>
-					</div>
+					</AdminThumbs>
 
-					<div className="flex-1"></div>
-					<div className="mt-5 space-x-2">
+					{/* challenges */}
+					<AdminThumbs
+						// title={`Challenges (${totals.bracketChallengeTotal})`}
+						title="Challenges (0)"
+						description="View and manage basketball leagues"
+						bgColor="orange"
+					>
 						<Link
 							to="/admin/bracket-challenges"
 							className="mt-2 cursor-pointer hover:bg-gray-600 bg-gray-700 text-white rounded px-3 py-1 text-xs font-bold"
@@ -51,19 +72,14 @@ const AdminDashboard = () => {
 							<FontAwesomeIcon icon="plus" className="me-1" />
 							NEW CHALLENGE
 						</Link>
-					</div>
-				</div>
-				{/* leagues */}
-				<div className="p-3 border rounded-lg shadow-lg border-gray-400 bg-yellow-100 flex flex-col">
-					<div>
-						<h2 className="font-semibold">Leagues (0)</h2>
-						<p className="text-sm text-gray-500">
-							View and manage basketball leagues
-						</p>
-					</div>
+					</AdminThumbs>
 
-					<div className="flex-1"></div>
-					<div className="mt-5 space-x-2">
+					{/* leagues */}
+					<AdminThumbs
+						title={`Leagues (${totals.leagueTotal})`}
+						description="View and manage basketball leagues"
+						bgColor="yellow"
+					>
 						<Link
 							to="/admin/leagues"
 							className="mt-2 cursor-pointer hover:bg-gray-600 bg-gray-700 text-white rounded px-3 py-1 text-xs font-bold"
@@ -77,19 +93,14 @@ const AdminDashboard = () => {
 							<FontAwesomeIcon icon="plus" className="me-1" />
 							NEW LEAGUE
 						</Link>
-					</div>
-				</div>
-				{/* teams */}
-				<div className="p-3 border rounded-lg shadow-lg border-gray-400 bg-blue-100 flex flex-col">
-					<div>
-						<h2 className="font-semibold">TEAMS (0)</h2>
-						<p className="text-sm text-gray-500">
-							View and manage basketball teams
-						</p>
-					</div>
+					</AdminThumbs>
 
-					<div className="flex-1"></div>
-					<div className="mt-5 space-x-2">
+					{/* teams */}
+					<AdminThumbs
+						title={`Teams (${totals.teamTotal})`}
+						description="View and manage basketball teams"
+						bgColor="blue"
+					>
 						<Link
 							to="/admin/teams"
 							className="mt-2 cursor-pointer hover:bg-gray-600 bg-gray-700 text-white rounded px-3 py-1 text-xs font-bold"
@@ -103,9 +114,14 @@ const AdminDashboard = () => {
 							<FontAwesomeIcon icon="plus" className="me-1" />
 							NEW TEAM
 						</Link>
-					</div>
+					</AdminThumbs>
 				</div>
-			</div>
+			) : (
+				<div className="mt-6 flex border border-gray-300 text-gray-400 rounded bg-gray-100 shadow justify-center items-center h-42">
+					<p className="font-semibold">Loading admin resources..</p>
+				</div>
+			)}
+			{!totals && <Loader />}
 		</div>
 	);
 };

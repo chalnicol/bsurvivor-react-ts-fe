@@ -1,16 +1,17 @@
-import {
-	nbaTeams,
-	type NBAPlayoffsMatchupInfo,
-	type NBATeamInfo,
-} from "../../data/nbaData";
-import NBAFinalsTeamSlot from "./nbaFinalTeamSlot";
+import { type NBAPlayoffsMatchupInfo } from "../../data/nbaData";
+import { type AnyTeamInfo } from "../../data/adminData";
+
 import { useContext, useMemo } from "react";
 import { NBAPlayoffsContext } from "../../context/nba/NBAPlayoffsContext";
+
+import NBAFinalsTeamSlot from "./nbaFinalTeamSlot";
+import { useAdmin } from "../../context/admin/AdminProvider";
 
 const NBAChampionships = () => {
 	// const [winningTeam, setWinningTeam] = useState<NBATeamInfo | null>(null);
 
 	const { data } = useContext(NBAPlayoffsContext);
+	const { nbaTeams } = useAdmin();
 
 	const EMPTY_FINALS_MATCHUP: NBAPlayoffsMatchupInfo = {
 		id: 1,
@@ -29,7 +30,7 @@ const NBAChampionships = () => {
 	}, [data]);
 	// const isSelected = matchups[0].picked !== 0 && matchups[0].teams[index].id
 
-	const winningTeam = useMemo((): NBATeamInfo | undefined => {
+	const winningTeam = useMemo((): AnyTeamInfo | undefined => {
 		const finalsBracket = data.find(
 			(bracket) => bracket.conference == "FINALS"
 		);

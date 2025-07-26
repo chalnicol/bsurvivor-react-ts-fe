@@ -176,7 +176,7 @@ const ViewUser = () => {
 											{roles.map((role) => (
 												<div
 													key={role.id}
-													className="flex items-center mb-1"
+													className="flex items-center mb-1 hover:text-amber-700"
 												>
 													<input
 														type="checkbox"

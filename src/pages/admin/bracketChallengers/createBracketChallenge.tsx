@@ -1,22 +1,35 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import api from "../../api/axiosConfig";
-import type { nbaTeamData, pbaTeamData } from "../../../data/adminData";
-import {
-	type NBATeamInfo,
-	nbaTeams as defaultNbaTeams,
-} from "../../../data/nbaData";
-import {
-	type PBATeamInfo,
-	pbaTeams as defaulPbaTeams,
-} from "../../../data/pbaData";
 import BreadCrumbs from "../../../components/breadCrumbs";
-
-type AnyTeamInfo = NBATeamInfo | PBATeamInfo;
+import ErrorDisplay from "../../../components/errorDisplay";
+import type {
+	nbaTeamData,
+	// pbaTeamData,
+	AnyTeamInfo,
+	PaginatedResponse,
+	BracketChallengeInfo,
+} from "../../../data/adminData";
+import { useAdmin } from "../../../context/admin/AdminProvider";
+import Loader from "../../../components/loader";
+import apiClient from "../../../utils/axiosConfig";
+import type {
+	// GeneralApiErrorResponse,
+	// LaravelValidationErrorsResponse,
+	ServerErrorData,
+} from "../../../data/adminData";
+import axios, { AxiosError } from "axios";
 
 const CreateBracketChallenge = () => {
-	const [league, setLeague] = useState<string>("NBA");
-	const [challengeName, setChallengeName] = useState<string>("");
+	const {
+		areTeamsAndLeaguesPopulated,
+		fetchTeamsAndLeagues,
+		nbaTeams,
+		pbaTeams,
+		leagues,
+		isLoading: isLoadingTeamsAndLeagues,
+	} = useAdmin();
+
+	const [league, setLeague] = useState<string>("");
+	const [name, setName] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
 	const [startDate, setStartDate] = useState<string>("");
 	const [endDate, setEndDate] = useState<string>("");
@@ -25,31 +38,130 @@ const CreateBracketChallenge = () => {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [conference, setConference] = useState<"EAST" | "WEST">("EAST");
 	const [showAddTeamModal, setShowAddTeamModal] = useState<boolean>(false);
-	const [pbaTeams, setPbaTeams] = useState<AnyTeamInfo[]>([]);
-	const [nbaTeams, setNbaTeams] = useState<AnyTeamInfo[]>([]);
+	const [message, setMessage] = useState<string>("");
+	const [generalErrorMessage, setGeneralErrorMessage] = useState<
+		string | null
+	>(null);
+	const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({}); // To hold validation errors
+
 	const [selectedNbaTeamsData, setSelectedNbaTeamsData] =
 		useState<nbaTeamData>({
 			east: [],
 			west: [],
 		});
-	const [selectedPbaTeamsData, setSelectedPbaTeamsData] =
-		useState<pbaTeamData>({
-			teams: [],
+	const [selectedPbaTeamsData, setSelectedPbaTeamsData] = useState<number[]>(
+		[]
+	);
+
+	useEffect(() => {
+		if (!areTeamsAndLeaguesPopulated) {
+			fetchTeamsAndLeagues();
+		}
+	}, [areTeamsAndLeaguesPopulated]);
+
+	const clearForms = () => {
+		setLeague("");
+		setName("");
+		setDescription("");
+		setStartDate("");
+		setEndDate("");
+		setIsPublic(false);
+		setSelectedNbaTeamsData({
+			east: [],
+			west: [],
 		});
+		setSelectedPbaTeamsData([]);
+		setSearchTerm("");
+		setConference("EAST");
+	};
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		// Handle form submission logic here
-		setIsLoading(true);
 
-		// console.log({
-		// 	league,
-		// 	challengeName,
-		// 	description,
-		// 	startDate,
-		// 	endDate,
-		// 	isPublic,
-		// });
+		// Handle form submission logic here
+
+		if (league == "") return;
+		//prepare to submit data..
+		const toSubmitData = {
+			name: name,
+			description: description,
+			start_date: startDate,
+			end_date: endDate,
+			is_public: isPublic,
+			league: league,
+			bracket_data: {
+				teams:
+					league === "NBA" ? selectedNbaTeamsData : selectedPbaTeamsData,
+			},
+		};
+
+		console.log(toSubmitData);
+
+		const storeBracketChallenge = async () => {
+			try {
+				setIsLoading(true);
+				setGeneralErrorMessage(null);
+				setFieldErrors({}); // Clear validation errors)
+				await apiClient.post<PaginatedResponse<BracketChallengeInfo>>(
+					"/admin/bracket-challenges",
+					toSubmitData
+				);
+				clearForms();
+				setMessage("Challenge created successfully!");
+			} catch (error) {
+				// console.error("Error creating challenge:", error);
+				// Type guard: Check if it's an Axios error
+				if (axios.isAxiosError(error)) {
+					// Cast the error for better TypeScript inference
+					const axiosError = error as AxiosError<ServerErrorData>;
+
+					if (axiosError.response) {
+						// --- Server responded with a 4xx/5xx status code ---
+						const errorData = axiosError.response.data;
+
+						// Always display the main 'message' from the server response
+						if (errorData?.message) {
+							setGeneralErrorMessage(errorData.message);
+						} else {
+							// Fallback if 'message' is missing from server error response
+							setGeneralErrorMessage(
+								`Error ${axiosError.response.status}: An unexpected server error occurred.`
+							);
+						}
+
+						// Check if it's a validation error (i.e., has an 'errors' property)
+						// Use 'in' operator for a reliable type guard with union types
+						if (
+							"errors" in errorData &&
+							typeof errorData.errors === "object" &&
+							errorData.errors !== null
+						) {
+							// TypeScript now knows errorData is of type LaravelValidationErrorsResponse
+							setFieldErrors(errorData.errors);
+						}
+					} else if (axiosError.request) {
+						// --- No response received (Network Error, Server Down, CORS) ---
+						setGeneralErrorMessage(
+							"Network Error: Could not connect to the server. Please check your internet connection or try again later."
+						);
+					} else {
+						// --- Request setup error ---
+						// Something happened setting up the request that triggered an Error
+						setGeneralErrorMessage(
+							`Request Error: ${axiosError.message}`
+						);
+					}
+				} else {
+					// --- Non-Axios / Unknown JavaScript Error ---
+					setGeneralErrorMessage(
+						`An unexpected error occurred: ${(error as Error).message}`
+					);
+				}
+			} finally {
+				setIsLoading(false);
+			}
+		};
+		storeBracketChallenge();
 	};
 
 	const handleTeamSelect = (team: AnyTeamInfo) => {
@@ -117,11 +229,29 @@ const CreateBracketChallenge = () => {
 				});
 			}
 		} else if (league === "PBA") {
-			setSelectedPbaTeamsData((prevData) => ({
-				teams: prevData.teams.includes(team.id)
-					? prevData.teams.filter((id) => id !== team.id)
-					: [...prevData.teams, team.id],
-			}));
+			// setSelectedPbaTeamsData((prevData) => ({
+			// 	teams: prevData.teams.includes(team.id)
+			// 		? prevData.teams.filter((id) => id !== team.id)
+			// 		: [...prevData.teams, team.id],
+			// }));
+			setSelectedPbaTeamsData((prevData) => {
+				const selected = prevData.includes(team.id);
+
+				if (selected) {
+					// If the team is already selected, unselect it
+					return prevData.filter((id) => id !== team.id);
+				} else {
+					// If the team is not selected
+					if (prevData.length < 8) {
+						// If less than 8 teams selected
+						return [...prevData, team.id];
+					} else {
+						// If 8 teams already selected
+						console.warn("Cannot add more than 8 teams.");
+						return prevData;
+					}
+				}
+			});
 		}
 	};
 
@@ -146,9 +276,7 @@ const CreateBracketChallenge = () => {
 				});
 			}
 		} else if (league === "PBA") {
-			setSelectedPbaTeamsData({
-				teams: [],
-			});
+			setSelectedPbaTeamsData([]);
 		}
 	};
 
@@ -159,11 +287,6 @@ const CreateBracketChallenge = () => {
 		}
 		setSearchTerm("");
 	};
-
-	useEffect(() => {
-		setPbaTeams(defaulPbaTeams);
-		setNbaTeams(defaultNbaTeams);
-	}, []);
 
 	const filteredNbaTeams = useMemo(() => {
 		// return nbaTeams.filter(
@@ -222,11 +345,11 @@ const CreateBracketChallenge = () => {
 
 	const selectedPBATeams = useMemo(() => {
 		return pbaTeams
-			.filter((team) => selectedPbaTeamsData.teams.includes(team.id))
+			.filter((team) => selectedPbaTeamsData.includes(team.id))
 			.sort(
 				(a, b) =>
-					selectedPbaTeamsData.teams.indexOf(a.id) -
-					selectedPbaTeamsData.teams.indexOf(b.id)
+					selectedPbaTeamsData.indexOf(a.id) -
+					selectedPbaTeamsData.indexOf(b.id)
 			);
 	}, [pbaTeams, selectedPbaTeamsData]);
 
@@ -242,7 +365,7 @@ const CreateBracketChallenge = () => {
 					return westIndex !== -1 ? westIndex + 1 : null;
 				}
 			} else if (team.league === "PBA") {
-				const teamIndex = selectedPbaTeamsData.teams.indexOf(team.id);
+				const teamIndex = selectedPbaTeamsData.indexOf(team.id);
 				return teamIndex !== -1 ? teamIndex + 1 : null;
 			}
 			return null;
@@ -252,7 +375,7 @@ const CreateBracketChallenge = () => {
 
 	return (
 		<>
-			<div className="py-7 min-h-[calc(100dvh-57px)]">
+			<div className="py-7 min-h-[calc(100dvh-57px)] relative">
 				<div className="p-4 md:p-6 rounded-lg shadow border border-gray-400">
 					<BreadCrumbs />
 
@@ -277,25 +400,33 @@ const CreateBracketChallenge = () => {
 										disabled={isLoading}
 										required
 									>
-										{/* <option value="">Select a league</option> */}
-										<option value="NBA">NBA</option>
-										<option value="PBA">PBA</option>
-										{/* Add more leagues as needed */}
+										<option value="">Select a league</option>
+										{leagues.map((league) => (
+											<option key={league.id} value={league.abbr}>
+												{league.abbr}
+											</option>
+										))}
 									</select>
+									{fieldErrors.league && (
+										<ErrorDisplay errors={fieldErrors.league} />
+									)}
 								</div>
 								<div className="mb-2">
 									<label htmlFor="challengeName" className="text-xs">
-										Challenge Name
+										Name
 									</label>
 									<input
 										type="text"
 										id="challengeName"
-										value={challengeName}
-										onChange={(e) => setChallengeName(e.target.value)}
+										value={name}
+										onChange={(e) => setName(e.target.value)}
 										className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 										placeholder="Enter challenge name"
 										required
 									/>
+									{fieldErrors.name && (
+										<ErrorDisplay errors={fieldErrors.name} />
+									)}
 								</div>
 								<div className="mb-2">
 									<label htmlFor="description" className="text-xs">
@@ -309,6 +440,9 @@ const CreateBracketChallenge = () => {
 										value={description}
 										onChange={(e) => setDescription(e.target.value)}
 									></textarea>
+									{fieldErrors.description && (
+										<ErrorDisplay errors={fieldErrors.description} />
+									)}
 								</div>
 								<div className="mb-2">
 									<label htmlFor="startDate" className="text-xs">
@@ -322,6 +456,9 @@ const CreateBracketChallenge = () => {
 										className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 										required
 									/>
+									{fieldErrors.start_date && (
+										<ErrorDisplay errors={fieldErrors.start_date} />
+									)}
 								</div>
 								<div className="mb-2">
 									<label htmlFor="endDate" className="text-xs">
@@ -335,6 +472,9 @@ const CreateBracketChallenge = () => {
 										className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 										required
 									/>
+									{fieldErrors.end_date && (
+										<ErrorDisplay errors={fieldErrors.end_date} />
+									)}
 								</div>
 								<div className="mb-6 flex items-center text-gray-600">
 									<input
@@ -357,70 +497,100 @@ const CreateBracketChallenge = () => {
 									<hr className="border-gray-400" />
 									{league === "NBA" && (
 										<>
-											<div className="mt-1 lg:flex gap-x-4">
-												<div className="border border-gray-300 shadow-sm mt-2 flex-1">
-													<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
-														<h3>East Teams</h3>
-														<button
-															type="button"
-															className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
-															onClick={() =>
-																handleOpenModalClick("EAST")
-															}
-														>
-															Change
-														</button>
-													</div>
-													<div className="h-37 lg:h-72 overflow-y-auto">
-														{selectedNBATeams?.east.length > 0 ? (
-															selectedNBATeams?.east.map(
-																(team, index) => (
-																	<div
-																		key={index}
-																		className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
-																	>
-																		{index + 1}. {team.name}
-																	</div>
+											<div className="mt-2 lg:flex gap-x-4 space-y-4 lg:space-y-0">
+												<div className="flex-1">
+													<div className="border border-gray-300 shadow-sm">
+														<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
+															<h3>East Teams</h3>
+															<button
+																type="button"
+																className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
+																onClick={() =>
+																	handleOpenModalClick("EAST")
+																}
+															>
+																Change
+															</button>
+														</div>
+														<div className="h-37 lg:h-72 overflow-y-auto">
+															{selectedNBATeams?.east.length >
+															0 ? (
+																selectedNBATeams?.east.map(
+																	(team, index) => (
+																		<div
+																			key={index}
+																			className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
+																		>
+																			{index + 1}.{" "}
+																			{team.name}
+																		</div>
+																	)
 																)
-															)
-														) : (
-															<p className="p-3 text-sm text-gray-500">
-																No teams selected
-															</p>
-														)}
+															) : (
+																<p className="p-3 text-sm text-gray-500">
+																	No teams selected
+																</p>
+															)}
+														</div>
 													</div>
+													{fieldErrors[
+														"bracket_data.teams.east"
+													] && (
+														<ErrorDisplay
+															errors={
+																fieldErrors[
+																	"bracket_data.teams.east"
+																]
+															}
+														/>
+													)}
 												</div>
-												<div className="border border-gray-300 shadow-sm mt-2 flex-1">
-													<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
-														<h3>West Teams</h3>
-														<button
-															type="button"
-															className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
-															onClick={() =>
-																handleOpenModalClick("WEST")
-															}
-														>
-															Change
-														</button>
-													</div>
-													<div className="h-37 lg:h-72 overflow-y-auto">
-														{selectedNBATeams?.west.length > 0 ? (
-															selectedNBATeams?.west.map(
-																(team, index) => (
-																	<div
-																		key={index}
-																		className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
-																	>
-																		{index + 1}. {team.name}
-																	</div>
+												<div className="flex-1">
+													<div className="border border-gray-300 shadow-sm">
+														<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
+															<h3>West Teams</h3>
+															<button
+																type="button"
+																className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
+																onClick={() =>
+																	handleOpenModalClick("WEST")
+																}
+															>
+																Change
+															</button>
+														</div>
+														<div className="h-37 lg:h-72 overflow-y-auto">
+															{selectedNBATeams?.west.length >
+															0 ? (
+																selectedNBATeams?.west.map(
+																	(team, index) => (
+																		<div
+																			key={index}
+																			className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
+																		>
+																			{index + 1}.{" "}
+																			{team.name}
+																		</div>
+																	)
 																)
-															)
-														) : (
-															<p className="p-3 text-sm text-gray-500">
-																No teams selected
-															</p>
-														)}
+															) : (
+																<p className="p-3 text-sm text-gray-500">
+																	No teams selected
+																</p>
+															)}
+														</div>
 													</div>
+													{fieldErrors[
+														"bracket_data.teams.west"
+													] && (
+														<ErrorDisplay
+															errors={
+																fieldErrors[
+																	"bracket_data.teams.west"
+																]
+															}
+														/>
+													)}
 												</div>
 											</div>
 										</>
@@ -460,7 +630,19 @@ const CreateBracketChallenge = () => {
 														)}
 													</div>
 												</div>
+												{fieldErrors["bracket_data.teams"] && (
+													<ErrorDisplay
+														errors={
+															fieldErrors["bracket_data.teams"]
+														}
+													/>
+												)}
 											</div>
+										</div>
+									)}
+									{league === "" && (
+										<div className="w-full bg-gray-50 h-22 mt-2 flex items-center justify-center rounded border border-gray-400">
+											Please select a league to set teams.
 										</div>
 									)}
 								</div>
@@ -473,6 +655,14 @@ const CreateBracketChallenge = () => {
 							CREATE CHALLENGE
 						</button>
 					</form>
+					{message && (
+						<p className="text-sm text-green-700 mt-3">{message}</p>
+					)}
+					{generalErrorMessage && (
+						<p className="text-sm text-red-700 mt-3">
+							{generalErrorMessage}
+						</p>
+					)}
 				</div>
 			</div>
 			{/* Modal for selecting teams */}
@@ -540,13 +730,14 @@ const CreateBracketChallenge = () => {
 									className="p-2 bg-gray-700 text-white text-sm mt-3 w-26 rounded cursor-pointer font-bold hover:bg-gray-600 transition duration-200"
 									onClick={handleCloseModalClick}
 								>
-									CLOSE
+									DONE
 								</button>
 							</div>
 						</div>
 					</div>
 				</div>
 			)}
+			{(isLoading || isLoadingTeamsAndLeagues) && <Loader />}
 		</>
 	);
 };

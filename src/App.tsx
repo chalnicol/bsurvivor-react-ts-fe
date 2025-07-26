@@ -18,14 +18,15 @@ import NBAPage from "./pages/leagues/nba";
 import PBAPage from "./pages/leagues/pba";
 import ProfilePage from "./pages/user/profile";
 
-import ViewBracketChallenges from "./pages/admin/bracketChallengers/viewBracketChalenges";
+import ListBracketChallenges from "./pages/admin/bracketChallengers/listBracketChallenges";
 import CreateBracketChallenge from "./pages/admin/bracketChallengers/createBracketChallenge";
 
-import ViewLeagues from "./pages/admin/leagues/viewLeagues";
+import ListLeagues from "./pages/admin/leagues/listLeagues";
 import CreateLeague from "./pages/admin/leagues/createLeague";
 
-import ViewTeams from "./pages/admin/teams/viewTeams";
+import ListTeams from "./pages/admin/teams/listTeams";
 import CreateTeam from "./pages/admin/teams/createTeam";
+import ViewTeam from "./pages/admin/teams/viewTeam";
 
 import ListUsers from "./pages/admin/users/listUsers";
 import ViewUser from "./pages/admin/users/viewUser";
@@ -112,7 +113,7 @@ function App() {
 
 								<Route
 									path="/admin/bracket-challenges/"
-									element={<ViewBracketChallenges />}
+									element={<ListBracketChallenges />}
 								/>
 								<Route
 									path="/admin/bracket-challenges/create"
@@ -121,7 +122,7 @@ function App() {
 
 								<Route
 									path="/admin/leagues/"
-									element={<ViewLeagues />}
+									element={<ListLeagues />}
 								/>
 
 								<Route
@@ -129,7 +130,11 @@ function App() {
 									element={<CreateLeague />}
 								/>
 
-								<Route path="/admin/teams/" element={<ViewTeams />} />
+								<Route path="/admin/teams/" element={<ListTeams />} />
+								<Route
+									path="/admin/teams/:slug"
+									element={<ViewTeam />}
+								/>
 								<Route
 									path="/admin/teams/create"
 									element={<CreateTeam />}
