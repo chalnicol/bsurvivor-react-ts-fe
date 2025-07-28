@@ -13,6 +13,8 @@ import Pagination from "../../../components/pagination";
 
 // Import the custom debounce hook
 import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
+import ToDelete from "../../../components/toDelete";
+import StatusMessage from "../../../components/statusMessage";
 
 const ListBracketChallenges = () => {
 	const [bracketChallenges, setBracketChallenges] = useState<
@@ -22,6 +24,10 @@ const ListBracketChallenges = () => {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [meta, setMeta] = useState<MetaInfo | null>(null);
 	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [toDelete, setToDelete] = useState<BracketChallengeInfo | null>(null);
+
+	const [success, setSuccess] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
 	// Use the debounced value of searchTerm
 	const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
@@ -49,10 +55,26 @@ const ListBracketChallenges = () => {
 		fetchBracketChallenges(currentPage, debouncedSearchTerm);
 	}, [currentPage, debouncedSearchTerm]);
 
-	// Handler for react-paginate page clicks
-	// const handlePageClick = (event: { selected: number }) => {
-	// 	setCurrentPage(event.selected);
-	// };
+	//delete bracket challenge
+	const deleteBracketChallenge = async (): Promise<void> => {
+		if (!toDelete) return;
+		setIsLoading(true);
+		try {
+			await apiClient.delete(`/admin/bracket-challenges/${toDelete.id}`);
+			setToDelete(null);
+			if (meta) {
+				const newTotal = bracketChallenges.length - 1;
+				if (newTotal === 0 && meta.current_page > 1) {
+					setCurrentPage((prev) => prev - 1);
+				} else {
+					fetchBracketChallenges(currentPage, debouncedSearchTerm);
+				}
+			}
+		} catch (error) {
+			console.error("Error deleting Bracket Challenge:", error);
+		}
+	};
+	//..
 	const handlePageClick = (page: number) => {
 		setCurrentPage(page);
 	};
@@ -99,6 +121,29 @@ const ListBracketChallenges = () => {
 					placeholder="Search Bracket Challenges here..."
 				/>
 
+				{success && (
+					<StatusMessage
+						type="success"
+						message={success}
+						onClose={() => setSuccess(null)}
+					/>
+				)}
+				{error && (
+					<StatusMessage
+						type="error"
+						message={error}
+						onClose={() => setError(null)}
+					/>
+				)}
+
+				{toDelete && (
+					<ToDelete
+						name={toDelete.name}
+						onConfirm={deleteBracketChallenge}
+						onCancel={() => setToDelete(null)}
+					/>
+				)}
+
 				<div className="mt-3 overflow-x-auto">
 					{bracketChallenges.length > 0 ? (
 						<table className="w-full text-sm min-w-xl text-nowrap">
@@ -109,6 +154,7 @@ const ListBracketChallenges = () => {
 									<td className="px-2 py-1">League</td>
 									<td className="px-2 py-1">Start Date</td>
 									<td className="px-2 py-1">End Date</td>
+									<td className="px-2 py-1">Is_Public</td>
 									<td className="px-2 py-1">Actions</td>
 								</tr>
 							</thead>
@@ -124,7 +170,17 @@ const ListBracketChallenges = () => {
 										<td className="px-2 py-1">
 											{challenge.end_date}
 										</td>
-
+										<td className="px-2 py-1">
+											<span
+												className={`font-bold ${
+													challenge.is_public
+														? "text-green-600"
+														: "text-red-600"
+												}`}
+											>
+												{challenge.is_public ? "Yes" : "No"}
+											</span>
+										</td>
 										<td className="px-2 py-1 flex items-center space-x-1">
 											<Link
 												to={`/admin/bracket-challenges/${challenge.id}`}
@@ -132,13 +188,18 @@ const ListBracketChallenges = () => {
 											>
 												view
 											</Link>
-											{/* <Link
+											<Link
 												to={`/admin/bracket-challenges/${challenge.id}/edit`}
 												className="block shadow cursor-pointer hover:bg-cyan-500 bg-cyan-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 											>
 												edit
-											</Link> */}
-											<button className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold">
+											</Link>
+											<button
+												className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
+												onClick={() => {
+													setToDelete(challenge);
+												}}
+											>
 												delete
 											</button>
 										</td>

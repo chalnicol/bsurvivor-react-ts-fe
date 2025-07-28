@@ -1,10 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BreadCrumbs from "../../../components/breadCrumbs";
 import apiClient from "../../../utils/axiosConfig";
 import Loader from "../../../components/loader";
 import StatusMessage from "../../../components/statusMessage";
+import { useAdmin } from "../../../context/admin/AdminProvider";
+import { useParams } from "react-router-dom";
+import type { AnyTeamInfo } from "../../../data/adminData";
+import { getTeamLogoSrc } from "../../../utils/imageService";
 
-const CreateLeague = () => {
+const EditTeam = () => {
+	const { id } = useParams<{ id: string }>();
+
+	const {
+		leagues,
+		fetchTeamsAndLeagues,
+		areTeamsAndLeaguesPopulated,
+		isLoading: isLoadingTeamsAndLeagues,
+	} = useAdmin();
+
+	const [team, setTeam] = useState<AnyTeamInfo | null>(null);
+	// const [league, setLeague]
+	const [league, setLeague] = useState<string>("");
+	const [conference, setConference] = useState<string>("");
+
 	const [logoUrl, setLogoUrl] = useState<string>("");
 	const [fileLogo, setFileLogo] = useState<File | null>(null);
 	const [abbr, setAbbr] = useState<string>("");
@@ -15,6 +33,8 @@ const CreateLeague = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
+
+	const [imagePreview, setImagePreview] = useState<string | null>(null);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files ? e.target.files[0] : null;
@@ -37,18 +57,16 @@ const CreateLeague = () => {
 		setFileLogo(null);
 	};
 
-	const resetForms = () => {
-		setLogoUrl("");
-		setFileLogo(null);
-		setAbbr("");
-		setName("");
-	};
-
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		const formData = new FormData();
 
+		formData.append("_method", "PUT");
+		formData.append("league", league);
+		if (league === "NBA") {
+			formData.append("conference", conference);
+		}
 		formData.append("name", name);
 		formData.append("abbr", abbr);
 		if (fileLogo !== null) {
@@ -63,22 +81,62 @@ const CreateLeague = () => {
 		setError(null);
 		setSuccess(null);
 		try {
-			const response = await apiClient.post("/admin/leagues", formData);
-			setSuccess(response.data.message || "League created successfully.");
-			resetForms();
+			const response = await apiClient.post(`/admin/teams/${id}`, formData);
+			setSuccess(response.data.message || "Team updated successfully.");
 		} catch (error) {
-			console.log("error creating league", error);
-			setError("Failed to create league.");
+			console.log("error creating team", error);
+			setError("Failed to update team.");
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
+	useEffect(() => {
+		if (!areTeamsAndLeaguesPopulated) {
+			fetchTeamsAndLeagues();
+		}
+	}, [areTeamsAndLeaguesPopulated]);
+
+	const fetchTeam = async () => {
+		setIsLoading(true);
+		try {
+			const response = await apiClient.get(`/admin/teams/${id}/edit`);
+			setTeam(response.data.data);
+			// console.log(response.data.user);
+		} catch (error) {
+			console.error("Error fetching user:", error);
+			setError("Failed to fetch team.");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		if (!id) {
+			setIsLoading(false);
+			return;
+		}
+		fetchTeam();
+	}, [id]);
+
+	useEffect(() => {
+		if (team) {
+			setLeague(team.league);
+			if (team.league === "NBA") {
+				setConference(team.conference);
+			}
+			setName(team.name);
+			setAbbr(team.abbr);
+			setImagePreview(team.logo ?? null);
+			// setLogoUrl(team.logo_url);
+		}
+	}, [team]);
+
 	return (
 		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
 			<div className="p-4 md:p-6 rounded-lg shadow border border-gray-400">
 				<BreadCrumbs />
-				<h1 className="text-lg font-bold mb-4">Create League</h1>
+				<h1 className="text-lg font-bold mb-4">Edit Team</h1>
 
 				<div className="max-w-lg">
 					{success && (
@@ -96,6 +154,48 @@ const CreateLeague = () => {
 						/>
 					)}
 					<form className="space-y-2 text-sm" onSubmit={handleSubmit}>
+						<div>
+							<label htmlFor="league" className="text-xs">
+								Select League
+							</label>
+							<select
+								id="league"
+								value={league}
+								onChange={(e) => setLeague(e.target.value)}
+								className="w-full px-3 py-1.5 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+								required
+							>
+								<option value="">Select a league</option>
+								{/* <option value="NBA">NBA</option>
+								<option value="PBA">PBA</option> */}
+								{leagues.map((league) => (
+									<option key={league.id} value={league.abbr}>
+										{league.abbr}
+									</option>
+								))}
+
+								{/* Add more leagues as needed */}
+							</select>
+						</div>
+						{league == "NBA" && (
+							<>
+								<label htmlFor="conference" className="text-xs">
+									Select Conference
+								</label>
+								<select
+									id="league"
+									value={conference}
+									onChange={(e) => setConference(e.target.value)}
+									className="w-full px-3 py-1.5 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									required
+								>
+									<option value="">Select conference</option>
+									<option value="EAST">EAST</option>
+									<option value="WEST">WEST</option>
+									{/* Add more leagues as needed */}
+								</select>
+							</>
+						)}
 						<div>
 							<label htmlFor="fullName" className="text-xs">
 								Name
@@ -126,8 +226,25 @@ const CreateLeague = () => {
 						</div>
 
 						<div>
+							<p className="text-xs mb-1">Logo Preview</p>
+							{team && imagePreview ? (
+								<div className="border border-gray-300 rounded-md shadow-sm p-2">
+									<img
+										src={getTeamLogoSrc(imagePreview)}
+										alt={team.abbr}
+										className="w-10 h-10 object-contain"
+									/>
+								</div>
+							) : (
+								<p className="border border-gray-300 rounded-md shadow-sm px-3 py-2">
+									No image preview available.
+								</p>
+							)}
+						</div>
+
+						<div>
 							<label htmlFor="file" className="text-xs">
-								Logo (Upload image or provide URL)
+								Update Logo (Upload image or provide URL)
 							</label>
 
 							{isLogoFile ? (
@@ -162,14 +279,14 @@ const CreateLeague = () => {
 							type="submit"
 							className="mt-2 bg-gray-700 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition duration-200 cursor-pointer"
 						>
-							CREATE LEAGUE
+							UPDATE TEAM
 						</button>
 					</form>
 				</div>
 			</div>
-			{isLoading && <Loader />}
+			{(isLoading || isLoadingTeamsAndLeagues) && <Loader />}
 		</div>
 	);
 };
 
-export default CreateLeague;
+export default EditTeam;

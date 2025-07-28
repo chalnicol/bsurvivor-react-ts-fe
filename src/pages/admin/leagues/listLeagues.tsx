@@ -13,6 +13,9 @@ import Pagination from "../../../components/pagination";
 
 // Import the custom debounce hook
 import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
+import { getTeamLogoSrc } from "../../../utils/imageService";
+import ToDelete from "../../../components/toDelete";
+import StatusMessage from "../../../components/statusMessage";
 
 const ListLeagues = () => {
 	const [loading, setLoading] = useState(false);
@@ -21,6 +24,10 @@ const ListLeagues = () => {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [meta, setMeta] = useState<MetaInfo | null>(null);
 	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [toDelete, setToDelete] = useState<LeagueInfo | null>(null);
+
+	const [success, setSuccess] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
 	// Use the debounced value of searchTerm
 	const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
@@ -46,6 +53,28 @@ const ListLeagues = () => {
 	useEffect(() => {
 		fetchLeagues(currentPage, debouncedSearchTerm);
 	}, [currentPage, debouncedSearchTerm]);
+
+	//delete bracket challenge
+	const deleteLeague = async (): Promise<void> => {
+		if (!toDelete) return;
+		setLoading(true);
+		try {
+			await apiClient.delete(`/admin/leagues/${toDelete.id}`);
+			setToDelete(null);
+			setSuccess("League deleted successfully!");
+			if (meta) {
+				const newTotal = leagues.length - 1;
+				if (newTotal === 0 && meta.current_page > 1) {
+					setCurrentPage((prev) => prev - 1);
+				} else {
+					fetchLeagues(currentPage, debouncedSearchTerm);
+				}
+			}
+		} catch (error) {
+			console.error("Error deleting Bracket Challenge:", error);
+			setError("Failed to delete League.");
+		}
+	};
 
 	// Handler for react-paginate page clicks
 	// const handlePageClick = (event: { selected: number }) => {
@@ -97,6 +126,29 @@ const ListLeagues = () => {
 					placeholder="Search leagues here..."
 				/>
 
+				{success && (
+					<StatusMessage
+						type="success"
+						message={success}
+						onClose={() => setSuccess(null)}
+					/>
+				)}
+				{error && (
+					<StatusMessage
+						type="error"
+						message={error}
+						onClose={() => setError(null)}
+					/>
+				)}
+
+				{toDelete && (
+					<ToDelete
+						name={toDelete.name}
+						onConfirm={deleteLeague}
+						onCancel={() => setToDelete(null)}
+					/>
+				)}
+
 				<div className="mt-3 overflow-x-auto">
 					{leagues.length > 0 ? (
 						<table className="w-full text-sm min-w-xl text-nowrap">
@@ -118,9 +170,9 @@ const ListLeagues = () => {
 										<td className="px-2 py-1">
 											{league.logo ? (
 												<img
-													src={league.logo}
+													src={getTeamLogoSrc(league.logo)}
 													alt={league.abbr}
-													className="w-10 h-10 object-contain"
+													className="w-6 h-6 object-contain"
 												/>
 											) : (
 												<p className="text-gray-500">--</p>
@@ -128,18 +180,23 @@ const ListLeagues = () => {
 										</td>
 										<td className="px-2 py-1 flex items-center space-x-1">
 											<Link
-												to={`/admin/leagues/${league.slug}`}
+												to={`/admin/leagues/${league.id}`}
 												className="block shadow cursor-pointer hover:bg-teal-500 bg-teal-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 											>
 												view
 											</Link>
-											{/* <Link
-												to={`/admin/leagues/${league.slug}/edit`}
+											<Link
+												to={`/admin/leagues/${league.id}/edit`}
 												className="block shadow cursor-pointer hover:bg-cyan-500 bg-cyan-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 											>
 												edit
-											</Link>*/}
-											<button className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold">
+											</Link>
+											<button
+												className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
+												onClick={() => {
+													setToDelete(league);
+												}}
+											>
 												delete
 											</button>
 										</td>

@@ -1,7 +1,7 @@
 export interface TeamInfo {
 	id: number;
 	name: string;
-	logo?: string;
+	logo?: string | null;
 	abbr: string;
 	slug?: string;
 	league_id?: number;
@@ -24,11 +24,14 @@ export interface LeagueInfo {
 	abbr: string;
 	logo?: string;
 	slug: string;
+	teams?: AnyTeamInfo[];
 }
 
 export interface nbaTeamData {
-	east: number[];
-	west: number[];
+	teams: {
+		east: number[];
+		west: number[];
+	};
 }
 
 export interface pbaTeamData {
@@ -48,6 +51,7 @@ export interface BracketChallengeInfo {
 	start_date: string;
 	end_date: string;
 	is_public: boolean;
+	bracket_data: AnyTeamData;
 }
 
 export interface UserInfo {
@@ -94,7 +98,7 @@ export interface PaginatedResponse<T> {
 export interface TotalsInfo {
 	leagueTotal: number;
 	userTotal: number;
-	// bracketChallengeTotal: number;
+	bracketChallengeTotal: number;
 	teamTotal: number;
 }
 

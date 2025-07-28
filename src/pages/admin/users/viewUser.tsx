@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import BreadCrumbs from "../../../components/breadCrumbs";
-import StatusMessage from "../../../components/statusMessages";
+import StatusMessage from "../../../components/statusMessage";
 import type { UserInfo } from "../../../data/adminData";
 import { useParams } from "react-router-dom";
 import { apiClient } from "../../../utils/api";
@@ -27,7 +27,6 @@ const ViewUser = () => {
 
 	useEffect(() => {
 		if (!id) {
-			setError("Invalid user ID");
 			setIsLoading(false);
 			return;
 		}
@@ -36,6 +35,7 @@ const ViewUser = () => {
 				setIsLoading(true);
 				setError(null);
 				setSuccess(null);
+				setError(null);
 				const response = await apiClient.get(`/admin/users/${id}`);
 				setUser(response.data.data);
 				// console.log(response.data.user);
@@ -85,6 +85,7 @@ const ViewUser = () => {
 				});
 			} catch (err) {
 				console.log("error", err);
+				setError("Failed to set roles.");
 			} finally {
 				setIsLoading(false);
 			}
@@ -130,9 +131,23 @@ const ViewUser = () => {
 				<div className="md:flex items-center space-y-2 md:space-y-0">
 					<h1 className="text-xl font-bold flex-1">User Details</h1>
 				</div>
-				<StatusMessage success={success} error={error} />
+
 				{/* inset content here.. */}
 				<div className="mt-3 max-w-lg">
+					{success && (
+						<StatusMessage
+							type="success"
+							message={success}
+							onClose={() => setSuccess(null)}
+						/>
+					)}
+					{error && (
+						<StatusMessage
+							type="error"
+							message={error}
+							onClose={() => setError(null)}
+						/>
+					)}
 					{user ? (
 						<>
 							<div className="space-y-3 text-sm">

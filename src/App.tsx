@@ -20,9 +20,12 @@ import ProfilePage from "./pages/user/profile";
 
 import ListBracketChallenges from "./pages/admin/bracketChallengers/listBracketChallenges";
 import CreateBracketChallenge from "./pages/admin/bracketChallengers/createBracketChallenge";
+import EditBracketChallenge from "./pages/admin/bracketChallengers/editBracketChallenge";
+import ViewBracketChallenge from "./pages/admin/bracketChallengers/viewBracketChallenges";
 
 import ListLeagues from "./pages/admin/leagues/listLeagues";
 import CreateLeague from "./pages/admin/leagues/createLeague";
+import ViewLeague from "./pages/admin/leagues/viewLeague";
 
 import ListTeams from "./pages/admin/teams/listTeams";
 import CreateTeam from "./pages/admin/teams/createTeam";
@@ -32,6 +35,8 @@ import ListUsers from "./pages/admin/users/listUsers";
 import ViewUser from "./pages/admin/users/viewUser";
 
 import { Routes, Route } from "react-router-dom";
+
+import BracketEntries from "./pages/user/bracketEntries";
 
 // Import the library
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -53,7 +58,8 @@ import {
 	faLock,
 	faCaretRight,
 } from "@fortawesome/free-solid-svg-icons";
-import BracketEntries from "./pages/user/bracketEntries";
+import EdiLeague from "./pages/admin/leagues/editLeague";
+import EditTeam from "./pages/admin/teams/editTeam";
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 
 // Add the imported icons/styles to the library
@@ -111,35 +117,55 @@ function App() {
 							<Route element={<ProtectedRoute requiredRoles="admin" />}>
 								<Route path="/admin" element={<AdminDashboard />} />
 
+								{/* bracket challenge routes */}
 								<Route
 									path="/admin/bracket-challenges/"
 									element={<ListBracketChallenges />}
 								/>
 								<Route
+									path="/admin/bracket-challenges/:id"
+									element={<ViewBracketChallenge />}
+								/>
+								<Route
 									path="/admin/bracket-challenges/create"
 									element={<CreateBracketChallenge />}
 								/>
+								<Route
+									path="/admin/bracket-challenges/:id/edit"
+									element={<EditBracketChallenge />}
+								/>
 
+								{/* league routes */}
 								<Route
 									path="/admin/leagues/"
 									element={<ListLeagues />}
 								/>
-
 								<Route
 									path="/admin/leagues/create"
 									element={<CreateLeague />}
 								/>
-
-								<Route path="/admin/teams/" element={<ListTeams />} />
 								<Route
-									path="/admin/teams/:slug"
-									element={<ViewTeam />}
+									path="/admin/leagues/:id"
+									element={<ViewLeague />}
+								/>
+								<Route
+									path="/admin/leagues/:id/edit"
+									element={<EdiLeague />}
+								/>
+
+								{/* team routes */}
+								<Route path="/admin/teams/" element={<ListTeams />} />
+								<Route path="/admin/teams/:id" element={<ViewTeam />} />
+								<Route
+									path="/admin/teams/:id/edit"
+									element={<EditTeam />}
 								/>
 								<Route
 									path="/admin/teams/create"
 									element={<CreateTeam />}
 								/>
 
+								{/* users routes */}
 								<Route path="/admin/users/" element={<ListUsers />} />
 								<Route path="/admin/users/:id" element={<ViewUser />} />
 							</Route>

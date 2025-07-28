@@ -17,9 +17,12 @@ import type {
 	ServerErrorData,
 } from "../../../data/adminData";
 import axios, { AxiosError } from "axios";
+import { useParams } from "react-router-dom";
 import StatusMessage from "../../../components/statusMessage";
 
-const CreateBracketChallenge = () => {
+const EditBracketChallenge = () => {
+	const { id } = useParams<{ id: string }>();
+
 	const {
 		areTeamsAndLeaguesPopulated,
 		fetchTeamsAndLeagues,
@@ -29,6 +32,8 @@ const CreateBracketChallenge = () => {
 		isLoading: isLoadingTeamsAndLeagues,
 	} = useAdmin();
 
+	const [bracketChallenge, setBracketChallenges] =
+		useState<BracketChallengeInfo | null>(null);
 	const [league, setLeague] = useState<string>("");
 	const [name, setName] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
@@ -43,7 +48,6 @@ const CreateBracketChallenge = () => {
 	const [generalErrorMessage, setGeneralErrorMessage] = useState<
 		string | null
 	>(null);
-
 	const [success, setSuccess] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
@@ -60,26 +64,51 @@ const CreateBracketChallenge = () => {
 		}
 	}, [areTeamsAndLeaguesPopulated]);
 
-	const clearForms = () => {
-		setLeague("");
-		setName("");
-		setDescription("");
-		setStartDate("");
-		setEndDate("");
-		setIsPublic(false);
-		setSelectedNbaTeamsData(null);
-		setSelectedPbaTeamsData(null);
-		setSearchTerm("");
-		setConference("EAST");
-	};
+	useEffect(() => {
+		const fetchBracketChallenge = async () => {
+			setIsLoading(true);
+			try {
+				const response = await apiClient.get(
+					`/admin/bracket-challenges/${id}/edit`
+				);
+				setBracketChallenges(response.data.data);
+			} catch (error) {
+				// console.error("Error fetching bracket challenge:", error);
+				setError("Failed to fetch bracket challenge.");
+			} finally {
+				setIsLoading(false);
+			}
+		};
+		fetchBracketChallenge();
+	}, [id]);
+
+	useEffect(() => {
+		if (bracketChallenge) {
+			setLeague(bracketChallenge.league);
+			setName(bracketChallenge.name);
+			setDescription(bracketChallenge.description || "");
+			setStartDate(bracketChallenge.start_date);
+			setEndDate(bracketChallenge.end_date);
+			setIsPublic(bracketChallenge.is_public);
+			if (bracketChallenge.league === "NBA") {
+				setSelectedNbaTeamsData(
+					bracketChallenge.bracket_data as nbaTeamData
+				);
+			} else {
+				setSelectedPbaTeamsData(
+					bracketChallenge.bracket_data as pbaTeamData
+				);
+			}
+		}
+	}, [bracketChallenge]);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 
 		// Handle form submission logic here
+
 		if (league == "") return;
 		//prepare to submit data..
-
 		const toSubmitData = {
 			name: name,
 			description: description,
@@ -91,21 +120,19 @@ const CreateBracketChallenge = () => {
 				league === "NBA" ? selectedNbaTeamsData : selectedPbaTeamsData,
 		};
 
-		// console.log(toSubmitData);
+		console.log(toSubmitData);
 
-		const storeBracketChallenge = async () => {
+		const editBracketChallenge = async () => {
 			try {
 				setIsLoading(true);
-				// setGeneralErrorMessage(null);
-				setError(null);
-				setSuccess(null);
+				setGeneralErrorMessage(null);
 				setFieldErrors({}); // Clear validation errors)
-				await apiClient.post<BracketChallengeInfo>(
-					"/admin/bracket-challenges",
+				await apiClient.put<BracketChallengeInfo>(
+					`/admin/bracket-challenges/${id}`,
 					toSubmitData
 				);
-				clearForms();
-				setSuccess("Challenge created successfully!");
+				// clearForms();
+				setSuccess("Challenge updated successfully!");
 			} catch (error) {
 				// console.error("Error creating challenge:", error);
 				// Type guard: Check if it's an Axios error
@@ -159,7 +186,7 @@ const CreateBracketChallenge = () => {
 				setIsLoading(false);
 			}
 		};
-		storeBracketChallenge();
+		editBracketChallenge();
 	};
 
 	const handleTeamSelect = (team: AnyTeamInfo) => {
@@ -437,9 +464,8 @@ const CreateBracketChallenge = () => {
 					<BreadCrumbs />
 
 					<h1 className="text-lg font-bold mb-4">
-						Create Bracket Challenge
+						Edit Bracket Challenge
 					</h1>
-					{/* <hr className="mt-2 mb-4 border-gray-400 shadow-lg" /> */}
 
 					{success && (
 						<StatusMessage
@@ -727,7 +753,7 @@ const CreateBracketChallenge = () => {
 							type="submit"
 							className="bg-gray-700 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition duration-200 cursor-pointer"
 						>
-							CREATE CHALLENGE
+							UPDATE CHALLENGE
 						</button>
 					</form>
 				</div>
@@ -815,4 +841,4 @@ const CreateBracketChallenge = () => {
 	);
 };
 
-export default CreateBracketChallenge;
+export default EditBracketChallenge;

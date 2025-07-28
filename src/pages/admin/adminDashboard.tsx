@@ -54,8 +54,7 @@ const AdminDashboard = () => {
 
 					{/* challenges */}
 					<AdminThumbs
-						// title={`Challenges (${totals.bracketChallengeTotal})`}
-						title="Challenges (0)"
+						title={`Challenges (${totals.bracketChallengeTotal})`}
 						description="View and manage basketball leagues"
 						bgColor="orange"
 					>

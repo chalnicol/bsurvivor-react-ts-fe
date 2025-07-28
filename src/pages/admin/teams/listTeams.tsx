@@ -7,9 +7,13 @@ import { apiClient } from "../../../utils/api";
 import Loader from "../../../components/loader";
 import { type PaginatedResponse, type MetaInfo } from "../../../data/adminData";
 import Pagination from "../../../components/pagination";
+import StatusMessage from "../../../components/statusMessage";
+import ToDelete from "../../../components/toDelete";
 
 // Import the custom debounce hook
 import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
+//
+import { getTeamLogoSrc } from "../../../utils/imageService";
 
 const ListTeams = () => {
 	const [teams, setTeams] = useState<AnyTeamInfo[]>([]);
@@ -17,6 +21,10 @@ const ListTeams = () => {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [meta, setMeta] = useState<MetaInfo | null>(null);
 	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [toDelete, setToDelete] = useState<AnyTeamInfo | null>(null);
+
+	const [success, setSuccess] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
 	// Use the debounced value of searchTerm
 	const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
@@ -42,6 +50,29 @@ const ListTeams = () => {
 		// This effect will run only after the user stops typing for 500ms
 		fetchTeams(currentPage, debouncedSearchTerm);
 	}, [currentPage, debouncedSearchTerm]); // Listen to debouncedSearchTerm
+
+	//delete bracket challenge
+	const deleteTeam = async (): Promise<void> => {
+		if (!toDelete) return;
+
+		setIsLoading(true);
+		try {
+			await apiClient.delete(`/admin/teams/${toDelete.id}`);
+			setToDelete(null);
+			setSuccess("Team deleted successfully!");
+			if (meta) {
+				const newTotal = teams.length - 1;
+				if (newTotal === 0 && meta.current_page > 1) {
+					setCurrentPage((prev) => prev - 1);
+				} else {
+					fetchTeams(currentPage, debouncedSearchTerm);
+				}
+			}
+		} catch (error) {
+			console.error("Error deleting Bracket Challenge:", error);
+			setError("Error deleting Bracket Challenge.");
+		}
+	};
 
 	// Handler for react-paginate page clicks
 	// const handlePageClick = (event: { selected: number }) => {
@@ -77,7 +108,7 @@ const ListTeams = () => {
 				<div className="md:flex items-center space-y-2 md:space-y-0">
 					<h1 className="text-xl font-bold flex-1">Teams</h1>
 					<Link
-						to="/admin/leagues/create"
+						to="/admin/teams/create"
 						className="text-sm bg-gray-700 hover:bg-gray-600 text-center text-white rounded p-2 text-xs font-bold"
 					>
 						<FontAwesomeIcon icon="plus" className="me-1" />
@@ -92,6 +123,30 @@ const ListTeams = () => {
 					className="px-1 py-0.5 border-b border-gray-400 w-full mt-3 focus:outline-none"
 					placeholder="Search teams here..."
 				/>
+
+				{success && (
+					<StatusMessage
+						type="success"
+						message={success}
+						onClose={() => setSuccess(null)}
+					/>
+				)}
+				{error && (
+					<StatusMessage
+						type="error"
+						message={error}
+						onClose={() => setError(null)}
+					/>
+				)}
+
+				{toDelete && (
+					<ToDelete
+						name={toDelete.name}
+						onConfirm={deleteTeam}
+						onCancel={() => setToDelete(null)}
+					/>
+				)}
+
 				<div className="mt-3 overflow-x-auto">
 					{teams.length > 0 ? (
 						<>
@@ -116,7 +171,7 @@ const ListTeams = () => {
 											<td className="px-2 py-1">
 												{team.logo ? (
 													<img
-														src={team.logo}
+														src={getTeamLogoSrc(team.logo)}
 														alt={team.abbr}
 														className="w-6 h-6 object-contain"
 													/>
@@ -137,20 +192,25 @@ const ListTeams = () => {
 
 											<td className="px-2 py-1 flex items-center space-x-1">
 												<Link
-													to={`/admin/teams/${team.slug}`}
+													to={`/admin/teams/${team.id}`}
 													className="block shadow cursor-pointer hover:bg-teal-500 bg-teal-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 												>
 													view
 												</Link>
-												{/* <Link
-													to={`/admin/leagues/${team.slug}/edit`}
+												<Link
+													to={`/admin/teams/${team.id}/edit`}
 													className="block shadow cursor-pointer hover:bg-cyan-500 bg-cyan-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 												>
 													edit
 												</Link>
-												<button className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold">
+												<button
+													className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
+													onClick={() => {
+														setToDelete(team);
+													}}
+												>
 													delete
-												</button> */}
+												</button>
 											</td>
 										</tr>
 									))}

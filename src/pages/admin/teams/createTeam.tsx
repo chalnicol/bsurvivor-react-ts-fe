@@ -1,12 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BreadCrumbs from "../../../components/breadCrumbs";
+import apiClient from "../../../utils/axiosConfig";
+import Loader from "../../../components/loader";
+import StatusMessage from "../../../components/statusMessage";
+import { useAdmin } from "../../../context/admin/AdminProvider";
 
 const CreateTeam = () => {
-	const [logo, setLogo] = useState<string>("");
+	const {
+		leagues,
+		fetchTeamsAndLeagues,
+		areTeamsAndLeaguesPopulated,
+		isLoading: isLoadingTeamsAndLeagues,
+	} = useAdmin();
+
+	const [league, setLeague] = useState<string>("");
+	const [conference, setConference] = useState<string>("");
+
+	const [logoUrl, setLogoUrl] = useState<string>("");
 	const [fileLogo, setFileLogo] = useState<File | null>(null);
 	const [abbr, setAbbr] = useState<string>("");
 	const [name, setName] = useState<string>("");
-	const [league, setLeague] = useState<number>(0);
+
+	const [isLogoFile, setIsLogoFile] = useState<boolean>(false);
+
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [success, setSuccess] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files ? e.target.files[0] : null;
@@ -15,15 +34,90 @@ const CreateTeam = () => {
 		} else {
 			setFileLogo(null);
 		}
+		console.log("file", file);
 	};
+
+	const handleFileInputType = () => {
+		setIsLogoFile((prev) => !prev);
+		setLogoUrl("");
+		setFileLogo(null);
+	};
+
+	const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setLogoUrl(e.target.value);
+		setFileLogo(null);
+	};
+
+	const resetForms = () => {
+		setLeague("");
+		setConference("");
+		setLogoUrl("");
+		setFileLogo(null);
+		setAbbr("");
+		setName("");
+	};
+
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		const formData = new FormData();
+		formData.append("league", league);
+		if (league === "NBA") {
+			formData.append("conference", conference);
+		}
+		formData.append("name", name);
+		formData.append("abbr", abbr);
+		if (fileLogo !== null) {
+			formData.append("logo", fileLogo);
+			console.log(fileLogo);
+		} else {
+			formData.append("logo_url", logoUrl);
+		}
+		console.log(formData);
+
+		setIsLoading(true);
+		setError(null);
+		setSuccess(null);
+		try {
+			const response = await apiClient.post("/admin/teams", formData);
+			setSuccess(response.data.message || "Team created successfully.");
+			resetForms();
+		} catch (error) {
+			console.log("error creating team", error);
+			setError("Failed to create team.");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		if (!areTeamsAndLeaguesPopulated) {
+			fetchTeamsAndLeagues();
+		}
+	}, [areTeamsAndLeaguesPopulated]);
+
 	return (
-		<div className="py-7 min-h-[calc(100dvh-57px)]">
+		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
 			<div className="p-4 md:p-6 rounded-lg shadow border border-gray-400">
 				<BreadCrumbs />
 				<h1 className="text-lg font-bold mb-4">Create Team</h1>
 
 				<div className="max-w-lg">
-					<form className="space-y-2 text-sm">
+					{success && (
+						<StatusMessage
+							type="success"
+							message={success}
+							onClose={() => setSuccess(null)}
+						/>
+					)}
+					{error && (
+						<StatusMessage
+							type="error"
+							message={error}
+							onClose={() => setError(null)}
+						/>
+					)}
+					<form className="space-y-2 text-sm" onSubmit={handleSubmit}>
 						<div>
 							<label htmlFor="league" className="text-xs">
 								Select League
@@ -31,16 +125,41 @@ const CreateTeam = () => {
 							<select
 								id="league"
 								value={league}
-								onChange={(e) => setLeague(Number(e.target.value))}
+								onChange={(e) => setLeague(e.target.value)}
 								className="w-full px-3 py-1.5 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 								required
 							>
-								<option value={0}>Select a league</option>
-								<option value={1}>NBA</option>
-								<option value={2}>PBA</option>
+								<option value="">Select a league</option>
+								{/* <option value="NBA">NBA</option>
+								<option value="PBA">PBA</option> */}
+								{leagues.map((league) => (
+									<option key={league.id} value={league.abbr}>
+										{league.abbr}
+									</option>
+								))}
+
 								{/* Add more leagues as needed */}
 							</select>
 						</div>
+						{league == "NBA" && (
+							<>
+								<label htmlFor="conference" className="text-xs">
+									Select Conference
+								</label>
+								<select
+									id="league"
+									value={conference}
+									onChange={(e) => setConference(e.target.value)}
+									className="w-full px-3 py-1.5 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									required
+								>
+									<option value="">Select conference</option>
+									<option value="EAST">EAST</option>
+									<option value="WEST">WEST</option>
+									{/* Add more leagues as needed */}
+								</select>
+							</>
+						)}
 						<div>
 							<label htmlFor="fullName" className="text-xs">
 								Name
@@ -75,31 +194,44 @@ const CreateTeam = () => {
 								Logo (Upload image or provide URL)
 							</label>
 
-							<input
-								type="text"
-								id="challengeName"
-								value={logo}
-								onChange={(e) => setLogo(e.target.value)}
-								className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-								placeholder="Enter logo URL"
-							/>
-							<input
-								type="file"
-								id="file"
-								onChange={handleFileChange}
-								className="w-full mt-2 block px-2 py-1.5 rounded border border-gray-300 shadow-sm text-sm text-stone-500 cursor-pointer file:mr-5 file:py-1.5 file:px-4 file:border file:border-stone-400 file:rounded file:text-xs file:font-medium file:bg-stone-50 file:text-stone-700"
-							/>
+							{isLogoFile ? (
+								<input
+									key="fileinput"
+									type="file"
+									id="file"
+									onChange={handleFileChange}
+									className="w-full mt-2 block px-2 py-1.5 rounded border border-gray-300 shadow-sm text-sm text-stone-500 cursor-pointer file:mr-5 file:py-1.5 file:px-4 file:border file:border-stone-400 file:rounded file:text-xs file:font-medium file:bg-stone-50 file:text-stone-700"
+								/>
+							) : (
+								<input
+									key="urlinput"
+									type="text"
+									id="url"
+									value={logoUrl}
+									onChange={handleUrlChange}
+									className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									placeholder="Enter logo URL"
+								/>
+							)}
+							<button
+								type="button"
+								className="text-sm cursor-pointer text-cyan-600 hover:text-cyan-500 mt-1 text-xs"
+								onClick={handleFileInputType}
+							>
+								{isLogoFile ? "I have a link" : "I have a file"}
+							</button>
 						</div>
 
 						<button
 							type="submit"
-							className="mt-4 bg-gray-700 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition duration-200 cursor-pointer"
+							className="mt-2 bg-gray-700 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition duration-200 cursor-pointer"
 						>
 							CREATE TEAM
 						</button>
 					</form>
 				</div>
 			</div>
+			{(isLoading || isLoadingTeamsAndLeagues) && <Loader />}
 		</div>
 	);
 };
