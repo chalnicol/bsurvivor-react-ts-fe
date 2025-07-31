@@ -45,49 +45,43 @@ const ViewLeague = () => {
 				<div className="mt-3 max-w-lg">
 					{league ? (
 						<>
-							<div className="space-y-3 text-sm">
-								<div>
-									<p className="bg-gray-300 px-2 py-1">Name</p>
-									<p className="p-2 bg-gray-200">{league.name}</p>
+							<div className="mt-6 flex gap-x-3 ">
+								<div className="flex-none">
+									<img
+										src={getTeamLogoSrc(league.logo || "")}
+										alt={league.abbr}
+										className="w-16 h-16 object-contain"
+									/>
 								</div>
-								<div>
-									<p className="bg-gray-300 px-2 py-1">Abbreviation</p>
-									<p className="p-2 bg-gray-200">{league.abbr}</p>
+								<div className="flex-1 py-1">
+									<h1 className="text-xl font-semibold text-gray-900">
+										{league.name}
+									</h1>
+									<h2 className="text-lg font-semibold text-gray-600">
+										( {league.abbr} )
+									</h2>
 								</div>
-								<div>
-									<p className="bg-gray-300 px-2 py-1">
-										<span>Logo</span>
-									</p>
-									<p className="p-2 bg-gray-200">
-										{league.logo ? (
-											<img
-												src={getTeamLogoSrc(league.logo)}
-												alt={league.abbr}
-												className="w-8 h-8 object-contain"
-											/>
-										) : (
-											<span>--</span>
-										)}
-									</p>
-								</div>
-								<div>
-									<p className="bg-gray-300 px-2 py-1">Teams</p>
-									<div className="p-2 bg-gray-200 h-45 overflow-y-auto">
-										{league.teams && league.teams.length > 0 ? (
-											league.teams.map((team) => (
-												<p
-													key={team.id}
-													className="py-0.5 border-b last:border-b-0 border-gray-300"
-												>
-													{team.name} ({team.abbr})
-												</p>
-											))
-										) : (
-											<p className="p-1">
-												No teams found for this league.
+							</div>
+							<hr className="my-2 border-gray-300 shadow" />
+							<div>
+								<h3 className="mb-1 font-semibold text-gray-800">
+									Teams:
+								</h3>
+								<div className="p-3 bg-gray-200 h-45 overflow-y-auto">
+									{league.teams && league.teams.length > 0 ? (
+										league.teams.map((team) => (
+											<p
+												key={team.id}
+												className="py-0.5 border-b last:border-b-0 border-gray-300"
+											>
+												{team.name} ({team.abbr})
 											</p>
-										)}
-									</div>
+										))
+									) : (
+										<p className="p-1">
+											No teams found for this league.
+										</p>
+									)}
 								</div>
 							</div>
 							<Link

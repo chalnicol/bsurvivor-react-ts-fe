@@ -1,26 +1,31 @@
-export interface NBAPlayoffsTeamInfo {
-	id: number; //team id
-	seed: number;
-	wins?: number;
-	losses?: number;
-}
+// import type { BracketChallengeInfo, NBATeamInfo } from "./adminData";
 
-export interface NBAPlayoffsMatchupInfo {
-	id: number;
-	teams: NBAPlayoffsTeamInfo[];
-	picked?: number; // Optional field to indicate if the matchup has been picked
-	winner?: number;
-}
+// export interface NBAPlayoffsTeamInfo extends NBATeamInfo {
+// 	seed: number;
+// 	slot: number;
+// }
 
-export interface NBAPlayoffsRoundsInfo {
-	id: number;
-	matchups: NBAPlayoffsMatchupInfo[];
-}
+// export interface NBAPlayoffsMatchupInfo {
+// 	id: number;
+// 	name: string;
+// 	matchup_index: number;
+// 	wins_teams_1: number;
+// 	wins_teams_2: number;
+// 	winner_team_id: number;
+// 	teams: NBAPlayoffsTeamInfo[];
+// }
 
-export interface NBAPlayoffsConferenceInfo {
-	conference: "EAST" | "WEST" | "FINALS";
-	rounds: NBAPlayoffsRoundsInfo[];
-}
+// export interface NBAPlayoffsRoundInfo {
+// 	id: number;
+// 	order_index: number;
+// 	name: string;
+// 	conference?: "EAST" | "WEST";
+// 	matchups: NBAPlayoffsMatchupInfo[];
+// }
+
+// export interface NBABracketChallengeInfo extends BracketChallengeInfo {
+// 	rounds: NBAPlayoffsRoundInfo[];
+// }
 
 //--- list all NBA teams	with their info
 // export const nbaTeams: NBATeamInfo[] = [
@@ -267,19 +272,3 @@ export interface NBAPlayoffsConferenceInfo {
 // ];
 
 //--- initial data.. --------
-
-export interface NBAPlayoffsSeedingInfo {
-	conference: "EAST" | "WEST";
-	teams: number[];
-}
-//	Example NBA Playoffs Info for 2025
-export const nbaPlayoffSeeding: NBAPlayoffsSeedingInfo[] = [
-	{
-		conference: "EAST",
-		teams: [1, 2, 3, 4, 5, 6, 12, 17], // Example seeds
-	},
-	{
-		conference: "WEST",
-		teams: [7, 8, 10, 11, 13, 14, 15, 18], // Example seeds
-	},
-];

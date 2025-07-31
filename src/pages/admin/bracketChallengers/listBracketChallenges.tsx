@@ -61,6 +61,7 @@ const ListBracketChallenges = () => {
 		setIsLoading(true);
 		try {
 			await apiClient.delete(`/admin/bracket-challenges/${toDelete.id}`);
+			setSuccess("Bracket Challenge deleted successfully");
 			setToDelete(null);
 			if (meta) {
 				const newTotal = bracketChallenges.length - 1;
@@ -72,16 +73,32 @@ const ListBracketChallenges = () => {
 			}
 		} catch (error) {
 			console.error("Error deleting Bracket Challenge:", error);
+			setError("Error deleting Bracket Challenge");
 		}
 	};
+
+	const clearMessaging = () => {
+		setSuccess(null);
+		setError(null);
+		setToDelete(null);
+	};
+
 	//..
 	const handlePageClick = (page: number) => {
 		setCurrentPage(page);
+		clearMessaging();
+	};
+
+	const handleDelete = (challenge: BracketChallengeInfo) => {
+		setError(null);
+		setSuccess(null);
+		setToDelete(challenge);
 	};
 
 	// Update searchTerm immediately on input change
 	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value);
+		clearMessaging();
 		// Do NOT reset currentPage here. Reset it when the debounced search term actually triggers a fetch.
 		// If you reset currentPage here, it would reset on every keystroke, which is not what we want.
 	};
@@ -197,7 +214,7 @@ const ListBracketChallenges = () => {
 											<button
 												className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 												onClick={() => {
-													setToDelete(challenge);
+													handleDelete(challenge);
 												}}
 											>
 												delete

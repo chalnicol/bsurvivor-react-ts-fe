@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import BreadCrumbs from "../../../components/breadCrumbs";
-import type { BracketChallengeInfo } from "../../../data/adminData";
 import { useParams } from "react-router-dom";
 import { apiClient } from "../../../utils/api";
 import Loader from "../../../components/loader";
 import { Link } from "react-router-dom";
-// import { useAdmin } from "../../../context/admin/AdminProvider";
+import type { BracketChallengeInfo } from "../../../data/adminData";
+import PBABracket from "../../../components/pba/pbaBracket";
+import NBABracket from "../../../components/nba/nbaBracket";
+import { BracketProvider } from "../../../context/bracket/BracketProvider";
 
 const ViewBracketChallenge = () => {
 	const { id } = useParams<{ id: string }>();
@@ -47,34 +49,33 @@ const ViewBracketChallenge = () => {
 					</h1>
 				</div>
 				{/* inset content here.. */}
-				<div className="mt-3 max-w-lg">
+				<div className="mt-6">
 					{bracketChallenge ? (
 						<>
-							<div className="space-y-3 text-sm">
+							<div>
+								<h1 className="text-2xl font-bold text-gray-600">
+									{bracketChallenge.name}
+								</h1>
+								<p className="text-sm text-gray-500">
+									{bracketChallenge.description ||
+										"No description provided."}
+								</p>
+							</div>
+							<hr className="my-3 border-gray-300 shadow" />
+
+							<div className="grid md:grid-cols-2 lg:grid-cols-4 grid-cols-1 gap-x-4 gap-y-2 mb-2">
 								<div>
-									<p className="bg-gray-300 px-2 py-1">Name</p>
-									<p className="p-2 bg-gray-200">
-										{bracketChallenge.name}
-									</p>
-								</div>
-								<div>
-									<p className="bg-gray-300 px-2 py-1">Description</p>
-									<p className="p-2 bg-gray-200">
-										{bracketChallenge.description}
-									</p>
-								</div>
-								<div>
-									<p className="bg-gray-300 px-2 py-1">League</p>
-									<p className="p-2 bg-gray-200">
+									<p className="text-sm">League</p>
+									<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
 										{bracketChallenge.league}
 									</p>
 								</div>
 								<div>
-									<p className="bg-gray-300 px-2 py-1">Is_Public</p>
+									<p className="text-sm">Is Public</p>
 									<p
-										className={`p-2 bg-gray-200 font-bold ${
+										className={`px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1 ${
 											bracketChallenge.is_public
-												? "text-green-600"
+												? "text-green-700"
 												: "text-red-600"
 										}`}
 									>
@@ -82,32 +83,47 @@ const ViewBracketChallenge = () => {
 									</p>
 								</div>
 								<div>
-									<p className="bg-gray-300 px-2 py-1">Start Date</p>
-									<p className="p-2 bg-gray-200">
+									<p className="text-sm">Start Date</p>
+									<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
 										{bracketChallenge.start_date}
 									</p>
 								</div>
 								<div>
-									<p className="bg-gray-300 px-2 py-1">End Date</p>
-									<p className="p-2 bg-gray-200">
+									<p className="text-sm">End Date</p>
+									<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
 										{bracketChallenge.end_date}
 									</p>
 								</div>
-								<div>
-									<p className="bg-gray-300 px-2 py-1">End Date</p>
-									<p className="p-2 bg-gray-200">
-										<code>
-											{JSON.stringify(bracketChallenge.bracket_data)}
-										</code>
-									</p>
-								</div>
 							</div>
-							<Link
-								to={`/admin/bracket-challenges/${bracketChallenge.id}/edit`}
-								className="block w-full md:w-50 mt-4 bg-amber-600 hover:bg-amber-500 text-white text-center font-bold py-1 px-4 rounded"
-							>
-								EDIT THIS CHALLENGE
-							</Link>
+							{/* preview */}
+							<div>
+								<p className="text-sm">Preview</p>
+								<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
+									<BracketProvider rounds={bracketChallenge.rounds}>
+										{bracketChallenge.league === "NBA" && (
+											<NBABracket />
+										)}
+										{bracketChallenge.league === "PBA" && (
+											<PBABracket />
+										)}
+									</BracketProvider>
+								</p>
+							</div>
+
+							<div className="flex space-x-3">
+								<Link
+									to={`/admin/bracket-challenges/${bracketChallenge.id}/edit`}
+									className="block w-full md:w-50 mt-4 bg-amber-600 hover:bg-amber-500 text-white text-center font-bold py-1 px-4 rounded"
+								>
+									EDIT DETAILS
+								</Link>
+								<Link
+									to={`/admin/bracket-challenges/${bracketChallenge.id}/edit`}
+									className="block w-full md:w-50 mt-4 bg-amber-600 hover:bg-amber-500 text-white text-center font-bold py-1 px-4 rounded"
+								>
+									UPDATE MATCHUPS
+								</Link>
+							</div>
 						</>
 					) : (
 						<p>

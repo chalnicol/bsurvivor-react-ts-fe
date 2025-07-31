@@ -7,7 +7,7 @@ export const getTeamLogoSrc = (logoPathFromApi: string) => {
 	// 	return "/images/default-team-logo.png"; // Path to a default logo in your React public folder
 	// }
 	if (logoPathFromApi === "") {
-		return "/images/default-team-logo.png";
+		return "/images/generic_logo.png";
 	}
 
 	// Check if the logo string starts with http:// or https://

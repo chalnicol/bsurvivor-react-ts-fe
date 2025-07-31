@@ -1,14 +1,20 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
+
 interface AdminThumbsProps {
-	children: React.ReactNode;
-	title: string;
+	// children: React.ReactNode;
+	resource: string;
+	total: number;
 	description: string;
 	bgColor: string;
+	withAddBtn?: boolean;
 }
 const AdminThumbs = ({
-	children,
-	title,
+	resource,
+	total,
 	description,
 	bgColor,
+	withAddBtn,
 }: AdminThumbsProps) => {
 	// const backgroundClr: string = `bg-orange-100`;
 
@@ -22,22 +28,52 @@ const AdminThumbs = ({
 				return "bg-green-100";
 			case "yellow":
 				return "bg-yellow-100";
+			case "cyan":
+				return "bg-cyan-100";
 			default:
 				return "bg-gray-100";
 		}
 	};
 
+	//capitalize first letter
+	const capitalizeEachWord = (str: string) => {
+		//remove
+		const split = str.split("-");
+		const capitalized = split.map((word) => {
+			return word.charAt(0).toUpperCase() + word.slice(1);
+		});
+		return capitalized.join(" ");
+	};
+
 	return (
 		<div
-			className={`p-3 border rounded-lg shadow border-gray-400 flex flex-col ${backgroundClr()}`}
+			className={`p-3 border rounded-lg shadow border-gray-400 flex flex-col overflow-hidden ${backgroundClr()}`}
 		>
 			<div>
-				<h2 className="font-semibold">{title}</h2>
+				<h2 className="font-semibold">
+					{capitalizeEachWord(resource)} ({total})
+				</h2>
 				<p className="text-sm text-gray-500">{description}</p>
 			</div>
 
 			<div className="flex-1"></div>
-			<div className="mt-5 space-x-2">{children}</div>
+			<div className="mt-5 space-x-2 flex">
+				<Link
+					to={`/admin/${resource}`}
+					className="mt-2 cursor-pointer hover:bg-gray-700 bg-gray-800 text-white rounded px-3 py-1 text-xs font-bold block min-w-28 text-center flex-none"
+				>
+					VIEW LIST
+				</Link>
+				{withAddBtn && (
+					<Link
+						to={`/admin/${resource}/create`}
+						className="mt-2 cursor-pointer hover:bg-red-700 bg-red-800 text-white rounded px-3 py-1 text-xs font-bold block min-w-24 text-center flex-none"
+					>
+						<FontAwesomeIcon icon="plus" className="me-1" />
+						NEW
+					</Link>
+				)}
+			</div>
 		</div>
 	);
 };

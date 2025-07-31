@@ -18,15 +18,24 @@ export interface PBATeamInfo extends TeamInfo {
 
 export type AnyTeamInfo = NBATeamInfo | PBATeamInfo;
 
-export interface LeagueInfo {
-	id: number;
-	name: string;
-	abbr: string;
-	logo?: string;
-	slug: string;
-	teams?: AnyTeamInfo[];
+//--
+export interface PlayoffsTeamInfo extends TeamInfo {
+	seed: number;
+	slot: number;
 }
 
+export interface NBAPlayoffsTeamInfo extends PlayoffsTeamInfo {
+	league: "NBA"; // Specify the league as NBA
+	conference: "EAST" | "WEST";
+}
+
+export interface PBAPlayoffsTeamInfo extends PlayoffsTeamInfo {
+	league: "PBA";
+}
+
+export type AnyPlayoffsTeamInfo = NBAPlayoffsTeamInfo | PBAPlayoffsTeamInfo;
+
+//--
 export interface nbaTeamData {
 	teams: {
 		east: number[];
@@ -40,6 +49,25 @@ export interface pbaTeamData {
 
 export type AnyTeamData = nbaTeamData | pbaTeamData;
 
+//--
+export interface PlayoffsMatchupInfo {
+	id: number;
+	name: string;
+	matchup_index: number;
+	wins_teams_1: number;
+	wins_teams_2: number;
+	winner_team_id: number;
+	teams: AnyPlayoffsTeamInfo[];
+}
+
+export interface PlayoffsRoundInfo {
+	id: number;
+	order_index: number;
+	name: string;
+	conference?: "EAST" | "WEST";
+	matchups: PlayoffsMatchupInfo[];
+}
+
 export interface BracketChallengeInfo {
 	id: number;
 	name: string;
@@ -47,11 +75,21 @@ export interface BracketChallengeInfo {
 	league: string;
 	description?: string;
 	slug: string;
-	teams: AnyTeamData;
 	start_date: string;
 	end_date: string;
 	is_public: boolean;
 	bracket_data: AnyTeamData;
+	rounds: PlayoffsRoundInfo[];
+}
+
+//...
+export interface LeagueInfo {
+	id: number;
+	name: string;
+	abbr: string;
+	logo?: string;
+	slug: string;
+	teams?: AnyTeamInfo[];
 }
 
 export interface UserInfo {
@@ -107,19 +145,19 @@ export interface ResourcesResponseInfo {
 	totals: TotalsInfo;
 }
 
-export interface GeneralApiErrorResponse {
-	message: string;
-}
+// export interface GeneralApiErrorResponse {
+// 	message: string;
+// }
 
-// Interface for Laravel's default validation errors
-export interface LaravelValidationErrorsResponse {
-	message: string; // "The given data was invalid."
-	errors: {
-		[field: string]: string[]; // Keys are field names, values are arrays of error strings
-	};
-}
+// // Interface for Laravel's default validation errors
+// export interface LaravelValidationErrorsResponse {
+// 	message: string; // "The given data was invalid."
+// 	errors: {
+// 		[field: string]: string[]; // Keys are field names, values are arrays of error strings
+// 	};
+// }
 
-// Union type to cover both possibilities for error.response.data
-export type ServerErrorData =
-	| GeneralApiErrorResponse
-	| LaravelValidationErrorsResponse;
+// // Union type to cover both possibilities for error.response.data
+// export type ServerErrorData =
+// 	| GeneralApiErrorResponse
+// 	| LaravelValidationErrorsResponse;

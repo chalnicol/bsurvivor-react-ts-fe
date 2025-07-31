@@ -1,8 +1,8 @@
-import React, { useReducer, useCallback, useMemo } from "react";
+import React, { useReducer, useCallback, useMemo, useContext } from "react";
 import {
 	NBAPlayoffsContext,
 	type NBAPlayoffsContextType,
-} from "./NBAPlayoffsContext";
+} from "./_NBAPlayoffsContext";
 import type {
 	NBAPlayoffsConferenceInfo,
 	NBAPlayoffsMatchupInfo,
@@ -59,7 +59,7 @@ const getTargetNextRoundMatchupIndex = (
 	return 0;
 };
 
-export const createInitialBracket = (): NBAPlayoffsConferenceInfo[] => {
+const createInitialBracket = (): NBAPlayoffsConferenceInfo[] => {
 	const initialBracketData: NBAPlayoffsConferenceInfo[] = [];
 
 	for (const { conference, teams } of nbaPlayoffSeeding) {
@@ -312,4 +312,10 @@ export const NBAPlayoffsProvider: React.FC<NBAPlayoffsProviderProps> = ({
 	);
 };
 
-export default NBAPlayoffsProvider;
+export const useNBABracket = () => {
+	const context = useContext(NBAPlayoffsContext);
+	if (context === undefined) {
+		throw new Error("useNBABracket must be used within an AdminProvider");
+	}
+	return context;
+};

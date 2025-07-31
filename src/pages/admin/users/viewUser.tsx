@@ -83,9 +83,9 @@ const ViewUser = () => {
 					}
 					return null;
 				});
-			} catch (err) {
-				console.log("error", err);
-				setError("Failed to set roles.");
+			} catch (error: any) {
+				console.log("error", error);
+				setError(error.message || "Failed to set roles.");
 			} finally {
 				setIsLoading(false);
 			}

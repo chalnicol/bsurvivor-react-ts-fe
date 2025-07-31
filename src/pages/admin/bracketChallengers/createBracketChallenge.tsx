@@ -11,13 +11,8 @@ import type {
 import { useAdmin } from "../../../context/admin/AdminProvider";
 import Loader from "../../../components/loader";
 import apiClient from "../../../utils/axiosConfig";
-import type {
-	// GeneralApiErrorResponse,
-	// LaravelValidationErrorsResponse,
-	ServerErrorData,
-} from "../../../data/adminData";
-import axios, { AxiosError } from "axios";
 import StatusMessage from "../../../components/statusMessage";
+import SelectTeamModal from "../../../components/selectTeamModal";
 
 const CreateBracketChallenge = () => {
 	const {
@@ -40,9 +35,6 @@ const CreateBracketChallenge = () => {
 	const [conference, setConference] = useState<"EAST" | "WEST">("EAST");
 	const [showAddTeamModal, setShowAddTeamModal] = useState<boolean>(false);
 	// const [message, setMessage] = useState<string>("");
-	const [generalErrorMessage, setGeneralErrorMessage] = useState<
-		string | null
-	>(null);
 
 	const [success, setSuccess] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -91,12 +83,11 @@ const CreateBracketChallenge = () => {
 				league === "NBA" ? selectedNbaTeamsData : selectedPbaTeamsData,
 		};
 
-		// console.log(toSubmitData);
+		// console.log("tosubmit", toSubmitData);
 
 		const storeBracketChallenge = async () => {
 			try {
 				setIsLoading(true);
-				// setGeneralErrorMessage(null);
 				setError(null);
 				setSuccess(null);
 				setFieldErrors({}); // Clear validation errors)
@@ -106,54 +97,20 @@ const CreateBracketChallenge = () => {
 				);
 				clearForms();
 				setSuccess("Challenge created successfully!");
-			} catch (error) {
-				// console.error("Error creating challenge:", error);
-				// Type guard: Check if it's an Axios error
-				if (axios.isAxiosError(error)) {
-					// Cast the error for better TypeScript inference
-					const axiosError = error as AxiosError<ServerErrorData>;
-
-					if (axiosError.response) {
-						// --- Server responded with a 4xx/5xx status code ---
-						const errorData = axiosError.response.data;
-
-						// Always display the main 'message' from the server response
-						if (errorData?.message) {
-							setGeneralErrorMessage(errorData.message);
-						} else {
-							// Fallback if 'message' is missing from server error response
-							setGeneralErrorMessage(
-								`Error ${axiosError.response.status}: An unexpected server error occurred.`
-							);
-						}
-
-						// Check if it's a validation error (i.e., has an 'errors' property)
-						// Use 'in' operator for a reliable type guard with union types
-						if (
-							"errors" in errorData &&
-							typeof errorData.errors === "object" &&
-							errorData.errors !== null
-						) {
-							// TypeScript now knows errorData is of type LaravelValidationErrorsResponse
-							setFieldErrors(errorData.errors);
-						}
-					} else if (axiosError.request) {
-						// --- No response received (Network Error, Server Down, CORS) ---
-						setGeneralErrorMessage(
-							"Network Error: Could not connect to the server. Please check your internet connection or try again later."
-						);
-					} else {
-						// --- Request setup error ---
-						// Something happened setting up the request that triggered an Error
-						setGeneralErrorMessage(
-							`Request Error: ${axiosError.message}`
-						);
-					}
+			} catch (error: any) {
+				if (error.type === "validation") {
+					setFieldErrors(error.errors);
+					// setError(error.message); // Often 'The given data was invalid.'
+				} else if (
+					error.type === "server" ||
+					error.type === "general" ||
+					error.type === "network" ||
+					error.type === "client"
+				) {
+					setError(error.message);
 				} else {
-					// --- Non-Axios / Unknown JavaScript Error ---
-					setGeneralErrorMessage(
-						`An unexpected error occurred: ${(error as Error).message}`
-					);
+					// Fallback for any other unexpected error type
+					setError("An unknown error occurred.");
 				}
 			} finally {
 				setIsLoading(false);
@@ -334,6 +291,10 @@ const CreateBracketChallenge = () => {
 			setConference(conference);
 		}
 		setSearchTerm("");
+	};
+
+	const handleSearchTermChange = (searchTerm: string) => {
+		setSearchTerm(searchTerm);
 	};
 
 	const filteredNbaTeams = useMemo(() => {
@@ -715,6 +676,7 @@ const CreateBracketChallenge = () => {
 											</div>
 										</div>
 									)}
+
 									{league === "" && (
 										<div className="w-full bg-gray-100 h-22 mt-2 flex items-center justify-center rounded border border-gray-400 shadow">
 											Please select a league to set teams.
@@ -734,81 +696,17 @@ const CreateBracketChallenge = () => {
 			</div>
 			{/* Modal for selecting teams */}
 			{showAddTeamModal && (
-				<div className="fixed left-0 bottom-0 w-full h-full z-10">
-					<div className="absolute top-0 left-0 bg-[#0a0a0a66] w-full h-full pointer-events-auto"></div>
-					<div className="absolute top-0 left-0 flex items-center justify-center h-full w-full">
-						<div className="w-11/12 max-w-xl bg-white border border-gray-300 rounded-lg p-4 shadow-lg relative">
-							<button
-								className="absolute top-5 right-5 border rounded font-bold bg-amber-600 text-white px-1.5 py-0.5 text-xs cursor-pointer hover:bg-amber-500 cursor-pointer"
-								onClick={handleCloseModalClick}
-							>
-								CLOSE
-							</button>
-							<h4 className="font-semibold text-lg">Select Teams</h4>
-							<div>
-								<input
-									type="search"
-									id="search"
-									className="border rounded border-gray-400 w-full px-3 py-2 mt-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-									placeholder="Search team..."
-									value={searchTerm}
-									onChange={(e) => setSearchTerm(e.target.value)}
-									autoComplete="off"
-								/>
-							</div>
-							<div className="border border-gray-400 h-50 mt-2 overflow-y-scroll">
-								{/* <p className="p-2">this is the content...</p> */}
-								{league === "NBA" &&
-									filteredNbaTeams.map((team) => (
-										<div
-											key={team.id}
-											className="p-2 border-b border-gray-300 last:border-b-0 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm flex items-center"
-											onClick={() => handleTeamSelect(team)}
-										>
-											<span className="flex-1">{team.name}</span>
-
-											{getCurrenTeamDataIndex(team) && (
-												<div className="w-7 h-4 rounded-full bg-gray-600 text-xs text-white font-semibold text-center leading-4">
-													{getCurrenTeamDataIndex(team)}
-												</div>
-											)}
-										</div>
-									))}
-								{league === "PBA" &&
-									filteredPbaTeams.map((team) => (
-										<div
-											key={team.id}
-											className="p-2 border-b border-gray-300 last:border-b-0 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm flex items-center"
-											onClick={() => handleTeamSelect(team)}
-										>
-											<span className="flex-1">{team.name}</span>
-
-											{getCurrenTeamDataIndex(team) && (
-												<div className="w-7 h-4 rounded-full bg-gray-600 text-xs text-white font-semibold text-center leading-4">
-													{getCurrenTeamDataIndex(team)}
-												</div>
-											)}
-										</div>
-									))}
-							</div>
-							<div className="space-x-2">
-								<button
-									className="p-2 bg-red-600 text-white text-sm mt-3 w-26 rounded cursor-pointer font-bold hover:bg-red-600 transition duration-200"
-									onClick={handleClearClick}
-								>
-									CLEAR
-								</button>
-
-								<button
-									className="p-2 bg-gray-700 text-white text-sm mt-3 w-26 rounded cursor-pointer font-bold hover:bg-gray-600 transition duration-200"
-									onClick={handleCloseModalClick}
-								>
-									DONE
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
+				<SelectTeamModal
+					league={league}
+					searchTerm={searchTerm}
+					filteredNbaTeams={filteredNbaTeams}
+					filteredPbaTeams={filteredPbaTeams}
+					getCurrenTeamDataIndex={getCurrenTeamDataIndex}
+					onSearchTermChange={handleSearchTermChange}
+					onClearClick={handleClearClick}
+					onClose={handleCloseModalClick}
+					onTeamSelect={handleTeamSelect}
+				/>
 			)}
 			{(isLoading || isLoadingTeamsAndLeagues) && <Loader />}
 		</>

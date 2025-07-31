@@ -76,17 +76,31 @@ const ListLeagues = () => {
 		}
 	};
 
+	const clearMessaging = () => {
+		setSuccess(null);
+		setError(null);
+		setToDelete(null);
+	};
+
 	// Handler for react-paginate page clicks
 	// const handlePageClick = (event: { selected: number }) => {
 	// 	setCurrentPage(event.selected);
 	// };
 	const handlePageClick = (page: number) => {
 		setCurrentPage(page);
+		clearMessaging();
+	};
+
+	const handleDelete = (league: LeagueInfo) => {
+		setError(null);
+		setSuccess(null);
+		setToDelete(league);
 	};
 
 	// Update searchTerm immediately on input change
 	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value);
+		clearMessaging();
 		// Do NOT reset currentPage here. Reset it when the debounced search term actually triggers a fetch.
 		// If you reset currentPage here, it would reset on every keystroke, which is not what we want.
 	};
@@ -194,7 +208,7 @@ const ListLeagues = () => {
 											<button
 												className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 												onClick={() => {
-													setToDelete(league);
+													handleDelete(league);
 												}}
 											>
 												delete

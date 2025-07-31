@@ -46,39 +46,39 @@ const ViewTeam = () => {
 				<div className="mt-3 max-w-lg">
 					{team ? (
 						<>
-							<div className="space-y-3 text-sm">
-								<div>
-									<p className="bg-gray-300 px-2 py-1">Name</p>
-									<p className="p-2 bg-gray-200">{team.name}</p>
+							<div className="mt-6 flex gap-x-3 ">
+								<div className="flex-none">
+									<img
+										src={getTeamLogoSrc(team.logo || "")}
+										alt={team.abbr}
+										className="w-16 h-16 object-contain"
+									/>
 								</div>
-								<div>
-									<p className="bg-gray-300 px-2 py-1">Initials</p>
-									<p className="p-2 bg-gray-200">{team.abbr}</p>
+								<div className="flex-1 py-1">
+									<h1 className="text-xl font-semibold text-gray-900">
+										{team.name}
+									</h1>
+									<h2 className="text-lg font-semibold text-gray-600">
+										( {team.abbr} )
+									</h2>
 								</div>
+							</div>
+							<hr className="my-2 border-gray-300 shadow" />
+							<div className="space-y-2">
 								<div>
-									<p className="bg-gray-300 px-2 py-1">League</p>
-									<p className="p-2 bg-gray-200">{team.league}</p>
-								</div>
-								<div>
-									<p className="bg-gray-300 px-2 py-1">Conference</p>
-									<p className="p-2 bg-gray-200">
-										{team.league == "NBA" ? team.conference : "--"}
+									<p className="text-sm">League</p>
+									<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
+										{team.league}
 									</p>
 								</div>
-								<div>
-									<p className="bg-gray-300 px-2 py-1">Logo</p>
-									<p className="p-2 bg-gray-200">
-										{team.logo ? (
-											<img
-												src={getTeamLogoSrc(team.logo)}
-												alt={team.abbr}
-												className="w-8 h-8 object-contain"
-											/>
-										) : (
-											<span>--</span>
-										)}
-									</p>
-								</div>
+								{team.league == "NBA" && (
+									<div>
+										<p className="text-sm">Conference</p>
+										<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
+											{team.conference}
+										</p>
+									</div>
+								)}
 							</div>
 							<Link
 								to={`/admin/teams/${team.id}/edit`}

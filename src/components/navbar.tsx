@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/auth/AuthProvider";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-
+import { useOutsideClick } from "../hooks/useOutsideClick";
 // import Dropdown from "./dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -16,9 +16,16 @@ const Navbar = () => {
 	const navigate = useNavigate();
 
 	const menuRef = useRef<HTMLDivElement>(null);
+
 	const dropdownMenuRef = useRef<HTMLDivElement>(null);
 
+	const dropdownRef = useOutsideClick<HTMLDivElement>(() => {
+		// 2. Callback function: close the dropdown when an outside click occurs
+		setShowDropdown(false);
+	});
+
 	const handleLogout = async () => {
+		setShowDropdown(false);
 		closeMenuAnim();
 		await logout();
 		navigate("/login");
@@ -67,6 +74,11 @@ const Navbar = () => {
 			ease: "power4.out",
 			onComplete: () => setShowMenuDropDown(false),
 		});
+	};
+
+	const handleDropdownItemsClick = (route: string) => {
+		setShowDropdown(false);
+		navigate(route);
 	};
 
 	useEffect(() => {
@@ -129,66 +141,59 @@ const Navbar = () => {
 						<Link to="/about">About</Link>
 					</div>
 					<div className="flex items-center space-x-3">
-						{/* {isAuthenticated && hasRole("admin") && (
-							<Link
-								to="/admin"
-								className="text-sm border rounded px-3 py-0.5"
-							>
-								Admin Dashboard
-							</Link>
-						)} */}
 						{isAuthenticated && user ? (
-							<>
+							<div className="relative" ref={dropdownRef}>
 								<button
-									className="block relative cursor-pointer"
+									className="block cursor-pointer"
 									onClick={() => setShowDropdown((prev) => !prev)}
 								>
 									<div className="flex items-center">
-										{/* <img
-											src="/user.png"
-											className="h-7 me-2"
-											alt="user"
-										/> */}
 										<FontAwesomeIcon icon="user" size="lg" />
 										<span className="ms-2 me-1">{user.username}</span>
 										<FontAwesomeIcon icon="caret-down" size="xs" />
 									</div>
-									{showDropdown && (
-										<div className="absolute bg-white rounded min-w-40 text-gray-600 shadow-lg right-0 mt-2 overflow-hidden">
-											<ul>
-												<li
-													className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
-													onClick={() => navigate("/profile")}
-												>
-													My Profile
-												</li>
-												<li
-													className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
-													onClick={() => navigate("/entries")}
-												>
-													My Entries
-												</li>
-
-												{hasRole("admin") && (
-													<li
-														className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
-														onClick={() => navigate("/admin")}
-													>
-														Admin Dashboard
-													</li>
-												)}
-
-												<li
-													className="text-right px-3 py-1.5 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
-													onClick={handleLogout}
-												>
-													Logout
-												</li>
-											</ul>
-										</div>
-									)}
 								</button>
-							</>
+								{showDropdown && (
+									<div className="absolute bg-white rounded min-w-40 text-gray-600 shadow-lg right-0 mt-2 overflow-hidden">
+										<ul>
+											<li
+												className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
+												onClick={() =>
+													handleDropdownItemsClick("/profile")
+												}
+											>
+												My Profile
+											</li>
+											<li
+												className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
+												onClick={() =>
+													handleDropdownItemsClick("/entries")
+												}
+											>
+												My Entries
+											</li>
+
+											{hasRole("admin") && (
+												<li
+													className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
+													onClick={() =>
+														handleDropdownItemsClick("/admin")
+													}
+												>
+													Admin Dashboard
+												</li>
+											)}
+
+											<li
+												className="text-right px-3 py-1.5 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
+												onClick={handleLogout}
+											>
+												Logout
+											</li>
+										</ul>
+									</div>
+								)}
+							</div>
 						) : (
 							<>
 								<Link to="/register">Register</Link>

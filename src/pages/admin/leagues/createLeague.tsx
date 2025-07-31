@@ -3,6 +3,7 @@ import BreadCrumbs from "../../../components/breadCrumbs";
 import apiClient from "../../../utils/axiosConfig";
 import Loader from "../../../components/loader";
 import StatusMessage from "../../../components/statusMessage";
+import ErrorDisplay from "../../../components/errorDisplay";
 
 const CreateLeague = () => {
 	const [logoUrl, setLogoUrl] = useState<string>("");
@@ -15,6 +16,8 @@ const CreateLeague = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
+
+	const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({}); // To hold validation errors
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files ? e.target.files[0] : null;
@@ -66,9 +69,21 @@ const CreateLeague = () => {
 			const response = await apiClient.post("/admin/leagues", formData);
 			setSuccess(response.data.message || "League created successfully.");
 			resetForms();
-		} catch (error) {
-			console.log("error creating league", error);
-			setError("Failed to create league.");
+		} catch (error: any) {
+			if (error.type === "validation") {
+				setFieldErrors(error.errors);
+				// setError(error.message); // Often 'The given data was invalid.'
+			} else if (
+				error.type === "server" ||
+				error.type === "general" ||
+				error.type === "network" ||
+				error.type === "client"
+			) {
+				setError(error.message);
+			} else {
+				// Fallback for any other unexpected error type
+				setError("An unknown error occurred.");
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -109,6 +124,9 @@ const CreateLeague = () => {
 								placeholder="Enter league's full name"
 								required
 							/>
+							{fieldErrors.name && (
+								<ErrorDisplay errors={fieldErrors.name} />
+							)}
 						</div>
 						<div>
 							<label htmlFor="abbr" className="text-xs">
@@ -123,6 +141,9 @@ const CreateLeague = () => {
 								placeholder="Enter league's abbreviation"
 								required
 							/>
+							{fieldErrors.abbr && (
+								<ErrorDisplay errors={fieldErrors.abbr} />
+							)}
 						</div>
 
 						<div>
@@ -131,23 +152,33 @@ const CreateLeague = () => {
 							</label>
 
 							{isLogoFile ? (
-								<input
-									key="fileinput"
-									type="file"
-									id="file"
-									onChange={handleFileChange}
-									className="w-full mt-2 block px-2 py-1.5 rounded border border-gray-300 shadow-sm text-sm text-stone-500 cursor-pointer file:mr-5 file:py-1.5 file:px-4 file:border file:border-stone-400 file:rounded file:text-xs file:font-medium file:bg-stone-50 file:text-stone-700"
-								/>
+								<>
+									<input
+										key="fileinput"
+										type="file"
+										id="file"
+										onChange={handleFileChange}
+										className="w-full mt-2 block px-2 py-1.5 rounded border border-gray-300 shadow-sm text-sm text-stone-500 cursor-pointer file:mr-5 file:py-1.5 file:px-4 file:border file:border-stone-400 file:rounded file:text-xs file:font-medium file:bg-stone-50 file:text-stone-700"
+									/>
+									{fieldErrors.logo && (
+										<ErrorDisplay errors={fieldErrors.logo} />
+									)}
+								</>
 							) : (
-								<input
-									key="urlinput"
-									type="text"
-									id="url"
-									value={logoUrl}
-									onChange={handleUrlChange}
-									className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-									placeholder="Enter logo URL"
-								/>
+								<>
+									<input
+										key="urlinput"
+										type="text"
+										id="url"
+										value={logoUrl}
+										onChange={handleUrlChange}
+										className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+										placeholder="Enter logo URL"
+									/>
+									{fieldErrors.logo_url && (
+										<ErrorDisplay errors={fieldErrors.logo_url} />
+									)}
+								</>
 							)}
 							<button
 								type="button"

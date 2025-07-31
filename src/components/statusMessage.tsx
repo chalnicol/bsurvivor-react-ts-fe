@@ -58,6 +58,9 @@ const StatusMessage = ({ message, type, onClose }: StatusMessageProps) => {
 			if (timer) {
 				clearTimeout(timer);
 			}
+			if (containerRef.current) {
+				gsap.killTweensOf(containerRef.current);
+			}
 		};
 	}, [message]);
 

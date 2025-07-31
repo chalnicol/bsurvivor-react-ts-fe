@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import type { LeagueInfo } from "../../../data/adminData";
 import { getTeamLogoSrc } from "../../../utils/imageService";
 import StatusMessage from "../../../components/statusMessage";
+import ErrorDisplay from "../../../components/errorDisplay";
 
 const EdiLeague = () => {
 	const { id } = useParams<{ id: string }>();
@@ -22,6 +23,9 @@ const EdiLeague = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
+
+	const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({}); // To hold validation errors
+
 	const [imagePreview, setImagePreview] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -105,9 +109,21 @@ const EdiLeague = () => {
 			);
 			setSuccess(response.data.message);
 			setLeague(response.data.league);
-		} catch (error) {
-			console.log("error creating league", error);
-			setError("Failed to edit league.");
+		} catch (error: any) {
+			if (error.type === "validation") {
+				setFieldErrors(error.errors);
+				// setError(error.message); // Often 'The given data was invalid.'
+			} else if (
+				error.type === "server" ||
+				error.type === "general" ||
+				error.type === "network" ||
+				error.type === "client"
+			) {
+				setError(error.message);
+			} else {
+				// Fallback for any other unexpected error type
+				setError("An unknown error occurred.");
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -149,6 +165,9 @@ const EdiLeague = () => {
 								placeholder="Enter league's full name"
 								required
 							/>
+							{fieldErrors.name && (
+								<ErrorDisplay errors={fieldErrors.name} />
+							)}
 						</div>
 						<div>
 							<label htmlFor="abbr" className="text-xs">
@@ -163,6 +182,9 @@ const EdiLeague = () => {
 								placeholder="Enter league's abbreviation"
 								required
 							/>
+							{fieldErrors.abbr && (
+								<ErrorDisplay errors={fieldErrors.abbr} />
+							)}
 						</div>
 
 						<div>
@@ -188,23 +210,33 @@ const EdiLeague = () => {
 							</label>
 
 							{isLogoFile ? (
-								<input
-									key="fileinput"
-									type="file"
-									id="file"
-									onChange={handleFileChange}
-									className="w-full mt-2 block px-2 py-1.5 rounded border border-gray-300 shadow-sm text-sm text-stone-500 cursor-pointer file:mr-5 file:py-1.5 file:px-4 file:border file:border-stone-400 file:rounded file:text-xs file:font-medium file:bg-stone-50 file:text-stone-700"
-								/>
+								<>
+									<input
+										key="fileinput"
+										type="file"
+										id="file"
+										onChange={handleFileChange}
+										className="w-full mt-2 block px-2 py-1.5 rounded border border-gray-300 shadow-sm text-sm text-stone-500 cursor-pointer file:mr-5 file:py-1.5 file:px-4 file:border file:border-stone-400 file:rounded file:text-xs file:font-medium file:bg-stone-50 file:text-stone-700"
+									/>
+									{fieldErrors.logo && (
+										<ErrorDisplay errors={fieldErrors.logo} />
+									)}
+								</>
 							) : (
-								<input
-									key="urlinput"
-									type="text"
-									id="url"
-									value={logoUrl}
-									onChange={handleUrlChange}
-									className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-									placeholder="Enter logo URL"
-								/>
+								<>
+									<input
+										key="urlinput"
+										type="text"
+										id="url"
+										value={logoUrl}
+										onChange={handleUrlChange}
+										className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+										placeholder="Enter logo URL"
+									/>
+									{fieldErrors.logo_url && (
+										<ErrorDisplay errors={fieldErrors.logo_url} />
+									)}
+								</>
 							)}
 							<button
 								type="button"
