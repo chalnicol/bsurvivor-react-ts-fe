@@ -1,4 +1,5 @@
 import type { AnyPlayoffsTeamInfo } from "../../data/adminData";
+import { useBracket } from "../../context/bracket/BracketProvider";
 
 interface TeamSlotProps {
 	team: AnyPlayoffsTeamInfo | null;
@@ -6,7 +7,7 @@ interface TeamSlotProps {
 	roundIndex?: number;
 	matchupIndex?: number;
 	conference?: "EAST" | "WEST";
-	isActive: boolean;
+	isClickable: boolean;
 	isSelected: boolean;
 	placeholderText: string;
 	alignment?: "left" | "right" | "center";
@@ -18,11 +19,13 @@ const TeamSlot = ({
 	roundIndex,
 	matchupIndex,
 	conference,
-	isActive,
+	isClickable,
 	isSelected,
 	alignment,
 	placeholderText,
 }: TeamSlotProps) => {
+	const { updatePick, updateFinalsPick } = useBracket();
+
 	const getImageURL = (logo: string) => {
 		//get nba logo if team logo is undefined
 		if (logo == "") return "/images/generic_logo.png";
@@ -42,26 +45,39 @@ const TeamSlot = ({
 	};
 
 	const handleClick = () => {
-		if (isActive) {
-			console.log("hey", slot, roundIndex, matchupIndex, conference);
+		if (isClickable) {
+			if (!team) return;
+
+			if (roundIndex && matchupIndex) {
+				console.log("hey", slot, roundIndex, matchupIndex, conference);
+
+				updatePick(
+					conference || null,
+					roundIndex || 0,
+					matchupIndex || 0,
+					team
+				);
+			} else {
+				console.log("finals pick");
+				updateFinalsPick(team);
+			}
 		}
 	};
 
+	const hoverClass =
+		isClickable && !isSelected ? "cursor-pointer hover:bg-yellow-50" : "";
+
+	const selectClass = isSelected ? "bg-yellow-100" : "";
+
+	const flexDirectionClass = alignment == "right" ? "flex-row-reverse" : "";
+
 	return (
 		<div
-			className={`border border-gray-400 rounded shadow select-none min-h-10 flex items-center overflow-hidden bg-white ${getAlignment()}`}
+			className={`border border-gray-400 rounded shadow select-none h-10 flex items-center overflow-hidden bg-white ${getAlignment()}`}
 		>
 			{team ? (
 				<div
-					className={`flex items-center gap-x-2 w-full h-full px-2 ${
-						alignment == "right" ? "flex-row-reverse" : ""
-					} ${getAlignment()} ${
-						isSelected ? "bg-yellow-100" : "bg-white "
-					}  ${
-						isActive && !isSelected
-							? "cursor-pointer hover:bg-yellow-50"
-							: ""
-					}`}
+					className={`flex items-center gap-x-2 w-full h-full px-2 ${flexDirectionClass} ${selectClass} ${getAlignment()} ${hoverClass}`}
 					title={team.name}
 					onClick={handleClick}
 				>
@@ -71,13 +87,13 @@ const TeamSlot = ({
 						className="h-6"
 					/>
 					<p className="text-lg font-bold">{team.abbr}</p>
-					{team.seed && (
+					{alignment !== "center" && team.seed && (
 						<p
 							className={`text-xs px-1 font-bold text-[0.6rem] leading-4 w-4 h-4 text-center rounded-full bg-gray-600 text-white ${
 								alignment == "right" ? "me-auto" : "ms-auto"
 							}`}
 						>
-							{team?.seed}
+							{team.seed}
 						</p>
 					)}
 				</div>

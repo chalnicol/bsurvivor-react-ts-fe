@@ -57,7 +57,7 @@ const Conference = ({ conference, league, className }: ConferenceProps) => {
 					</p>
 				)}
 
-				<div className={`mt-2 flex items-center gap-x-3 ${flexAlignment}`}>
+				<div className={`mt-2 flex items-center gap-x-4 ${flexAlignment}`}>
 					{rounds.map((round) => (
 						<div key={round.id} className="flex-1 min-w-34">
 							<p

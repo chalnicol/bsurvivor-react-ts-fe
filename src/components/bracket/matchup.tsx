@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
 	AnyPlayoffsTeamInfo,
 	PlayoffsMatchupInfo,
 } from "../../data/adminData";
 import TeamSlot from "./teamSlot";
+import { useBracket } from "../../context/bracket/BracketProvider";
 
 interface MatchupProps {
 	roundIndex: number;
@@ -11,6 +12,7 @@ interface MatchupProps {
 	conference?: "EAST" | "WEST";
 }
 const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
+	const { isPreview } = useBracket();
 	const alignment = conference === "WEST" ? "right" : "left";
 	const textAlignment = conference === "WEST" ? "text-right" : "text-left";
 
@@ -46,6 +48,23 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 
 	if (!matchup) return;
 
+	const isClickable = useCallback(() => {
+		if (!isPreview && matchup) {
+			return matchup.teams.length >= 2 && matchup.winner_team_id === null;
+		}
+		return false;
+	}, [matchup]);
+
+	const isSelected = useCallback(
+		(teamId: number) => {
+			if (matchup) {
+				return matchup.winner_team_id === teamId;
+			}
+			return false;
+		},
+		[matchup]
+	);
+
 	return (
 		<>
 			<div>
@@ -56,8 +75,8 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 						roundIndex={roundIndex}
 						matchupIndex={matchup.matchup_index}
 						conference={conference}
-						isActive={false}
-						isSelected={false}
+						isClickable={isClickable()}
+						isSelected={isSelected(team1?.id || 0)}
 						alignment={alignment}
 						placeholderText={getPlaceHolderText(1)}
 					/>
@@ -67,8 +86,8 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 						roundIndex={roundIndex}
 						matchupIndex={matchup.matchup_index}
 						conference={conference}
-						isActive={false}
-						isSelected={false}
+						isClickable={isClickable()}
+						isSelected={isSelected(team2?.id || 0)}
 						alignment={alignment}
 						placeholderText={getPlaceHolderText(2)}
 					/>

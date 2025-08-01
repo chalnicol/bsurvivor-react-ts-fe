@@ -5,8 +5,7 @@ import { apiClient } from "../../../utils/api";
 import Loader from "../../../components/loader";
 import { Link } from "react-router-dom";
 import type { BracketChallengeInfo } from "../../../data/adminData";
-import PBABracket from "../../../components/pba/pbaBracket";
-import NBABracket from "../../../components/nba/nbaBracket";
+import Bracket from "../../../components/bracket/bracket";
 import { BracketProvider } from "../../../context/bracket/BracketProvider";
 
 const ViewBracketChallenge = () => {
@@ -98,16 +97,14 @@ const ViewBracketChallenge = () => {
 							{/* preview */}
 							<div>
 								<p className="text-sm">Preview</p>
-								<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
-									<BracketProvider rounds={bracketChallenge.rounds}>
-										{bracketChallenge.league === "NBA" && (
-											<NBABracket />
-										)}
-										{bracketChallenge.league === "PBA" && (
-											<PBABracket />
-										)}
+								<div className="mt-1">
+									<BracketProvider
+										data={bracketChallenge.rounds}
+										isPreview={true}
+									>
+										<Bracket league={bracketChallenge.league} />
 									</BracketProvider>
-								</p>
+								</div>
 							</div>
 
 							<div className="flex space-x-3">

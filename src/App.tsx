@@ -1,7 +1,5 @@
 // import { useState } from "react";
 import Navbar from "./components/navbar";
-import Home from "./pages/home";
-
 import Register from "./components/auth/register";
 import Login from "./components/auth/login";
 import ForgotPassword from "./components/auth/forgotPassword";
@@ -10,33 +8,31 @@ import ProtectedRoute from "./components/protectedRoute";
 import PublicOnlyRoute from "./components/publicOnlyRoute";
 import Unauthorized from "./components/unauthorized";
 import PageNotFound from "./components/pageNotFound";
-
 import AdminDashboard from "./pages/admin/adminDashboard";
-
 import About from "./pages/about";
 import NBAPage from "./pages/leagues/nba";
 import PBAPage from "./pages/leagues/pba";
 import ProfilePage from "./pages/user/profile";
-
 import ListBracketChallenges from "./pages/admin/bracketChallengers/listBracketChallenges";
 import CreateBracketChallenge from "./pages/admin/bracketChallengers/createBracketChallenge";
 import EditBracketChallenge from "./pages/admin/bracketChallengers/editBracketChallenge";
 import ViewBracketChallenge from "./pages/admin/bracketChallengers/viewBracketChallenges";
-
 import ListLeagues from "./pages/admin/leagues/listLeagues";
 import CreateLeague from "./pages/admin/leagues/createLeague";
 import ViewLeague from "./pages/admin/leagues/viewLeague";
-
 import ListTeams from "./pages/admin/teams/listTeams";
 import CreateTeam from "./pages/admin/teams/createTeam";
 import ViewTeam from "./pages/admin/teams/viewTeam";
-
 import ListUsers from "./pages/admin/users/listUsers";
 import ViewUser from "./pages/admin/users/viewUser";
+import BracketEntries from "./pages/user/bracketEntries";
+import EdiLeague from "./pages/admin/leagues/editLeague";
+import EditTeam from "./pages/admin/teams/editTeam";
+import BracketChallengePage from "./pages/bracketChallenge";
+import HomePage from "./pages/homePage";
 
 import { Routes, Route } from "react-router-dom";
-
-import BracketEntries from "./pages/user/bracketEntries";
+import ScrollToTop from "./components/scrollToTop";
 
 // Import the library
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -58,8 +54,10 @@ import {
 	faLock,
 	faCaretRight,
 } from "@fortawesome/free-solid-svg-icons";
-import EdiLeague from "./pages/admin/leagues/editLeague";
-import EditTeam from "./pages/admin/teams/editTeam";
+import Footer from "./components/footer";
+import TermsOfServicePage from "./pages/termsOfService";
+import PrivacyPolicyPage from "./pages/privacyPolicy";
+
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 
 // Add the imported icons/styles to the library
@@ -87,14 +85,28 @@ function App() {
 			<Navbar />
 			<div className="w-full bg-gray-50">
 				<div className="max-w-7xl mx-auto px-4">
+					<ScrollToTop />
+
 					<Routes>
 						{/* Define your routes inside Routes */}
-						<Route path="/" element={<Home />} />
+						<Route path="/" element={<HomePage />} />
 						<Route path="/about" element={<About />} />
 						<Route path="/nba" element={<NBAPage />} />
 						<Route path="/pba" element={<PBAPage />} />
-						<Route path="/unauthorized" element={<Unauthorized />} />{" "}
-						{/* Unauthorized page */}
+						<Route
+							path="/bracket-challenges/:id"
+							element={<BracketChallengePage />}
+						/>
+						<Route
+							path="/terms-of-service"
+							element={<TermsOfServicePage />}
+						/>
+						<Route
+							path="/privacy-policy"
+							element={<PrivacyPolicyPage />}
+						/>
+						<Route path="/unauthorized" element={<Unauthorized />} />
+
 						{/* Public routes */}
 						<Route element={<PublicOnlyRoute />}>
 							<Route path="/register" element={<Register />} />
@@ -179,6 +191,7 @@ function App() {
 					</Routes>
 				</div>
 			</div>
+			<Footer />
 		</>
 	);
 }
