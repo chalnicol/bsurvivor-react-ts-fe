@@ -14,6 +14,7 @@ import apiClient from "../../../utils/axiosConfig";
 import { useParams } from "react-router-dom";
 import StatusMessage from "../../../components/statusMessage";
 import SelectTeamModal from "../../../components/selectTeamModal";
+import ContentBase from "../../../components/ContentBase";
 
 const EditBracketChallenge = () => {
 	const { id } = useParams<{ id: string }>();
@@ -421,49 +422,46 @@ const EditBracketChallenge = () => {
 	);
 
 	return (
-		<>
-			<div className="py-7 min-h-[calc(100dvh-57px)] relative">
-				<div className="p-4 md:p-6 rounded-lg shadow border border-gray-400">
-					<BreadCrumbs />
+		<ContentBase className="py-7 px-4">
+			<div className="p-4 md:p-6 rounded-lg shadow border border-gray-400">
+				<BreadCrumbs />
 
-					<h1 className="text-lg font-bold mb-4">
-						Edit Bracket Challenge
-					</h1>
+				<h1 className="text-lg font-bold mb-4">Edit Bracket Challenge</h1>
 
-					{success && (
-						<StatusMessage
-							type="success"
-							message={success}
-							onClose={() => setSuccess(null)}
-						/>
-					)}
-					{error && (
-						<StatusMessage
-							type="error"
-							message={error}
-							onClose={() => setError(null)}
-						/>
-					)}
+				{success && (
+					<StatusMessage
+						type="success"
+						message={success}
+						onClose={() => setSuccess(null)}
+					/>
+				)}
+				{error && (
+					<StatusMessage
+						type="error"
+						message={error}
+						onClose={() => setError(null)}
+					/>
+				)}
 
-					<form onSubmit={handleSubmit}>
-						<div className="md:flex gap-x-6 lg:gap-x-12 space-y-4 md:space-y-0">
-							<div className="flex-1">
-								{/* Example input fields */}
-								<div className="mb-2">
-									<label htmlFor="league" className="text-xs">
-										Select League
-									</label>
-									<input
-										type="text"
-										id="league"
-										value={league}
-										className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-										readOnly
-									/>
-									<p className="text-xs text-teal-600 mt-1">
-										Note: The "League" input cannot be changed.
-									</p>
-									{/* <select
+				<form onSubmit={handleSubmit}>
+					<div className="md:flex gap-x-6 lg:gap-x-12 space-y-4 md:space-y-0">
+						<div className="flex-1">
+							{/* Example input fields */}
+							<div className="mb-2">
+								<label htmlFor="league" className="text-xs">
+									Select League
+								</label>
+								<input
+									type="text"
+									id="league"
+									value={league}
+									className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									readOnly
+								/>
+								<p className="text-xs text-teal-600 mt-1">
+									Note: The "League" input cannot be changed.
+								</p>
+								{/* <select
 										id="league"
 										value={league}
 										onChange={(e) => setLeague(e.target.value)}
@@ -481,213 +479,112 @@ const EditBracketChallenge = () => {
 									{fieldErrors.league && (
 										<ErrorDisplay errors={fieldErrors.league} />
 									)} */}
-								</div>
-								<div className="mb-2">
-									<label htmlFor="challengeName" className="text-xs">
-										Name
-									</label>
-									<input
-										type="text"
-										id="challengeName"
-										value={name}
-										onChange={(e) => setName(e.target.value)}
-										className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-										placeholder="Enter challenge name"
-										required
-									/>
-									{fieldErrors.name && (
-										<ErrorDisplay errors={fieldErrors.name} />
-									)}
-								</div>
-								<div className="mb-2">
-									<label htmlFor="description" className="text-xs">
-										Description
-									</label>
-									<textarea
-										id="description"
-										className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-										placeholder="Enter challenge description"
-										rows={3}
-										value={description}
-										onChange={(e) => setDescription(e.target.value)}
-									></textarea>
-									{fieldErrors.description && (
-										<ErrorDisplay errors={fieldErrors.description} />
-									)}
-								</div>
-								<div className="mb-2">
-									<label htmlFor="startDate" className="text-xs">
-										Start Date
-									</label>
-									<input
-										type="date"
-										id="startDate"
-										value={startDate}
-										onChange={(e) => setStartDate(e.target.value)}
-										className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-										required
-									/>
-									{fieldErrors.start_date && (
-										<ErrorDisplay errors={fieldErrors.start_date} />
-									)}
-								</div>
-								<div className="mb-2">
-									<label htmlFor="endDate" className="text-xs">
-										End Date
-									</label>
-									<input
-										type="date"
-										id="endDate"
-										value={endDate}
-										onChange={(e) => setEndDate(e.target.value)}
-										className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-										required
-									/>
-									{fieldErrors.end_date && (
-										<ErrorDisplay errors={fieldErrors.end_date} />
-									)}
-								</div>
-								<div className="mb-6 flex items-center text-gray-600">
-									<input
-										type="checkbox"
-										id="is_public"
-										name="is_public"
-										className="w-4 h-4 me-2"
-										disabled={isLoading}
-										checked={isPublic}
-										onChange={(e) => setIsPublic(e.target.checked)}
-									/>
-									<label htmlFor="is_public">Is Public</label>
-								</div>
 							</div>
-							<div className="flex-1 lg:flex-2">
-								<div className="mb-6">
-									<label htmlFor="league" className="text-xs">
-										Select Teams <span>(in order)</span>
-									</label>
-									<hr className="border-gray-400" />
-									{league === "NBA" && (
-										<>
-											<div className="mt-2 lg:flex gap-x-4 space-y-4 lg:space-y-0">
-												<div className="flex-1">
-													<div className="border border-gray-300 shadow-sm">
-														<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
-															<h3>East Teams</h3>
-															<button
-																type="button"
-																className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
-																onClick={() =>
-																	handleOpenModalClick("EAST")
-																}
-															>
-																Change
-															</button>
-														</div>
-														<div className="h-37 lg:h-72 overflow-y-auto">
-															{selectedNBATeams &&
-															selectedNBATeams.east.length >
-																0 ? (
-																selectedNBATeams.east.map(
-																	(team, index) => (
-																		<div
-																			key={index}
-																			className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
-																		>
-																			{index + 1}.{" "}
-																			{team.name}
-																		</div>
-																	)
-																)
-															) : (
-																<p className="p-3 text-sm text-gray-500">
-																	No teams selected
-																</p>
-															)}
-														</div>
-													</div>
-													{fieldErrors[
-														"bracket_data.teams.east"
-													] && (
-														<ErrorDisplay
-															errors={
-																fieldErrors[
-																	"bracket_data.teams.east"
-																]
-															}
-														/>
-													)}
-												</div>
-												<div className="flex-1">
-													<div className="border border-gray-300 shadow-sm">
-														<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
-															<h3>West Teams</h3>
-															<button
-																type="button"
-																className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
-																onClick={() =>
-																	handleOpenModalClick("WEST")
-																}
-															>
-																Change
-															</button>
-														</div>
-														<div className="h-37 lg:h-72 overflow-y-auto">
-															{selectedNBATeams &&
-															selectedNBATeams.west.length >
-																0 ? (
-																selectedNBATeams.west.map(
-																	(team, index) => (
-																		<div
-																			key={index}
-																			className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
-																		>
-																			{index + 1}.{" "}
-																			{team.name}
-																		</div>
-																	)
-																)
-															) : (
-																<p className="p-3 text-sm text-gray-500">
-																	No teams selected
-																</p>
-															)}
-														</div>
-													</div>
-													{fieldErrors[
-														"bracket_data.teams.west"
-													] && (
-														<ErrorDisplay
-															errors={
-																fieldErrors[
-																	"bracket_data.teams.west"
-																]
-															}
-														/>
-													)}
-												</div>
-											</div>
-										</>
-									)}
-									{league === "PBA" && (
-										<div className="mt-1">
-											<div className="">
-												<div className="border border-gray-300 shadow-sm mt-2">
+							<div className="mb-2">
+								<label htmlFor="challengeName" className="text-xs">
+									Name
+								</label>
+								<input
+									type="text"
+									id="challengeName"
+									value={name}
+									onChange={(e) => setName(e.target.value)}
+									className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									placeholder="Enter challenge name"
+									required
+								/>
+								{fieldErrors.name && (
+									<ErrorDisplay errors={fieldErrors.name} />
+								)}
+							</div>
+							<div className="mb-2">
+								<label htmlFor="description" className="text-xs">
+									Description
+								</label>
+								<textarea
+									id="description"
+									className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									placeholder="Enter challenge description"
+									rows={3}
+									value={description}
+									onChange={(e) => setDescription(e.target.value)}
+								></textarea>
+								{fieldErrors.description && (
+									<ErrorDisplay errors={fieldErrors.description} />
+								)}
+							</div>
+							<div className="mb-2">
+								<label htmlFor="startDate" className="text-xs">
+									Start Date
+								</label>
+								<input
+									type="date"
+									id="startDate"
+									value={startDate}
+									onChange={(e) => setStartDate(e.target.value)}
+									className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									required
+								/>
+								{fieldErrors.start_date && (
+									<ErrorDisplay errors={fieldErrors.start_date} />
+								)}
+							</div>
+							<div className="mb-2">
+								<label htmlFor="endDate" className="text-xs">
+									End Date
+								</label>
+								<input
+									type="date"
+									id="endDate"
+									value={endDate}
+									onChange={(e) => setEndDate(e.target.value)}
+									className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									required
+								/>
+								{fieldErrors.end_date && (
+									<ErrorDisplay errors={fieldErrors.end_date} />
+								)}
+							</div>
+							<div className="mb-6 flex items-center text-gray-600">
+								<input
+									type="checkbox"
+									id="is_public"
+									name="is_public"
+									className="w-4 h-4 me-2"
+									disabled={isLoading}
+									checked={isPublic}
+									onChange={(e) => setIsPublic(e.target.checked)}
+								/>
+								<label htmlFor="is_public">Is Public</label>
+							</div>
+						</div>
+						<div className="flex-1 lg:flex-2">
+							<div className="mb-6">
+								<label htmlFor="league" className="text-xs">
+									Select Teams <span>(in order)</span>
+								</label>
+								<hr className="border-gray-400" />
+								{league === "NBA" && (
+									<>
+										<div className="mt-2 lg:flex gap-x-4 space-y-4 lg:space-y-0">
+											<div className="flex-1">
+												<div className="border border-gray-300 shadow-sm">
 													<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
-														<h3>Teams</h3>
+														<h3>East Teams</h3>
 														<button
 															type="button"
 															className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
 															onClick={() =>
-																handleOpenModalClick(null)
+																handleOpenModalClick("EAST")
 															}
 														>
 															Change
 														</button>
 													</div>
 													<div className="h-37 lg:h-72 overflow-y-auto">
-														{selectedPBATeams &&
-														selectedPBATeams.length > 0 ? (
-															selectedPBATeams.map(
+														{selectedNBATeams &&
+														selectedNBATeams.east.length > 0 ? (
+															selectedNBATeams.east.map(
 																(team, index) => (
 																	<div
 																		key={index}
@@ -704,33 +601,126 @@ const EditBracketChallenge = () => {
 														)}
 													</div>
 												</div>
-												{fieldErrors["bracket_data.teams"] && (
+												{fieldErrors["bracket_data.teams.east"] && (
 													<ErrorDisplay
 														errors={
-															fieldErrors["bracket_data.teams"]
+															fieldErrors[
+																"bracket_data.teams.east"
+															]
+														}
+													/>
+												)}
+											</div>
+											<div className="flex-1">
+												<div className="border border-gray-300 shadow-sm">
+													<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
+														<h3>West Teams</h3>
+														<button
+															type="button"
+															className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
+															onClick={() =>
+																handleOpenModalClick("WEST")
+															}
+														>
+															Change
+														</button>
+													</div>
+													<div className="h-37 lg:h-72 overflow-y-auto">
+														{selectedNBATeams &&
+														selectedNBATeams.west.length > 0 ? (
+															selectedNBATeams.west.map(
+																(team, index) => (
+																	<div
+																		key={index}
+																		className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
+																	>
+																		{index + 1}. {team.name}
+																	</div>
+																)
+															)
+														) : (
+															<p className="p-3 text-sm text-gray-500">
+																No teams selected
+															</p>
+														)}
+													</div>
+												</div>
+												{fieldErrors["bracket_data.teams.west"] && (
+													<ErrorDisplay
+														errors={
+															fieldErrors[
+																"bracket_data.teams.west"
+															]
 														}
 													/>
 												)}
 											</div>
 										</div>
-									)}
-									{league === "" && (
-										<div className="w-full bg-gray-100 h-22 mt-2 flex items-center justify-center rounded border border-gray-400 shadow">
-											Please select a league to set teams.
+									</>
+								)}
+								{league === "PBA" && (
+									<div className="mt-1">
+										<div className="">
+											<div className="border border-gray-300 shadow-sm mt-2">
+												<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
+													<h3>Teams</h3>
+													<button
+														type="button"
+														className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
+														onClick={() =>
+															handleOpenModalClick(null)
+														}
+													>
+														Change
+													</button>
+												</div>
+												<div className="h-37 lg:h-72 overflow-y-auto">
+													{selectedPBATeams &&
+													selectedPBATeams.length > 0 ? (
+														selectedPBATeams.map(
+															(team, index) => (
+																<div
+																	key={index}
+																	className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
+																>
+																	{index + 1}. {team.name}
+																</div>
+															)
+														)
+													) : (
+														<p className="p-3 text-sm text-gray-500">
+															No teams selected
+														</p>
+													)}
+												</div>
+											</div>
+											{fieldErrors["bracket_data.teams"] && (
+												<ErrorDisplay
+													errors={
+														fieldErrors["bracket_data.teams"]
+													}
+												/>
+											)}
 										</div>
-									)}
-								</div>
+									</div>
+								)}
+								{league === "" && (
+									<div className="w-full bg-gray-100 h-22 mt-2 flex items-center justify-center rounded border border-gray-400 shadow">
+										Please select a league to set teams.
+									</div>
+								)}
 							</div>
 						</div>
-						<button
-							type="submit"
-							className="bg-gray-700 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition duration-200 cursor-pointer"
-						>
-							UPDATE CHALLENGE
-						</button>
-					</form>
-				</div>
+					</div>
+					<button
+						type="submit"
+						className="bg-gray-700 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition duration-200 cursor-pointer"
+					>
+						UPDATE CHALLENGE
+					</button>
+				</form>
 			</div>
+
 			{/* Modal for selecting teams */}
 			{showAddTeamModal && (
 				<SelectTeamModal
@@ -746,7 +736,7 @@ const EditBracketChallenge = () => {
 				/>
 			)}
 			{(isLoading || isLoadingTeamsAndLeagues) && <Loader />}
-		</>
+		</ContentBase>
 	);
 };
 

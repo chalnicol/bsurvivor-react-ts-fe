@@ -1,21 +1,35 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import ContentBase from "../ContentBase";
 
 const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const { login, isLoading, error, clearMessages } = useAuth();
+	const { login, isLoading, error, clearMessages, isAuthenticated } =
+		useAuth();
 	const navigate = useNavigate();
+	const location = useLocation();
+
+	const from = location.state?.from?.pathname || "/"; // Default to /dashboard
+
+	console.log("loc", location.state?.from?.pathname);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const success = await login(email, password);
 		if (success) {
-			navigate("/");
+			// navigate("/");
+			navigate(from, { replace: true });
 		}
 	};
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate(from, { replace: true });
+		}
+	}, [isAuthenticated, navigate, from]);
 
 	useEffect(() => {
 		return () => {
@@ -24,7 +38,7 @@ const Login = () => {
 	}, []);
 
 	return (
-		<div className="flex items-center justify-center min-h-[calc(100dvh-57px)]">
+		<ContentBase className="flex items-center justify-center p-4">
 			<div className="border border-gray-400 bg-white p-8 pt-6 rounded shadow-md w-full max-w-md">
 				<h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
@@ -90,7 +104,7 @@ const Login = () => {
 					)}
 				</div>
 			</div>
-		</div>
+		</ContentBase>
 	);
 };
 export default Login;

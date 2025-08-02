@@ -1,7 +1,9 @@
+import ContentBase from "../components/ContentBase";
+
 const About = () => {
 	return (
-		<div className="mx-auto py-4 min-h-[calc(100dvh-57px)]">
-			<div className="border border-gray-400 px-3 md:px-8 pt-2 pb-12 mt-4 mb-7 rounded-lg shadow">
+		<ContentBase className="p-4">
+			<div className="border border-gray-400 px-3 md:px-8 pt-2 pb-12 mt-3 mb-6 rounded-lg shadow">
 				<h1 className="text-3xl font-bold mt-4 mb-3">
 					About Our Bracket Challenge
 				</h1>
@@ -65,7 +67,7 @@ const About = () => {
 					more connected to the game you love.
 				</p>
 			</div>
-		</div>
+		</ContentBase>
 	);
 };
 export default About;

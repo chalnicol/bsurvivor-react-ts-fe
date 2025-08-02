@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import type { BracketChallengeInfo } from "../../../data/adminData";
 import Bracket from "../../../components/bracket/bracket";
 import { BracketProvider } from "../../../context/bracket/BracketProvider";
+import { displayLocalDate } from "../../../utils/dateToLocal";
+import ContentBase from "../../../components/ContentBase";
 
 const ViewBracketChallenge = () => {
 	const { id } = useParams<{ id: string }>();
@@ -39,7 +41,7 @@ const ViewBracketChallenge = () => {
 	}, [id]);
 
 	return (
-		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
+		<ContentBase className="py-7 px-4">
 			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">
@@ -84,13 +86,13 @@ const ViewBracketChallenge = () => {
 								<div>
 									<p className="text-sm">Start Date</p>
 									<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
-										{bracketChallenge.start_date}
+										{displayLocalDate(bracketChallenge.start_date)}
 									</p>
 								</div>
 								<div>
 									<p className="text-sm">End Date</p>
 									<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
-										{bracketChallenge.end_date}
+										{displayLocalDate(bracketChallenge.end_date)}
 									</p>
 								</div>
 							</div>
@@ -133,7 +135,7 @@ const ViewBracketChallenge = () => {
 			</div>
 
 			{isLoading && <Loader />}
-		</div>
+		</ContentBase>
 	);
 };
 

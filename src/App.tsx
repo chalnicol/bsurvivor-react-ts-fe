@@ -84,9 +84,8 @@ function App() {
 		<>
 			<Navbar />
 			<div className="w-full bg-gray-50">
-				<div className="max-w-7xl mx-auto px-4">
+				<div className="max-w-7xl mx-auto">
 					<ScrollToTop />
-
 					<Routes>
 						{/* Define your routes inside Routes */}
 						<Route path="/" element={<HomePage />} />
@@ -107,10 +106,11 @@ function App() {
 						/>
 						<Route path="/unauthorized" element={<Unauthorized />} />
 
+						<Route path="/register" element={<Register />} />
+						<Route path="/login" element={<Login />} />
+
 						{/* Public routes */}
 						<Route element={<PublicOnlyRoute />}>
-							<Route path="/register" element={<Register />} />
-							<Route path="/login" element={<Login />} />
 							<Route
 								path="/forgot-password"
 								element={<ForgotPassword />}
@@ -120,6 +120,7 @@ function App() {
 								element={<ResetPassword />}
 							/>
 						</Route>
+
 						{/* Optional: A "Not Found" route */}
 						<Route path="*" element={<PageNotFound />} />
 						<Route element={<ProtectedRoute />}>

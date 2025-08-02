@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/auth/AuthProvider";
 
 interface ProtectedRouteProps {
@@ -13,6 +13,7 @@ const ProtectedRoute = ({
 	requiredPermissions,
 }: ProtectedRouteProps) => {
 	const { isAuthenticated, loading, hasRole, can } = useAuth();
+	const location = useLocation();
 
 	if (loading) {
 		// return <div className="py-3">Loading authentication...</div>; // Or a spinner/loading component
@@ -24,7 +25,8 @@ const ProtectedRoute = ({
 	}
 
 	if (!isAuthenticated) {
-		return <Navigate to="/login" replace />;
+		// return <Navigate to="/login" replace />;
+		return <Navigate to="/login" state={{ from: location }} replace />;
 	}
 
 	if (requiredRoles) {

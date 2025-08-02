@@ -128,7 +128,7 @@ const Navbar = () => {
 	}, []);
 
 	return (
-		<nav className="bg-gray-800 h-14 sticky top-0 z-50">
+		<nav className="bg-gray-800 h-14 sticky top-0 z-10">
 			<div className="max-w-7xl mx-auto flex justify-between items-center gap-x-6 h-full px-4">
 				<Link to="/" className="text-lg text-white font-bold">
 					<FontAwesomeIcon icon="basketball" /> Survivor

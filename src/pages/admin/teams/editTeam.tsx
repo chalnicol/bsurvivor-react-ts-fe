@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import type { AnyTeamInfo } from "../../../data/adminData";
 import { getTeamLogoSrc } from "../../../utils/imageService";
 import ErrorDisplay from "../../../components/errorDisplay";
+import ContentBase from "../../../components/ContentBase";
 
 const EditTeam = () => {
 	const { id } = useParams<{ id: string }>();
@@ -148,7 +149,7 @@ const EditTeam = () => {
 	}, [team]);
 
 	return (
-		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
+		<ContentBase className="py-7 px-4">
 			<div className="p-4 md:p-6 rounded-lg shadow border border-gray-400">
 				<BreadCrumbs />
 				<h1 className="text-lg font-bold mb-4">Edit Team</h1>
@@ -322,7 +323,7 @@ const EditTeam = () => {
 				</div>
 			</div>
 			{(isLoading || isLoadingTeamsAndLeagues) && <Loader />}
-		</div>
+		</ContentBase>
 	);
 };
 

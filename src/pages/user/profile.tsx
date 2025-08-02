@@ -4,7 +4,7 @@ import DeleteAccount from "../../components/profile/deleteAccount";
 
 const ProfilePage = () => {
 	return (
-		<div className="py-10 space-y-8  min-h-[calc(100dvh-57px)]">
+		<div className="py-10 space-y-8 min-h-[calc(100dvh-96px)] p-4">
 			{/* profile */}
 			<ProfileInformation />
 			{/* change password */}

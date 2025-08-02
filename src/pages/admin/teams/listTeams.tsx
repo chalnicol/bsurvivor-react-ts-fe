@@ -14,6 +14,7 @@ import ToDelete from "../../../components/toDelete";
 import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
 //
 import { getTeamLogoSrc } from "../../../utils/imageService";
+import ContentBase from "../../../components/ContentBase";
 
 const ListTeams = () => {
 	const [teams, setTeams] = useState<AnyTeamInfo[]>([]);
@@ -116,7 +117,7 @@ const ListTeams = () => {
 	}, [debouncedSearchTerm]);
 
 	return (
-		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
+		<ContentBase className="py-7 px-4">
 			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">
@@ -244,7 +245,7 @@ const ListTeams = () => {
 				/>
 			</div>
 			{isLoading && <Loader />}
-		</div>
+		</ContentBase>
 	);
 };
 

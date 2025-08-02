@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const BracketEntries = () => {
 	return (
-		<div className="py-7 min-h-[calc(100dvh-57px)]">
+		<div className="py-7 min-h-[calc(100dvh-96px)] p-4">
 			<div>
 				<h1 className="font-bold text-lg">Bracket Challenges Entries</h1>
 

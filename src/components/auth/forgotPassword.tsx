@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
+import ContentBase from "../ContentBase";
 
 const ForgotPassword = () => {
 	const [email, setEmail] = useState("");
@@ -22,7 +23,7 @@ const ForgotPassword = () => {
 	}, []);
 
 	return (
-		<div className="flex items-center justify-center min-h-[calc(100dvh-57px)]">
+		<ContentBase className="flex items-center justify-center p-4">
 			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md border border-gray-400">
 				<h2 className="text-2xl font-bold mb-4 text-center">
 					Forgot Password?
@@ -68,7 +69,7 @@ const ForgotPassword = () => {
 				)}
 				{error && <p className="text-red-500 text-sm my-3">{error}</p>}
 			</div>
-		</div>
+		</ContentBase>
 	);
 };
 export default ForgotPassword;

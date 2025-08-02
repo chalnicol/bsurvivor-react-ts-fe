@@ -7,6 +7,8 @@ import { BracketProvider } from "../context/bracket/BracketProvider";
 import Loader from "../components/loader";
 import Bracket from "../components/bracket/bracket";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { displayLocalDate } from "../utils/dateToLocal";
+import ContentBase from "../components/ContentBase";
 
 const BracketChallengePage = () => {
 	const { id } = useParams<{ id: string }>();
@@ -40,7 +42,7 @@ const BracketChallengePage = () => {
 	}, [id]);
 
 	return (
-		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
+		<ContentBase className="px-4 py-7">
 			{bracketChallenge ? (
 				<>
 					<h1 className="text-xl font-bold flex-1">
@@ -49,6 +51,25 @@ const BracketChallengePage = () => {
 					{bracketChallenge.description && (
 						<p className="text-sm my-1">{bracketChallenge.description}</p>
 					)}
+
+					<div className="md:flex gap-x-4 space-y-2 md:space-y-0 mt-3">
+						<div className="flex-1 md:flex items-center gap-x-2">
+							<p className="text-xs font-bold text-gray-600 mb-1 md:mb-0">
+								Start Date
+							</p>
+							<p className="border border-gray-300 py-1 px-2 rounded bg-gray-200 flex-1">
+								{displayLocalDate(bracketChallenge.start_date)}
+							</p>
+						</div>
+						<div className="flex-1 md:flex items-center gap-x-2">
+							<p className="text-xs font-bold text-gray-600 mb-1 md:mb-0">
+								End Date
+							</p>
+							<p className="border border-gray-300 py-1 px-2 rounded bg-gray-200 flex-1">
+								{displayLocalDate(bracketChallenge.end_date)}
+							</p>
+						</div>
+					</div>
 
 					<div className="mt-3">
 						<BracketProvider
@@ -65,7 +86,7 @@ const BracketChallengePage = () => {
 				</p>
 			)}
 			{isLoading && <Loader />}
-		</div>
+		</ContentBase>
 	);
 };
 

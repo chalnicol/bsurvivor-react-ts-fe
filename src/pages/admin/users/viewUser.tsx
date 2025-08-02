@@ -7,6 +7,7 @@ import { apiClient } from "../../../utils/api";
 import Loader from "../../../components/loader";
 import { useAdmin } from "../../../context/admin/AdminProvider";
 import { useAuth } from "../../../context/auth/AuthProvider";
+import ContentBase from "../../../components/ContentBase";
 
 const ViewUser = () => {
 	const { id } = useParams<{ id: string }>();
@@ -125,7 +126,7 @@ const ViewUser = () => {
 	}, [user]);
 
 	return (
-		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
+		<ContentBase className="py-7">
 			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">
@@ -229,9 +230,8 @@ const ViewUser = () => {
 					)}
 				</div>
 			</div>
-
 			{isLoading && <Loader />}
-		</div>
+		</ContentBase>
 	);
 };
 

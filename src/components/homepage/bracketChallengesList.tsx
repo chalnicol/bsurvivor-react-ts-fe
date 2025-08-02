@@ -16,7 +16,7 @@ const BracketChallengeActiveList = () => {
 			setIsLoading(true);
 			try {
 				const response = await apiClient.get("/bracket-challenges/active");
-				console.log(response.data.challenges);
+				// console.log(response.data.challenges);
 				setBracketChallenges(response.data.challenges);
 			} catch (error) {
 				console.error(error);

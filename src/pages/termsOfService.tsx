@@ -1,6 +1,8 @@
+import ContentBase from "../components/ContentBase";
+
 const TermsOfServicePage = () => {
 	return (
-		<div className="mx-auto py-4 min-h-[calc(100dvh-57px)]">
+		<ContentBase className="p-4">
 			<div className="border border-gray-400 px-3 md:px-8 pt-2 pb-12 mt-4 mb-7 rounded-lg shadow">
 				<h1 className="text-3xl font-bold mt-4 mb-3">Terms of Service</h1>
 
@@ -143,7 +145,7 @@ const TermsOfServicePage = () => {
 					Last Updated: [Current Date, e.g., August 1, 2025]
 				</p>
 			</div>
-		</div>
+		</ContentBase>
 	);
 };
 

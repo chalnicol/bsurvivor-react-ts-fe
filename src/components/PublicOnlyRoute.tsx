@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/auth/AuthProvider";
-
+// import { useLocation } from "react-router-dom";
 const PublicOnlyRoute: React.FC = () => {
 	const { isAuthenticated, loading } = useAuth();
 

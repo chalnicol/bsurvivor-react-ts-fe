@@ -6,6 +6,7 @@ import {
 } from "../../data/adminData";
 import { useEffect, useState } from "react";
 import Loader from "../../components/loader";
+import ContentBase from "../../components/ContentBase";
 
 const AdminDashboard = () => {
 	const [totals, setTotals] = useState<TotalsInfo | null>(null);
@@ -31,7 +32,7 @@ const AdminDashboard = () => {
 	}, []);
 
 	return (
-		<div className="py-7 min-h-[calc(100dvh-57px)] relative">
+		<ContentBase className="py-7 px-4">
 			<h1 className="text-2xl font-bold mb-1">Admin Dashboard</h1>
 			<p className="text-sm">Welcome to the admin dashboard!</p>
 			{totals ? (
@@ -85,7 +86,7 @@ const AdminDashboard = () => {
 				</div>
 			)}
 			{!totals && <Loader />}
-		</div>
+		</ContentBase>
 	);
 };
 

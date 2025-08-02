@@ -1,6 +1,8 @@
+import ContentBase from "../components/ContentBase";
+
 const PrivacyPolicyPage = () => {
 	return (
-		<div className="mx-auto py-4 min-h-[calc(100dvh-57px)]">
+		<ContentBase className="p-4">
 			<div className="border border-gray-400 px-3 md:px-8 pt-2 pb-12 mt-4 mb-7 rounded-lg shadow">
 				<h1 className="text-3xl font-bold mt-4 mb-3">Privacy Policy</h1>
 
@@ -179,21 +181,7 @@ const PrivacyPolicyPage = () => {
 				</p>
 
 				<h2 className="text-2xl font-semibold text-gray-700 mt-8 mb-4">
-					7. Children's Privacy
-				</h2>
-				<p className="mb-4">
-					Our Service does not address anyone under the age of [e.g., 13].
-					We do not knowingly collect personally identifiable information
-					from anyone under the age of [e.g., 13]. If you are a parent or
-					guardian and you are aware that your child has provided us with
-					Personal Data, please contact us. If we become aware that we have
-					collected Personal Data from children without verification of
-					parental consent, we take steps to remove that information from
-					our servers.
-				</p>
-
-				<h2 className="text-2xl font-semibold text-gray-700 mt-8 mb-4">
-					8. Changes to This Privacy Policy
+					7. Changes to This Privacy Policy
 				</h2>
 				<p className="mb-4">
 					We may update our Privacy Policy from time to time. We will
@@ -204,25 +192,26 @@ const PrivacyPolicyPage = () => {
 				</p>
 
 				<h2 className="text-2xl font-semibold text-gray-700 mt-8 mb-4">
-					9. Contact Us
+					8. Contact Us
 				</h2>
 				<p className="mb-4">
 					If you have any questions about this Privacy Policy, please
 					contact us:
 				</p>
 				<ul className="list-disc ml-6 mb-4">
-					<li className="mb-2">By email: [Your Contact Email Address]</li>
-					<li className="mb-2">
+					<li className="mb-2">By email: chalnicol@gmail.com</li>
+					<li className="mb-2">By phone number: +639694547951</li>
+					{/* <li className="mb-2">
 						By visiting this page on our website: [Link to your contact
 						page, if applicable]
-					</li>
+					</li> */}
 				</ul>
 
 				<p className="text-sm text-gray-500 mt-8">
 					Last Updated: [Current Date, e.g., August 1, 2025]
 				</p>
 			</div>
-		</div>
+		</ContentBase>
 	);
 };
 

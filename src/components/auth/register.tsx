@@ -1,19 +1,31 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import ContentBase from "../ContentBase";
 
 const Register = () => {
+	const location = useLocation();
+
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [passwordConfirmation, setPasswordConfirmation] = useState("");
-	const { register, error, isLoading, clearMessages } = useAuth();
+	const { register, error, isLoading, isAuthenticated, clearMessages } =
+		useAuth();
 	const navigate = useNavigate();
+
+	const from = location.state?.from?.pathname || "/"; // Default to /dashboard
 
 	useEffect(() => {
 		clearMessages();
 	}, []);
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate(from, { replace: true });
+		}
+	}, [isAuthenticated, navigate, from]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -30,7 +42,7 @@ const Register = () => {
 	};
 
 	return (
-		<div className="flex items-center justify-center min-h-[calc(100dvh-57px)]">
+		<ContentBase className="flex items-center justify-center p-4">
 			<div className="border border-gray-400 bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md">
 				<h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
 
@@ -119,7 +131,7 @@ const Register = () => {
 					)}
 				</div>
 			</div>
-		</div>
+		</ContentBase>
 	);
 };
 export default Register;

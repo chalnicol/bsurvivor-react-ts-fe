@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
+import ContentBase from "../ContentBase";
 
 const resetPassword = () => {
 	const location = useLocation();
@@ -69,7 +70,7 @@ const resetPassword = () => {
 
 	if (isInvalid) {
 		return (
-			<div className="flex items-center justify-center min-h-[calc(100dvh-57px)]">
+			<ContentBase className="flex items-center justify-center p-4">
 				<div className="border bg-white border-gray-500 p-3 rounded max-w-lg shadow-lg mx-auto">
 					<h2 className="font-bold text-lg">Invalid Link</h2>
 					<p className="text-sm mt-2 mb-6">
@@ -84,12 +85,12 @@ const resetPassword = () => {
 						REQUEST NEW LINK
 					</button>
 				</div>
-			</div>
+			</ContentBase>
 		);
 	}
 
 	return (
-		<div className="flex items-center justify-center min-h-[calc(100dvh-57px)]">
+		<ContentBase className="flex items-center justify-center p-4">
 			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md border border-gray-400">
 				<h2 className="text-2xl font-bold mb-4 text-center">
 					Reset Password
@@ -161,7 +162,7 @@ const resetPassword = () => {
 				)}
 				{error && <p className="text-red-500 text-sm my-3">{error}</p>}
 			</div>
-		</div>
+		</ContentBase>
 	);
 };
 export default resetPassword;
