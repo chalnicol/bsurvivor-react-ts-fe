@@ -9,6 +9,7 @@ import Bracket from "../../../components/bracket/bracket";
 import { BracketProvider } from "../../../context/bracket/BracketProvider";
 import { displayLocalDate } from "../../../utils/dateToLocal";
 import ContentBase from "../../../components/ContentBase";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ViewBracketChallenge = () => {
 	const { id } = useParams<{ id: string }>();
@@ -54,9 +55,10 @@ const ViewBracketChallenge = () => {
 					{bracketChallenge ? (
 						<>
 							<div>
-								<h1 className="text-2xl font-bold text-gray-600">
+								<h2 className="text-2xl font-bold text-gray-600">
+									<FontAwesomeIcon icon="caret-right" />{" "}
 									{bracketChallenge.name}
-								</h1>
+								</h2>
 								<p className="text-sm text-gray-500">
 									{bracketChallenge.description ||
 										"No description provided."}
@@ -66,15 +68,9 @@ const ViewBracketChallenge = () => {
 
 							<div className="grid md:grid-cols-2 lg:grid-cols-4 grid-cols-1 gap-x-4 gap-y-2 mb-2">
 								<div>
-									<p className="text-sm">League</p>
-									<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
-										{bracketChallenge.league}
-									</p>
-								</div>
-								<div>
 									<p className="text-sm">Is Public</p>
 									<p
-										className={`px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1 ${
+										className={`px-3 py-2 border border-gray-400 bg-gray-200 font-semibold rounded mt-1 ${
 											bracketChallenge.is_public
 												? "text-green-700"
 												: "text-red-600"
@@ -84,14 +80,21 @@ const ViewBracketChallenge = () => {
 									</p>
 								</div>
 								<div>
+									<p className="text-sm">League</p>
+									<p className="px-3 py-2 border border-gray-400 bg-gray-200 font-semibold rounded mt-1">
+										{bracketChallenge.league}
+									</p>
+								</div>
+
+								<div>
 									<p className="text-sm">Start Date</p>
-									<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
+									<p className="px-3 py-2 border border-gray-400 bg-gray-200 font-semibold rounded mt-1">
 										{displayLocalDate(bracketChallenge.start_date)}
 									</p>
 								</div>
 								<div>
 									<p className="text-sm">End Date</p>
-									<p className="px-3 py-2 border border-gray-200 bg-gray-200 font-semibold rounded mt-1">
+									<p className="px-3 py-2 border border-gray-400 bg-gray-200 font-semibold rounded mt-1">
 										{displayLocalDate(bracketChallenge.end_date)}
 									</p>
 								</div>
@@ -101,8 +104,8 @@ const ViewBracketChallenge = () => {
 								<p className="text-sm">Preview</p>
 								<div className="mt-1">
 									<BracketProvider
-										data={bracketChallenge.rounds}
-										isPreview={true}
+										bracketChallenge={bracketChallenge}
+										activeControls={false}
 									>
 										<Bracket league={bracketChallenge.league} />
 									</BracketProvider>
@@ -125,7 +128,7 @@ const ViewBracketChallenge = () => {
 							</div>
 						</>
 					) : (
-						<p>
+						<p className="bg-gray-200 px-3 py-2">
 							{isLoading
 								? "Loading bracket challenge details..."
 								: "No bracket challenge data found."}

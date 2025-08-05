@@ -57,7 +57,7 @@ const ViewTeam = () => {
 								</div>
 								<div className="flex-1 py-1">
 									<h1 className="text-xl font-semibold text-gray-900">
-										{team.name}
+										{team.fname} {team.lname}
 									</h1>
 									<h2 className="text-lg font-semibold text-gray-600">
 										( {team.abbr} )

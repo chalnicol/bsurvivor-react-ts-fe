@@ -339,7 +339,8 @@ const EditBracketChallenge = () => {
 				// Inside this block, 'team' is now correctly inferred as NBATeamInfo
 				return (
 					team.conference === conference &&
-					team.name.toLowerCase().includes(searchTerm.toLowerCase())
+					(team.fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+						team.lname.toLowerCase().includes(searchTerm.toLowerCase()))
 				);
 			}
 			// If it's not an NBA team, it shouldn't be included in filteredNbaTeams
@@ -352,7 +353,10 @@ const EditBracketChallenge = () => {
 			// Type Guard: Check if 'team' is an PBATeamInfo
 			if (team.league === "PBA") {
 				// Inside this block, 'team' is now correctly inferred as NBATeamInfo
-				return team.name.toLowerCase().includes(searchTerm.toLowerCase());
+				return (
+					team.fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+					team.lname.toLowerCase().includes(searchTerm.toLowerCase())
+				);
 			}
 			// If it's not an PBA team, it shouldn't be included in filteredNbaTeams
 			return false;
@@ -590,7 +594,8 @@ const EditBracketChallenge = () => {
 																		key={index}
 																		className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
 																	>
-																		{index + 1}. {team.name}
+																		{index + 1}. {team.fname}{" "}
+																		{team.lname}
 																	</div>
 																)
 															)
@@ -632,9 +637,10 @@ const EditBracketChallenge = () => {
 																(team, index) => (
 																	<div
 																		key={index}
-																		className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
+																		className="p-2 even:bg-gray-100 hover:bg-blue-50 text-sm"
 																	>
-																		{index + 1}. {team.name}
+																		{index + 1}. {team.fname}{" "}
+																		{team.lname}
 																	</div>
 																)
 															)
@@ -681,9 +687,10 @@ const EditBracketChallenge = () => {
 															(team, index) => (
 																<div
 																	key={index}
-																	className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
+																	className="p-2 even:bg-gray-100 hover:bg-blue-50 text-sm"
 																>
-																	{index + 1}. {team.name}
+																	{index + 1}. {team.fname}{" "}
+																	{team.lname}
 																</div>
 															)
 														)

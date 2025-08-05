@@ -75,7 +75,7 @@ const ViewLeague = () => {
 												key={team.id}
 												className="py-0.5 border-b last:border-b-0 border-gray-300"
 											>
-												{team.name} ({team.abbr})
+												{team.fname} {team.lname} ({team.abbr})
 											</p>
 										))
 									) : (

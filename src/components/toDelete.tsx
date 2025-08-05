@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 interface ToDeleteProps {
 	name: string;
 	onCancel: () => void;
 	onConfirm: () => void;
 }
+
+gsap.registerPlugin(ScrollToPlugin);
 
 const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -35,6 +37,16 @@ const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
 		}
 	};
 
+	const scrollAnim = () => {
+		if (containerRef.current) {
+			gsap.to(window, {
+				scrollTo: { y: containerRef.current.offsetTop, offsetY: 10 },
+				duration: 0.5,
+				ease: "power4.out",
+			});
+		}
+	};
+
 	const handleResponse = (response: "cancel" | "confirm") => {
 		if (response === "cancel") {
 			closeAnim();
@@ -45,6 +57,13 @@ const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
 
 	useEffect(() => {
 		openAnim();
+		scrollAnim();
+
+		// return () => {
+		// 	if (containerRef.current) {
+		// 		gsap.killTweensOf(containerRef.current);
+		// 	}
+		// };
 	}, [name]);
 
 	return (

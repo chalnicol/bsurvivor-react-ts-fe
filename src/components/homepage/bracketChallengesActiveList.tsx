@@ -45,8 +45,8 @@ const BracketChallengeActiveList = () => {
 									{bracketChallenge.name}
 								</div>
 								<Link
-									to={`/bracket-challenges/${bracketChallenge.id}`}
-									className="bg-teal-700 font-bold hover:bg-gren-500 text-xs px-3 py-1 block w-26 md:w-14 rounded text-white text-center cursor-pointer"
+									to={`/bracket-challenges/${bracketChallenge.slug}`}
+									className="bg-teal-700 font-bold hover:bg-teal-600 text-xs px-3 py-1 block w-26 md:w-18 rounded text-white text-center cursor-pointer"
 								>
 									VIEW
 								</Link>

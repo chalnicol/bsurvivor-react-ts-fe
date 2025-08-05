@@ -10,7 +10,9 @@ const PublicOnlyRoute: React.FC = () => {
 	if (loading) {
 		return (
 			<div className="py-7 min-h-[calc(100dvh-57px)] flex items-center justify-center">
-				<p className="font-medium xl:text-lg">Loading Authentication...</p>
+				<p className="font-medium xl:text-lg border border-gray-400 rounded p-2">
+					Loading Authentication...
+				</p>
 			</div>
 		);
 	}

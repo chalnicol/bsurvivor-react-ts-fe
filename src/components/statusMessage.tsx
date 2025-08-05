@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
 interface StatusMessageProps {
 	message: string;
@@ -8,17 +9,19 @@ interface StatusMessageProps {
 	onClose: () => void;
 }
 
+gsap.registerPlugin(ScrollToPlugin);
+
 const StatusMessage = ({ message, type, onClose }: StatusMessageProps) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const bgClr = () => {
 		switch (type) {
 			case "success":
-				return "bg-green-600";
+				return "bg-green-500";
 			case "error":
-				return "bg-red-600";
+				return "bg-red-500";
 			default:
-				return "bg-green-600";
+				return "bg-green-500";
 		}
 	};
 
@@ -47,11 +50,21 @@ const StatusMessage = ({ message, type, onClose }: StatusMessageProps) => {
 		}
 	};
 
+	const scrollAnim = () => {
+		if (containerRef.current) {
+			gsap.to(window, {
+				scrollTo: { y: containerRef.current.offsetTop, offsetY: 10 },
+				duration: 0.5,
+				ease: "power4.out",
+			});
+		}
+	};
+
 	useEffect(() => {
 		if (!message) return;
 
 		openAnim();
-
+		scrollAnim();
 		let timer = setTimeout(() => closeAnim(), 5000);
 
 		return () => {

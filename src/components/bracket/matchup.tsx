@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type {
 	AnyPlayoffsTeamInfo,
 	PlayoffsMatchupInfo,
@@ -12,7 +12,7 @@ interface MatchupProps {
 	conference?: "EAST" | "WEST";
 }
 const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
-	const { isPreview } = useBracket();
+	const { activeControls } = useBracket();
 	const alignment = conference === "WEST" ? "right" : "left";
 	const textAlignment = conference === "WEST" ? "text-right" : "text-left";
 
@@ -49,7 +49,7 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 	if (!matchup) return;
 
 	const isClickable = useCallback(() => {
-		if (!isPreview && matchup) {
+		if (activeControls && matchup) {
 			return matchup.teams.length >= 2 && matchup.winner_team_id === null;
 		}
 		return false;
@@ -68,10 +68,10 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 	return (
 		<>
 			<div>
-				<div className="space-y-1">
+				<div className="space-y-1.5">
 					<TeamSlot
 						team={team1}
-						slot={1}
+						// slot={1}
 						roundIndex={roundIndex}
 						matchupIndex={matchup.matchup_index}
 						conference={conference}
@@ -82,7 +82,7 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 					/>
 					<TeamSlot
 						team={team2}
-						slot={2}
+						// slot={2}
 						roundIndex={roundIndex}
 						matchupIndex={matchup.matchup_index}
 						conference={conference}

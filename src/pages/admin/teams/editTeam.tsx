@@ -28,7 +28,8 @@ const EditTeam = () => {
 	const [logoUrl, setLogoUrl] = useState<string>("");
 	const [fileLogo, setFileLogo] = useState<File | null>(null);
 	const [abbr, setAbbr] = useState<string>("");
-	const [name, setName] = useState<string>("");
+	const [fname, setFName] = useState<string>("");
+	const [lname, setLName] = useState<string>("");
 
 	const [isLogoFile, setIsLogoFile] = useState<boolean>(false);
 
@@ -71,7 +72,9 @@ const EditTeam = () => {
 		if (league === "NBA") {
 			formData.append("conference", conference);
 		}
-		formData.append("name", name);
+		formData.append("fname", fname);
+		formData.append("lname", lname);
+
 		formData.append("abbr", abbr);
 		if (fileLogo !== null) {
 			formData.append("logo", fileLogo);
@@ -141,7 +144,8 @@ const EditTeam = () => {
 			if (team.league === "NBA") {
 				setConference(team.conference);
 			}
-			setName(team.name);
+			setFName(team.fname);
+			setLName(team.lname);
 			setAbbr(team.abbr);
 			setImagePreview(team.logo ?? null);
 			// setLogoUrl(team.logo_url);
@@ -219,20 +223,37 @@ const EditTeam = () => {
 							</>
 						)}
 						<div>
-							<label htmlFor="fullName" className="text-xs">
-								Name
+							<label htmlFor="fname" className="text-xs">
+								First Name ( City or Club )
 							</label>
 							<input
 								type="text"
 								id="fullName"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
+								value={fname}
+								onChange={(e) => setFName(e.target.value)}
 								className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 								placeholder="Enter league's full name"
 								required
 							/>
-							{fieldErrors.name && (
-								<ErrorDisplay errors={fieldErrors.name} />
+							{fieldErrors.fname && (
+								<ErrorDisplay errors={fieldErrors.fname} />
+							)}
+						</div>
+						<div>
+							<label htmlFor="lname" className="text-xs">
+								Last Name ( Monicker )
+							</label>
+							<input
+								type="text"
+								id="lname"
+								value={lname}
+								onChange={(e) => setLName(e.target.value)}
+								className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+								placeholder="Enter league's full name"
+								required
+							/>
+							{fieldErrors.lname && (
+								<ErrorDisplay errors={fieldErrors.lname} />
 							)}
 						</div>
 						<div>

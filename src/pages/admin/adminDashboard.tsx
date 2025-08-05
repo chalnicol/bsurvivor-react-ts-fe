@@ -44,6 +44,14 @@ const AdminDashboard = () => {
 						description="View and manage users."
 						bgColor="green"
 					/>
+					{/* entries */}
+					<AdminThumbs
+						resource="bracket-challenge-entries"
+						total={totals.bracketChallengeEntryTotal}
+						description="View and manage basketball teams."
+						bgColor="cyan"
+						withAddBtn={false}
+					/>
 
 					{/* challenges */}
 					<AdminThumbs
@@ -69,14 +77,6 @@ const AdminDashboard = () => {
 						total={totals.teamTotal}
 						description="View and manage basketball teams."
 						bgColor="blue"
-						withAddBtn={true}
-					/>
-
-					<AdminThumbs
-						resource="bracket-challenge-entries"
-						total={0}
-						description="View and manage basketball teams."
-						bgColor="cyan"
 						withAddBtn={true}
 					/>
 				</div>

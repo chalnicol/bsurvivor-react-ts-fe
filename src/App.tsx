@@ -25,11 +25,16 @@ import CreateTeam from "./pages/admin/teams/createTeam";
 import ViewTeam from "./pages/admin/teams/viewTeam";
 import ListUsers from "./pages/admin/users/listUsers";
 import ViewUser from "./pages/admin/users/viewUser";
-import BracketEntries from "./pages/user/bracketEntries";
+import BracketEntriesList from "./pages/user/bracketEntriesList";
 import EdiLeague from "./pages/admin/leagues/editLeague";
 import EditTeam from "./pages/admin/teams/editTeam";
-import BracketChallengePage from "./pages/bracketChallenge";
+import BracketChallengePage from "./pages/bracketChallengePage";
 import HomePage from "./pages/homePage";
+import Footer from "./components/footer";
+import TermsOfServicePage from "./pages/termsOfService";
+import PrivacyPolicyPage from "./pages/privacyPolicy";
+import ListBracketChallengeEntries from "./pages/admin/bracketChallengeEntries/listBracketChallengeEntries";
+import ViewBracketChallengeEntry from "./pages/admin/bracketChallengeEntries/viewBracketChallengeEntry";
 
 import { Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/scrollToTop";
@@ -54,9 +59,7 @@ import {
 	faLock,
 	faCaretRight,
 } from "@fortawesome/free-solid-svg-icons";
-import Footer from "./components/footer";
-import TermsOfServicePage from "./pages/termsOfService";
-import PrivacyPolicyPage from "./pages/privacyPolicy";
+import BracketChallengeEntryPage from "./pages/bracketChallengeEntryPage";
 
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 
@@ -93,8 +96,12 @@ function App() {
 						<Route path="/nba" element={<NBAPage />} />
 						<Route path="/pba" element={<PBAPage />} />
 						<Route
-							path="/bracket-challenges/:id"
+							path="/bracket-challenges/:slug"
 							element={<BracketChallengePage />}
+						/>
+						<Route
+							path="/bracket-challenge-entries/:slug"
+							element={<BracketChallengeEntryPage />}
 						/>
 						<Route
 							path="/terms-of-service"
@@ -125,10 +132,20 @@ function App() {
 						<Route path="*" element={<PageNotFound />} />
 						<Route element={<ProtectedRoute />}>
 							<Route path="/profile" element={<ProfilePage />} />
-							<Route path="/entries" element={<BracketEntries />} />
+							<Route path="/entries" element={<BracketEntriesList />} />
 
 							<Route element={<ProtectedRoute requiredRoles="admin" />}>
 								<Route path="/admin" element={<AdminDashboard />} />
+
+								{/* bracket challenge entries routes */}
+								<Route
+									path="/admin/bracket-challenge-entries/"
+									element={<ListBracketChallengeEntries />}
+								/>
+								<Route
+									path="/admin/bracket-challenge-entries/:id"
+									element={<ViewBracketChallengeEntry />}
+								/>
 
 								{/* bracket challenge routes */}
 								<Route

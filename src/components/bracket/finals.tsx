@@ -1,25 +1,24 @@
 import TeamSlot from "./teamSlot";
-import { useCallback, useEffect, useState } from "react";
-
+import { useCallback, useEffect, useRef, useState } from "react";
 import pbaThrophy from "../../assets/pba_trophy.png";
 import pbaLogo from "../../assets/pba.png";
 import nbaThrophy from "../../assets/nba_trophy.png";
 import nbaLogo from "../../assets/nba.png";
-
 import { useBracket } from "../../context/bracket/BracketProvider";
-
 import type {
 	AnyPlayoffsTeamInfo,
 	PlayoffsMatchupInfo,
 } from "../../data/adminData";
 import { getTeamLogoSrc } from "../../utils/imageService";
+import gsap from "gsap";
 
 interface PBAFinalsProps {
 	league: "NBA" | "PBA";
 	className?: string;
 }
+
 const Finals = ({ league, className }: PBAFinalsProps) => {
-	const { rounds } = useBracket();
+	const { rounds, activeControls } = useBracket();
 
 	const [matchup, setMatchup] = useState<PlayoffsMatchupInfo | null>(null);
 
@@ -29,6 +28,8 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 	const [winningTeam, setWinningTeam] = useState<AnyPlayoffsTeamInfo | null>(
 		null
 	);
+
+	const winningTeamRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (!rounds) return;
@@ -53,6 +54,17 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 		}
 	}, [rounds]);
 
+	useEffect(() => {
+		if (!activeControls) return;
+		if (winningTeam && winningTeamRef.current) {
+			gsap.fromTo(
+				winningTeamRef.current,
+				{ scale: 0 },
+				{ scale: 1, duration: 0.5, ease: "elastic.out(1.1, 0.6)" }
+			);
+		}
+	}, [winningTeam, winningTeamRef.current]);
+
 	const isClickable = useCallback(() => {
 		if (matchup) {
 			return matchup.teams.length >= 2 && matchup.winner_team_id == null;
@@ -73,7 +85,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 	return (
 		<>
 			<div
-				className={`text-center space-y-10 select-none w-44 ${className}`}
+				className={`text-center space-y-10 select-none w-48 ${className}`}
 			>
 				<div>
 					<div className="font-bold text-lg mb-1 flex items-center gap-x-2 justify-center">
@@ -87,7 +99,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 					<div className="space-y-2 w-full">
 						<TeamSlot
 							team={teamA}
-							slot={1}
+							// slot={1}
 							alignment="center"
 							isSelected={isSelected(teamA?.id || 0)}
 							isClickable={isClickable()}
@@ -98,7 +110,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 
 						<TeamSlot
 							team={teamB}
-							slot={2}
+							// slot={2}
 							alignment="center"
 							isSelected={isSelected(teamB?.id || 0)}
 							isClickable={isClickable()}
@@ -117,20 +129,32 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 								/>
 								<span>CHAMPION</span>
 							</div>
-							<div className="border border-gray-400 rounded shadow bg-white px-3 py-2 space-y-2">
+							<div
+								ref={winningTeamRef}
+								className={`border-2 rounded-lg shadow px-3 py-1.5 space-y-2 whitespace-nowrap ${
+									winningTeam
+										? "border-gray-400 bg-green-50"
+										: "border-gray-300 bg-white"
+								}`}
+							>
 								{winningTeam ? (
-									<div className="flex items-center justify-center gap-x-2">
+									<div className="flex items-center justify-center gap-x-1">
 										<img
 											src={getTeamLogoSrc(winningTeam.logo || "")}
 											alt={winningTeam.abbr}
-											className="h-8 object-contain"
+											className="h-9 object-contain"
 										/>
-										<p className="text-2xl font-bold">
-											{winningTeam.abbr}
-										</p>
+										<div className="leading-5">
+											<p className="font-bold text-left">
+												{winningTeam.fname}
+											</p>
+											<p className="font-bold text-left">
+												{winningTeam.lname}
+											</p>
+										</div>
 									</div>
 								) : (
-									<p className=" font-semibold h-8 flex items-center justify-center">
+									<p className=" font-bold text-gray-500 h-10 flex items-center justify-center">
 										- CHAMPION -
 									</p>
 								)}

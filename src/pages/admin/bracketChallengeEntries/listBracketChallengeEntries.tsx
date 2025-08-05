@@ -1,8 +1,7 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import BreadCrumbs from "../../../components/breadCrumbs";
 import {
-	type BracketChallengeInfo,
+	type BracketChallengeEntryInfo,
 	type MetaInfo,
 	type PaginatedResponse,
 } from "../../../data/adminData";
@@ -16,17 +15,19 @@ import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
 import ToDelete from "../../../components/toDelete";
 import StatusMessage from "../../../components/statusMessage";
 import ContentBase from "../../../components/ContentBase";
-import { displayLocalDate } from "../../../utils/dateToLocal";
+import { Link } from "react-router-dom";
 
-const ListBracketChallenges = () => {
-	const [bracketChallenges, setBracketChallenges] = useState<
-		BracketChallengeInfo[]
+const ListBracketChallengeEntries = () => {
+	const [bracketChallengeEntries, setBracketChallengeEntries] = useState<
+		BracketChallengeEntryInfo[]
 	>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [meta, setMeta] = useState<MetaInfo | null>(null);
 	const [searchTerm, setSearchTerm] = useState<string>("");
-	const [toDelete, setToDelete] = useState<BracketChallengeInfo | null>(null);
+	const [toDelete, setToDelete] = useState<BracketChallengeEntryInfo | null>(
+		null
+	);
 
 	const [success, setSuccess] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -38,13 +39,13 @@ const ListBracketChallenges = () => {
 		setIsLoading(true);
 		try {
 			const response = await apiClient.get<
-				PaginatedResponse<BracketChallengeInfo>
+				PaginatedResponse<BracketChallengeEntryInfo>
 			>(
-				`/admin/bracket-challenges?page=${page}${
+				`/admin/bracket-challenge-entries?page=${page}${
 					term ? `&search=${term}` : ""
 				}`
 			);
-			setBracketChallenges(response.data.data);
+			setBracketChallengeEntries(response.data.data);
 			setMeta(response.data.meta);
 		} catch (error) {
 			console.error("Error fetching Bracket Challenges:", error);
@@ -58,15 +59,16 @@ const ListBracketChallenges = () => {
 	}, [currentPage, debouncedSearchTerm]);
 
 	//delete bracket challenge
-	const deleteBracketChallenge = async (): Promise<void> => {
+	const deleteBracketChallengeEntry = async (): Promise<void> => {
 		if (!toDelete) return;
 		setIsLoading(true);
 		try {
-			await apiClient.delete(`/admin/bracket-challenges/${toDelete.id}`);
-			setSuccess("Bracket Challenge deleted successfully");
-			setToDelete(null);
+			await apiClient.delete(
+				`/admin/bracket-challenge-entries/${toDelete.id}`
+			);
+			setSuccess("Bracket Challenge Entry deleted successfully");
 			if (meta) {
-				const newTotal = bracketChallenges.length - 1;
+				const newTotal = bracketChallengeEntries.length - 1;
 				if (newTotal === 0 && meta.current_page > 1) {
 					setCurrentPage((prev) => prev - 1);
 				} else {
@@ -76,6 +78,9 @@ const ListBracketChallenges = () => {
 		} catch (error) {
 			console.error("Error deleting Bracket Challenge:", error);
 			setError("Error deleting Bracket Challenge");
+		} finally {
+			setToDelete(null);
+			setIsLoading(false);
 		}
 	};
 
@@ -91,10 +96,10 @@ const ListBracketChallenges = () => {
 		clearMessaging();
 	};
 
-	const handleDelete = (challenge: BracketChallengeInfo) => {
+	const handleDelete = (entry: BracketChallengeEntryInfo) => {
 		setError(null);
 		setSuccess(null);
-		setToDelete(challenge);
+		setToDelete(entry);
 	};
 
 	// Update searchTerm immediately on input change
@@ -122,14 +127,9 @@ const ListBracketChallenges = () => {
 			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">
-					<h1 className="text-xl font-bold flex-1">Bracket Challenges</h1>
-					<Link
-						to="/admin/bracket-challenges/create"
-						className="text-sm bg-gray-700 hover:bg-gray-600 text-center text-white rounded p-2 text-xs font-bold"
-					>
-						<FontAwesomeIcon icon="plus" className="me-1" />
-						NEW CHALLENGE
-					</Link>
+					<h1 className="text-xl font-bold flex-1">
+						Bracket Challenge Entries
+					</h1>
 				</div>
 
 				<input
@@ -137,7 +137,7 @@ const ListBracketChallenges = () => {
 					value={searchTerm}
 					onChange={handleSearchInputChange}
 					className="px-1 py-0.5 border-b border-gray-400 w-full mt-3 focus:outline-none"
-					placeholder="Search Bracket Challenges here..."
+					placeholder="Search Bracket Challenge Entries here..."
 				/>
 
 				{success && (
@@ -158,65 +158,52 @@ const ListBracketChallenges = () => {
 				{toDelete && (
 					<ToDelete
 						name={toDelete.name}
-						onConfirm={deleteBracketChallenge}
+						onConfirm={deleteBracketChallengeEntry}
 						onCancel={() => setToDelete(null)}
 					/>
 				)}
 
 				<div className="mt-3 overflow-x-auto">
-					{bracketChallenges.length > 0 ? (
+					{bracketChallengeEntries.length > 0 ? (
 						<table className="w-full text-sm min-w-xl text-nowrap">
 							<thead className="text-white bg-gray-700 font-semibold">
 								<tr>
 									<td className="px-2 py-1">ID</td>
 									<td className="px-2 py-1">Name</td>
+
+									<td className="px-2 py-1">Bracket Challenge</td>
 									<td className="px-2 py-1">League</td>
-									<td className="px-2 py-1">Start Date</td>
-									<td className="px-2 py-1">End Date</td>
-									<td className="px-2 py-1">Is_Public</td>
+									<td className="px-2 py-1">User</td>
+
 									<td className="px-2 py-1">Actions</td>
 								</tr>
 							</thead>
 							<tbody>
-								{bracketChallenges.map((challenge) => (
-									<tr key={challenge.id} className="even:bg-gray-200">
-										<td className="px-2 py-1">{challenge.id}</td>
-										<td className="px-2 py-1">{challenge.name}</td>
-										<td className="px-2 py-1">{challenge.league}</td>
+								{bracketChallengeEntries.map((entry) => (
+									<tr key={entry.id} className="even:bg-gray-200">
+										<td className="px-2 py-1">{entry.id}</td>
+										<td className="px-2 py-1">{entry.name}</td>
+
 										<td className="px-2 py-1">
-											{displayLocalDate(challenge.start_date)}
+											{entry.bracket_challenge.name}
 										</td>
 										<td className="px-2 py-1">
-											{displayLocalDate(challenge.end_date)}
+											{entry.bracket_challenge.league}
 										</td>
 										<td className="px-2 py-1">
-											<span
-												className={`font-bold ${
-													challenge.is_public
-														? "text-green-600"
-														: "text-red-600"
-												}`}
-											>
-												{challenge.is_public ? "Yes" : "No"}
-											</span>
+											{entry.user.username}
 										</td>
 										<td className="px-2 py-1 flex items-center space-x-1">
 											<Link
-												to={`/admin/bracket-challenges/${challenge.id}`}
+												to={`/admin/bracket-challenge-entries/${entry.id}`}
 												className="block shadow cursor-pointer hover:bg-teal-500 bg-teal-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 											>
 												view
 											</Link>
-											<Link
-												to={`/admin/bracket-challenges/${challenge.id}/edit`}
-												className="block shadow cursor-pointer hover:bg-cyan-500 bg-cyan-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
-											>
-												edit
-											</Link>
 											<button
 												className="shadow cursor-pointer hover:bg-red-500 bg-red-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 												onClick={() => {
-													handleDelete(challenge);
+													handleDelete(entry);
 												}}
 											>
 												delete
@@ -229,8 +216,8 @@ const ListBracketChallenges = () => {
 					) : (
 						<p>
 							{isLoading
-								? "Loading Bracket Challenges..."
-								: "No Bracket Challenges found."}
+								? "Loading Bracket Challenge Entries..."
+								: "No Bracket Challenge Entries found."}
 						</p>
 					)}
 				</div>
@@ -245,4 +232,4 @@ const ListBracketChallenges = () => {
 	);
 };
 
-export default ListBracketChallenges;
+export default ListBracketChallengeEntries;

@@ -156,7 +156,7 @@ const ListTeams = () => {
 
 				{toDelete && (
 					<ToDelete
-						name={toDelete.name}
+						name={`${toDelete.fname} ${toDelete.lname}`}
 						onConfirm={deleteTeam}
 						onCancel={() => setToDelete(null)}
 					/>
@@ -182,7 +182,7 @@ const ListTeams = () => {
 									{teams.map((team) => (
 										<tr key={team.id} className="even:bg-gray-200">
 											<td className="px-2 py-1">{team.id}</td>
-											<td className="px-2 py-1">{team.name}</td>
+											<td className="px-2 py-1">{`${team.fname} ${team.lname}`}</td>
 											<td className="px-2 py-1">
 												{team.logo ? (
 													<img

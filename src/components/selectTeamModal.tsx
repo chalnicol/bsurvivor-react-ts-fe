@@ -53,7 +53,9 @@ const SelectTeamModal = ({
 								className="p-2 border-b border-gray-300 even:bg-gray-100 odd:bg-white hover:bg-blue-100 cursor-pointer text-sm flex items-center"
 								onClick={() => onTeamSelect(team)}
 							>
-								<span className="flex-1">{team.name}</span>
+								<span className="flex-1">
+									{team.fname} {team.lname}
+								</span>
 
 								{getCurrenTeamDataIndex(team) && (
 									<div className="w-7 h-4 rounded-full bg-gray-600 text-xs text-white font-semibold text-center leading-4">
@@ -69,7 +71,9 @@ const SelectTeamModal = ({
 								className="p-2 border-b border-gray-300 even:bg-gray-100 odd:bg-white  hover:bg-blue-100 cursor-pointer text-sm flex items-center"
 								onClick={() => onTeamSelect(team)}
 							>
-								<span className="flex-1">{team.name}</span>
+								<span className="flex-1">
+									{team.fname} {team.lname}
+								</span>
 
 								{getCurrenTeamDataIndex(team) && (
 									<div className="w-7 h-4 rounded-full bg-gray-600 text-xs text-white font-semibold text-center leading-4">

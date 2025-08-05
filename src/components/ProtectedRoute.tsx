@@ -19,7 +19,9 @@ const ProtectedRoute = ({
 		// return <div className="py-3">Loading authentication...</div>; // Or a spinner/loading component
 		return (
 			<div className="py-7 min-h-[calc(100dvh-57px)] flex items-center justify-center">
-				<p className="font-medium xl:text-lg">Loading Authentication...</p>
+				<p className="font-medium xl:text-lg border border-gray-400 rounded px-4 py-2 shadow">
+					Loading Authentication...
+				</p>
 			</div>
 		);
 	}

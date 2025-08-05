@@ -1,6 +1,7 @@
 export interface TeamInfo {
 	id: number;
-	name: string;
+	fname: string;
+	lname: string;
 	logo?: string | null;
 	abbr: string;
 	slug?: string;
@@ -68,6 +69,20 @@ export interface PlayoffsRoundInfo {
 	matchups: PlayoffsMatchupInfo[];
 }
 
+export interface NBAEntryData {
+	league: "NBA";
+	east: number[][];
+	west: number[][];
+	final: number[][];
+}
+
+export interface PBAEntryData {
+	league: "PBA";
+	rounds: number[][];
+}
+
+export type AnyEntryData = NBAEntryData | PBAEntryData;
+
 export interface BracketChallengeInfo {
 	id: number;
 	name: string;
@@ -80,6 +95,17 @@ export interface BracketChallengeInfo {
 	is_public: boolean;
 	bracket_data: AnyTeamData;
 	rounds: PlayoffsRoundInfo[];
+}
+
+export interface BracketChallengeEntryInfo {
+	id: number;
+	name: string;
+	user_id: number;
+	bracket_challenge_id: number;
+	entry_data: AnyEntryData;
+	user: UserInfo;
+	bracket_challenge: BracketChallengeInfo;
+	status: "pending" | "failed" | "success";
 }
 
 //...
@@ -137,6 +163,7 @@ export interface TotalsInfo {
 	leagueTotal: number;
 	userTotal: number;
 	bracketChallengeTotal: number;
+	bracketChallengeEntryTotal: number;
 	teamTotal: number;
 }
 

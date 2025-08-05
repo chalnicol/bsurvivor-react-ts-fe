@@ -14,7 +14,7 @@ const Login = () => {
 
 	const from = location.state?.from?.pathname || "/"; // Default to /dashboard
 
-	console.log("loc", location.state?.from?.pathname);
+	// console.log("loc", location.state?.from?.pathname);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();

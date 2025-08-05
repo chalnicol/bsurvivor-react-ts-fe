@@ -1,9 +1,11 @@
 import type { AnyPlayoffsTeamInfo } from "../../data/adminData";
 import { useBracket } from "../../context/bracket/BracketProvider";
+import gsap from "gsap";
+import { useEffect, useRef } from "react";
 
 interface TeamSlotProps {
 	team: AnyPlayoffsTeamInfo | null;
-	slot: number;
+	// slot: number;
 	roundIndex?: number;
 	matchupIndex?: number;
 	conference?: "EAST" | "WEST";
@@ -15,7 +17,7 @@ interface TeamSlotProps {
 
 const TeamSlot = ({
 	team,
-	slot,
+	// slot,
 	roundIndex,
 	matchupIndex,
 	conference,
@@ -24,7 +26,27 @@ const TeamSlot = ({
 	alignment,
 	placeholderText,
 }: TeamSlotProps) => {
-	const { updatePick, updateFinalsPick } = useBracket();
+	const { updatePick, updateFinalsPick, activeControls } = useBracket();
+
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (!activeControls) return;
+		if (team && containerRef.current) {
+			if (roundIndex !== 1) {
+				gsap.fromTo(
+					containerRef.current,
+					{ scale: 0 },
+					{ scale: 1, duration: 0.5, ease: "elastic.out(1.1, 0.6)" }
+				);
+			}
+		}
+		return () => {
+			if (containerRef.current) {
+				gsap.killTweensOf(containerRef.current);
+			}
+		};
+	}, [roundIndex, team, containerRef.current]);
 
 	const getImageURL = (logo: string) => {
 		//get nba logo if team logo is undefined
@@ -49,7 +71,7 @@ const TeamSlot = ({
 			if (!team) return;
 
 			if (roundIndex && matchupIndex) {
-				console.log("hey", slot, roundIndex, matchupIndex, conference);
+				// console.log("hey", slot, roundIndex, matchupIndex, conference);
 
 				updatePick(
 					conference || null,
@@ -73,12 +95,15 @@ const TeamSlot = ({
 
 	return (
 		<div
-			className={`border border-gray-400 rounded shadow select-none h-10 flex items-center overflow-hidden bg-white ${getAlignment()}`}
+			ref={containerRef}
+			className={`border rounded shadow select-none h-10 flex items-center overflow-hidden bg-white ${
+				isSelected ? "border-red-600" : "border-gray-300"
+			} ${getAlignment()}`}
 		>
 			{team ? (
 				<div
 					className={`flex items-center gap-x-2 w-full h-full px-2 ${flexDirectionClass} ${selectClass} ${getAlignment()} ${hoverClass}`}
-					title={team.name}
+					title={`${team.fname} ${team.lname}`}
 					onClick={handleClick}
 				>
 					<img

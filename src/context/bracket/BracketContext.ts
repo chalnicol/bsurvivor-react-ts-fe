@@ -6,7 +6,10 @@ import type {
 
 interface BracketContextType {
 	rounds: PlayoffsRoundInfo[] | null;
-	isPreview: boolean;
+	error: string | null;
+	success: string | null;
+	isLoading: boolean;
+	activeControls: boolean;
 	updatePick: (
 		conference: "EAST" | "WEST" | null,
 		roundIndex: number,
@@ -15,6 +18,8 @@ interface BracketContextType {
 	) => void;
 	updateFinalsPick: (team: AnyPlayoffsTeamInfo) => void;
 	resetPicks: () => void;
+	submitPicks: (league: string) => void;
+	resetMessage: () => void;
 }
 
 export const BracketContext = createContext<BracketContextType | undefined>(

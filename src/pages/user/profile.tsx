@@ -1,17 +1,18 @@
 import ProfileInformation from "../../components/profile/profileInformation";
 import ChangePassword from "../../components/profile/changePassword";
 import DeleteAccount from "../../components/profile/deleteAccount";
+import ContentBase from "../../components/ContentBase";
 
 const ProfilePage = () => {
 	return (
-		<div className="py-10 space-y-8 min-h-[calc(100dvh-96px)] p-4">
+		<ContentBase className="py-10 space-y-8 min-h-[calc(100dvh-96px)] px-4">
 			{/* profile */}
 			<ProfileInformation />
 			{/* change password */}
 			<ChangePassword />
 			{/* delete account */}
 			<DeleteAccount />
-		</div>
+		</ContentBase>
 	);
 };
 

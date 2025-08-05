@@ -76,10 +76,10 @@ const Navbar = () => {
 		});
 	};
 
-	const handleDropdownItemsClick = (route: string) => {
-		setShowDropdown(false);
-		navigate(route);
-	};
+	// const handleDropdownItemsClick = (route: string) => {
+	// 	setShowDropdown(false);
+	// 	navigate(route);
+	// };
 
 	useEffect(() => {
 		if (showMenu) {
@@ -128,7 +128,7 @@ const Navbar = () => {
 	}, []);
 
 	return (
-		<nav className="bg-gray-800 h-14 sticky top-0 z-10">
+		<nav className="bg-gray-800 h-14 sticky top-0 z-20">
 			<div className="max-w-7xl mx-auto flex justify-between items-center gap-x-6 h-full px-4">
 				<Link to="/" className="text-lg text-white font-bold">
 					<FontAwesomeIcon icon="basketball" /> Survivor
@@ -154,43 +154,38 @@ const Navbar = () => {
 									</div>
 								</button>
 								{showDropdown && (
-									<div className="absolute bg-white rounded min-w-40 text-gray-600 shadow-lg right-0 mt-2 overflow-hidden">
-										<ul>
-											<li
-												className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
-												onClick={() =>
-													handleDropdownItemsClick("/profile")
-												}
-											>
-												My Profile
-											</li>
-											<li
-												className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
-												onClick={() =>
-													handleDropdownItemsClick("/entries")
-												}
-											>
-												My Entries
-											</li>
+									<div className="absolute font-medium border border-gray-300 bg-white rounded-lg min-w-40 text-gray-700 shadow-lg right-0 mt-2 overflow-hidden">
+										<Link
+											to="/profile"
+											className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
+											onClick={() => setShowDropdown(false)}
+										>
+											My Profile
+										</Link>
+										<Link
+											to="/entries"
+											className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
+											onClick={() => setShowDropdown(false)}
+										>
+											My Entries
+										</Link>
 
-											{hasRole("admin") && (
-												<li
-													className="text-right px-3 py-1.5 font-medium hover:bg-gray-100 cursor-pointer"
-													onClick={() =>
-														handleDropdownItemsClick("/admin")
-													}
-												>
-													Admin Dashboard
-												</li>
-											)}
-
-											<li
-												className="text-right px-3 py-1.5 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
-												onClick={handleLogout}
+										{hasRole("admin") && (
+											<Link
+												to="/admin"
+												className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
+												onClick={() => setShowDropdown(false)}
 											>
-												Logout
-											</li>
-										</ul>
+												Admin Dashboard
+											</Link>
+										)}
+
+										<button
+											className="w-full text-right px-3 py-2 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
+											onClick={handleLogout}
+										>
+											Logout
+										</button>
 									</div>
 								)}
 							</div>

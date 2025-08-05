@@ -1,4 +1,4 @@
-import BracketChallengeActiveList from "../components/homepage/bracketChallengesList";
+import BracketChallengeActiveList from "../components/homepage/bracketChallengesActiveList";
 import Hero from "../components/hero";
 import SurvivorList from "../components/homepage/survivorList";
 import ContentBase from "../components/ContentBase";
@@ -8,7 +8,7 @@ const HomePage = () => {
 	return (
 		<ContentBase className="px-4">
 			<Hero />
-			<div className="border border-gray-400 shadow px-4 pt-4 md:px-6 md:pt-6 rounded-lg mt-8 mb-12">
+			<div className="border border-gray-400 shadow px-4 pt-4 md:px-6 md:pt-6 rounded-lg mb-12 mt-6">
 				<h1 className="text-4xl font-bold">
 					Welcome to Basketball Survivor!
 				</h1>

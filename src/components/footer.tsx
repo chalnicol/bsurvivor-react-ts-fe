@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const Footer = () => {
 	return (
 		<footer>
-			<div className="bg-gray-800 text-white">
+			<div className="bg-gray-800 text-white text-sm">
 				<div className="max-w-7xl mx-auto">
 					<div className="flex flex-col md:flex-row items-center justify-center py-2 gap-x-3">
 						<p>&copy; 2023 Basketball Survivor. All rights reserved.</p>
