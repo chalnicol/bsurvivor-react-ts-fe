@@ -39,7 +39,7 @@ const BracketChallengeActiveList = () => {
 						{bracketChallenges.map((bracketChallenge) => (
 							<div
 								key={bracketChallenge.id}
-								className="sm:flex items-center space-y-1 md:space-y-0 even:bg-gray-200 odd:bg-gray-100 px-3 py-3 md:py-2  border-b border-gray-300"
+								className="sm:flex items-center space-y-1 md:space-y-0 even:bg-gray-300 odd:bg-gray-200 px-3 py-3 md:py-2  border-b border-gray-300"
 							>
 								<div className="flex-1 font-semibold text-gray-600">
 									{bracketChallenge.name}

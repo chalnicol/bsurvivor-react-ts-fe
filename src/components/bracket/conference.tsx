@@ -1,5 +1,5 @@
 import type { PlayoffsRoundInfo } from "../../data/adminData";
-import NBAMatchup from "./matchup";
+import Matchup from "./matchup";
 import { useBracket } from "../../context/bracket/BracketProvider";
 import { useEffect, useState } from "react";
 
@@ -61,13 +61,13 @@ const Conference = ({ conference, league, className }: ConferenceProps) => {
 					{rounds.map((round) => (
 						<div key={round.id} className="flex-1 min-w-34">
 							<p
-								className={`font-semibold text-sm mb-0.5 ${textAlignment}`}
+								className={`font-semibold text-white text-sm mb-0.5 ${textAlignment}`}
 							>
 								{round.name}
 							</p>
 							<div className={`${spacingClass(round.order_index)}`}>
 								{round.matchups.map((matchup) => (
-									<NBAMatchup
+									<Matchup
 										key={matchup.id}
 										roundIndex={round.order_index}
 										conference={conference}

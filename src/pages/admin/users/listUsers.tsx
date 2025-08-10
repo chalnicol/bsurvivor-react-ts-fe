@@ -13,7 +13,7 @@ import Pagination from "../../../components/pagination";
 
 // Import the custom debounce hook
 import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
-import ContentBase from "../../../components/ContentBase";
+import ContentBase from "../../../components/contentBase";
 
 const ListUsers = () => {
 	// const users: UserInfo[] = [
@@ -116,8 +116,8 @@ const ListUsers = () => {
 	}, []);
 
 	return (
-		<ContentBase className="py-7">
-			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+		<ContentBase className="py-7 px-4">
+			<div className="p-3 lg:p-5 bg-gray-100 rounded-lg shadow border border-gray-400 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">
 					<h1 className="text-xl font-bold flex-1">Users</h1>

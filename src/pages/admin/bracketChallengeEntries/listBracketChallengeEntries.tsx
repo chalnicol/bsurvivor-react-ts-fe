@@ -5,7 +5,7 @@ import {
 	type MetaInfo,
 	type PaginatedResponse,
 } from "../../../data/adminData";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import apiClient from "../../../utils/axiosConfig";
 import Loader from "../../../components/loader";
 import Pagination from "../../../components/pagination";
@@ -14,7 +14,7 @@ import Pagination from "../../../components/pagination";
 import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
 import ToDelete from "../../../components/toDelete";
 import StatusMessage from "../../../components/statusMessage";
-import ContentBase from "../../../components/ContentBase";
+import ContentBase from "../../../components/contentBase";
 import { Link } from "react-router-dom";
 
 const ListBracketChallengeEntries = () => {
@@ -122,9 +122,22 @@ const ListBracketChallengeEntries = () => {
 		// setCurrentPage(1);
 	}, [debouncedSearchTerm]);
 
+	const textClass = useCallback((status: string): string => {
+		switch (status) {
+			case "success":
+				return "text-green-600";
+			case "failed":
+				return "text-red-600";
+			case "active":
+				return "text-blue-600";
+			default:
+				return "text-red-200";
+		}
+	}, []);
+
 	return (
 		<ContentBase className="py-7 px-4">
-			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+			<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">
 					<h1 className="text-xl font-bold flex-1">
@@ -174,7 +187,7 @@ const ListBracketChallengeEntries = () => {
 									<td className="px-2 py-1">Bracket Challenge</td>
 									<td className="px-2 py-1">League</td>
 									<td className="px-2 py-1">User</td>
-
+									<td className="px-2 py-1">Status</td>
 									<td className="px-2 py-1">Actions</td>
 								</tr>
 							</thead>
@@ -192,6 +205,15 @@ const ListBracketChallengeEntries = () => {
 										</td>
 										<td className="px-2 py-1">
 											{entry.user.username}
+										</td>
+										<td className="px-2 py-1">
+											<span
+												className={`text-xs font-bold select-none rounded px-2 ${textClass(
+													entry.status
+												)}`}
+											>
+												{entry.status.toLocaleUpperCase()}
+											</span>
 										</td>
 										<td className="px-2 py-1 flex items-center space-x-1">
 											<Link

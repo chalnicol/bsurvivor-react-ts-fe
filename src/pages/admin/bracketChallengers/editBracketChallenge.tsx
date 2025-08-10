@@ -14,7 +14,7 @@ import apiClient from "../../../utils/axiosConfig";
 import { useParams } from "react-router-dom";
 import StatusMessage from "../../../components/statusMessage";
 import SelectTeamModal from "../../../components/selectTeamModal";
-import ContentBase from "../../../components/ContentBase";
+import ContentBase from "../../../components/contentBase";
 
 const EditBracketChallenge = () => {
 	const { id } = useParams<{ id: string }>();
@@ -156,6 +156,7 @@ const EditBracketChallenge = () => {
 				setSelectedNbaTeamsData((prevData) => {
 					if (!prevData) {
 						return {
+							league: "NBA",
 							teams: {
 								east: [team.id],
 								west: [],
@@ -199,6 +200,7 @@ const EditBracketChallenge = () => {
 				setSelectedNbaTeamsData((prevData) => {
 					if (!prevData) {
 						return {
+							league: "NBA",
 							teams: {
 								east: [],
 								west: [team.id],
@@ -243,6 +245,7 @@ const EditBracketChallenge = () => {
 			setSelectedPbaTeamsData((prevData) => {
 				if (!prevData) {
 					return {
+						league: "PBA",
 						teams: [team.id],
 					};
 				}
@@ -310,6 +313,7 @@ const EditBracketChallenge = () => {
 			}
 		} else if (league === "PBA") {
 			setSelectedPbaTeamsData({
+				league: "PBA",
 				teams: [],
 			});
 		}
@@ -427,7 +431,7 @@ const EditBracketChallenge = () => {
 
 	return (
 		<ContentBase className="py-7 px-4">
-			<div className="p-4 md:p-6 rounded-lg shadow border border-gray-400">
+			<div className="p-4 md:p-6 bg-gray-100 rounded-lg shadow border border-gray-400">
 				<BreadCrumbs />
 
 				<h1 className="text-lg font-bold mb-4">Edit Bracket Challenge</h1>
@@ -592,7 +596,7 @@ const EditBracketChallenge = () => {
 																(team, index) => (
 																	<div
 																		key={index}
-																		className="p-2 even:bg-gray-100 hover:bg-blue-100 cursor-pointer text-sm"
+																		className="p-2 even:bg-gray-200 hover:bg-blue-100 text-sm"
 																	>
 																		{index + 1}. {team.fname}{" "}
 																		{team.lname}
@@ -637,7 +641,7 @@ const EditBracketChallenge = () => {
 																(team, index) => (
 																	<div
 																		key={index}
-																		className="p-2 even:bg-gray-100 hover:bg-blue-50 text-sm"
+																		className="p-2 even:bg-gray-200 hover:bg-blue-50 text-sm"
 																	>
 																		{index + 1}. {team.fname}{" "}
 																		{team.lname}
@@ -712,7 +716,7 @@ const EditBracketChallenge = () => {
 									</div>
 								)}
 								{league === "" && (
-									<div className="w-full bg-gray-100 h-22 mt-2 flex items-center justify-center rounded border border-gray-400 shadow">
+									<div className="w-full bg-gray-200 h-22 mt-2 flex items-center justify-center rounded border border-gray-400 shadow">
 										Please select a league to set teams.
 									</div>
 								)}

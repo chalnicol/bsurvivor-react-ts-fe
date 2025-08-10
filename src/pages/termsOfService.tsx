@@ -1,9 +1,9 @@
-import ContentBase from "../components/ContentBase";
+import ContentBase from "../components/contentBase";
 
 const TermsOfServicePage = () => {
 	return (
 		<ContentBase className="p-4">
-			<div className="border border-gray-400 px-3 md:px-8 pt-2 pb-12 mt-4 mb-7 rounded-lg shadow">
+			<div className="border border-gray-400 bg-gray-100 px-3 md:px-8 pt-2 pb-12 mt-4 mb-7 rounded-lg shadow">
 				<h1 className="text-3xl font-bold mt-4 mb-3">Terms of Service</h1>
 
 				<p className="mb-4">

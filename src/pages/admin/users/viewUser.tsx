@@ -7,7 +7,7 @@ import { apiClient } from "../../../utils/api";
 import Loader from "../../../components/loader";
 import { useAdmin } from "../../../context/admin/AdminProvider";
 import { useAuth } from "../../../context/auth/AuthProvider";
-import ContentBase from "../../../components/ContentBase";
+import ContentBase from "../../../components/contentBase";
 
 const ViewUser = () => {
 	const { id } = useParams<{ id: string }>();
@@ -127,7 +127,7 @@ const ViewUser = () => {
 
 	return (
 		<ContentBase className="py-7">
-			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+			<div className="p-3 lg:p-5 border bg-gray-100 rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">
 					<h1 className="text-xl font-bold flex-1">User Details</h1>
@@ -170,17 +170,27 @@ const ViewUser = () => {
 									<div className="p-2 bg-gray-200">
 										{auth && auth.id !== user.id ? (
 											<button
-												className={`font-bold cursor-pointer text-white py-1 rounded shadow min-w-20 ${
+												className={`font-bold cursor-pointer text-white py-1 rounded shadow px-3 ${
 													user.is_blocked
-														? "bg-green-600 hover:bg-green-500"
+														? "bg-amber-600 hover:bg-amber-500"
 														: "bg-red-600 hover:bg-red-500"
 												}`}
 												onClick={handleToggleBlockUser}
 											>
-												{user.is_blocked ? "ACTIVATE" : "BLOCK"}
+												{user.is_blocked
+													? "UNBLOCK USER"
+													: "BLOCK USER"}
 											</button>
 										) : (
-											<p>{user.is_blocked ? "blocked" : "active"}</p>
+											<span
+												className={`font-bold text-xs px-2 rounded text-white select-none ${
+													user.is_blocked
+														? "bg-red-500"
+														: "bg-green-500"
+												}`}
+											>
+												{user.is_blocked ? "BLOCKED" : "ACTIVE"}
+											</span>
 										)}
 									</div>
 								</div>

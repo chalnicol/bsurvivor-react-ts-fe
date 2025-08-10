@@ -9,7 +9,8 @@ interface BracketContextType {
 	error: string | null;
 	success: string | null;
 	isLoading: boolean;
-	activeControls: boolean;
+	isActive: boolean;
+	league: string;
 	updatePick: (
 		conference: "EAST" | "WEST" | null,
 		roundIndex: number,

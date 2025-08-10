@@ -1,7 +1,7 @@
 import ProfileInformation from "../../components/profile/profileInformation";
 import ChangePassword from "../../components/profile/changePassword";
 import DeleteAccount from "../../components/profile/deleteAccount";
-import ContentBase from "../../components/ContentBase";
+import ContentBase from "../../components/contentBase";
 
 const ProfilePage = () => {
 	return (

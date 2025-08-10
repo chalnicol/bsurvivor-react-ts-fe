@@ -20,7 +20,7 @@ const DeleteAccount = () => {
 	};
 
 	return (
-		<div className="p-6 rounded-lg shadow border border-gray-400">
+		<div className="p-6 rounded-lg shadow border border-gray-400 bg-gray-100">
 			<div className="max-w-lg">
 				<h1 className="text-lg font-bold">Delete Account</h1>
 				<hr className="mt-2 mb-4 border-gray-400 shadow-lg" />

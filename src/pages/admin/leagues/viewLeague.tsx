@@ -6,7 +6,7 @@ import { apiClient } from "../../../utils/api";
 import Loader from "../../../components/loader";
 import { getTeamLogoSrc } from "../../../utils/imageService";
 import { Link } from "react-router-dom";
-import ContentBase from "../../../components/ContentBase";
+import ContentBase from "../../../components/contentBase";
 
 const ViewLeague = () => {
 	const { id } = useParams<{ id: string }>();

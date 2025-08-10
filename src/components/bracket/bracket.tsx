@@ -4,21 +4,19 @@ import { useAuth } from "../../context/auth/AuthProvider";
 import Conference from "./conference";
 import Finals from "./finals";
 import StatusMessage from "../statusMessage";
-import { useLocation, useNavigate } from "react-router-dom";
+// import { useLocation, useNavigate } from "react-router-dom";
 
-interface BracketProps {
-	league: string;
-}
-const Bracket = ({ league }: BracketProps) => {
+const Bracket = () => {
 	const { isAuthenticated } = useAuth();
-	const navigate = useNavigate();
-	const location = useLocation();
+	const { league } = useBracket();
+	// const navigate = useNavigate();
+	// const location = useLocation();
 
 	const {
 		error,
 		success,
 		isLoading,
-		activeControls,
+		isActive,
 		resetMessage,
 		resetPicks,
 		submitPicks,
@@ -26,7 +24,7 @@ const Bracket = ({ league }: BracketProps) => {
 
 	const handleSubmit = () => {
 		if (!isAuthenticated) {
-			navigate("/login", { state: { from: location }, replace: true });
+			// navigate("/login", { state: { from: location }, replace: true });
 			return;
 		}
 		submitPicks(league);
@@ -48,7 +46,7 @@ const Bracket = ({ league }: BracketProps) => {
 					onClose={resetMessage}
 				/>
 			)}
-			<div className="w-full bg-gray-200 border border-gray-400 rounded px-3 md:px-6 py-4 relative">
+			<div className="w-full rounded relative text-black py-2">
 				<div className="overflow-x-auto">
 					{league == "NBA" && (
 						<div className="flex gap-x-6 items-center min-w-4xl mb-3">
@@ -83,9 +81,10 @@ const Bracket = ({ league }: BracketProps) => {
 					</div>
 				)}
 			</div>
-			{activeControls && (
-				<div className="md:flex items-center space-y-2 md:space-y-0 mt-3">
-					<div className="space-x-2">
+			{isActive && (
+				<>
+					<hr className="my-2 border-gray-400" />
+					<div className="flex items-center space-x-2 mt-3">
 						<button
 							className={`px-3 py-2  text-white min-w-30 rounded  font-bold transition duration-200 ${
 								isLoading
@@ -95,21 +94,23 @@ const Bracket = ({ league }: BracketProps) => {
 							onClick={resetPicks}
 							disabled={isLoading}
 						>
-							RESET
+							RESET PICKS
 						</button>
-						<button
-							className={`px-3 py-2 text-white min-w-30 rounded font-bold transition duration-200 ${
-								isLoading
-									? "bg-gray-600 opacity-70"
-									: "bg-gray-700 hover:bg-gray-600 cursor-pointer"
-							}`}
-							onClick={handleSubmit}
-							disabled={isLoading}
-						>
-							SUBMIT
-						</button>
+						{isAuthenticated && (
+							<button
+								className={`px-3 py-2 text-white min-w-30 rounded font-bold transition duration-200 ${
+									isLoading
+										? "bg-green-400 opacity-70"
+										: "bg-green-500 hover:bg-green-400 cursor-pointer"
+								}`}
+								onClick={handleSubmit}
+								disabled={isLoading}
+							>
+								SUBMIT PICKS
+							</button>
+						)}
 					</div>
-				</div>
+				</>
 			)}
 		</>
 	);

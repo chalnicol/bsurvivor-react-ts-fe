@@ -2,13 +2,20 @@ import { Link, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import ContentBase from "../ContentBase";
+import ContentBase from "../contentBase";
+import ErrorDisplay from "../errorDisplay";
 
 const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const { login, isLoading, error, clearMessages, isAuthenticated } =
-		useAuth();
+	const {
+		isAuthenticated,
+		isLoading,
+		error,
+		fieldErrors,
+		login,
+		clearMessages,
+	} = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 
@@ -20,7 +27,6 @@ const Login = () => {
 		e.preventDefault();
 		const success = await login(email, password);
 		if (success) {
-			// navigate("/");
 			navigate(from, { replace: true });
 		}
 	};
@@ -58,6 +64,9 @@ const Login = () => {
 							onChange={(e) => setEmail(e.target.value)}
 							required
 						/>
+						{fieldErrors?.email && (
+							<ErrorDisplay errors={fieldErrors.email} />
+						)}
 					</div>
 					<div className="mb-6">
 						<label

@@ -2,7 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import ContentBase from "../ContentBase";
+import ContentBase from "../contentBase";
+import ErrorDisplay from "../errorDisplay";
 
 const Register = () => {
 	const location = useLocation();
@@ -11,14 +12,23 @@ const Register = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [passwordConfirmation, setPasswordConfirmation] = useState("");
-	const { register, error, isLoading, isAuthenticated, clearMessages } =
-		useAuth();
+	const {
+		error,
+		fieldErrors,
+		isLoading,
+		isAuthenticated,
+		register,
+		clearMessages,
+	} = useAuth();
 	const navigate = useNavigate();
 
 	const from = location.state?.from?.pathname || "/"; // Default to /dashboard
 
 	useEffect(() => {
-		clearMessages();
+		// clearMessages();
+		return () => {
+			clearMessages();
+		};
 	}, []);
 
 	useEffect(() => {
@@ -38,6 +48,8 @@ const Register = () => {
 		);
 		if (success) {
 			navigate("/");
+		} else {
+			console.log("e", error);
 		}
 	};
 
@@ -62,6 +74,9 @@ const Register = () => {
 							className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							required
 						/>
+						{fieldErrors?.username && (
+							<ErrorDisplay errors={fieldErrors.username} />
+						)}
 					</div>
 					<div className="mb-4">
 						<label className="block text-sm font-medium text-gray-700 mb-1">
@@ -75,6 +90,9 @@ const Register = () => {
 							required
 							disabled={isLoading}
 						/>
+						{fieldErrors?.email && (
+							<ErrorDisplay errors={fieldErrors.email} />
+						)}
 					</div>
 					<div className="mb-4">
 						<label className="block text-sm font-medium text-gray-700 mb-1">
@@ -88,6 +106,9 @@ const Register = () => {
 							required
 							disabled={isLoading}
 						/>
+						{fieldErrors?.password && (
+							<ErrorDisplay errors={fieldErrors.password} />
+						)}
 					</div>
 					<div className="mb-4">
 						<label className="block text-sm font-medium text-gray-700 mb-1">
@@ -114,7 +135,7 @@ const Register = () => {
 						REGISTER
 					</button>
 				</form>
-				{error && <p className="my-3 text-red-500">{error}</p>}
+				{error && <p className="my-3 text-red-500 text-sm">{error}</p>}
 
 				<div className="mt-3">
 					{isLoading ? (

@@ -1,55 +1,91 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { BracketContext } from "./BracketContext";
 import type {
-	AnyEntryData,
 	AnyPlayoffsTeamInfo,
+	BracketChallengeEntryData,
+	BracketChallengeEntryPredictionsInfo,
 	BracketChallengeInfo,
+	// NBAEntryData,
 	PlayoffsRoundInfo,
 } from "../../data/adminData";
-import apiClient from "../../utils/axiosConfig";
+import { apiClient } from "../../utils/api";
 
 interface BracketProviderProps {
 	// data: PlayoffsRoundInfo[];
 	bracketChallenge: BracketChallengeInfo;
-	entryData?: AnyEntryData | null;
-	activeControls: boolean;
+	predictions?: BracketChallengeEntryPredictionsInfo[];
+	isPreview: boolean;
 	children: React.ReactNode;
 }
 
 export const BracketProvider: React.FC<BracketProviderProps> = ({
 	bracketChallenge,
-	entryData,
-	activeControls,
+	isPreview,
 	children,
+	predictions,
 }) => {
-	const [rounds, setRounds] = useState<PlayoffsRoundInfo[] | null>(
-		bracketChallenge.rounds
-	);
+	const [rounds, setRounds] = useState<PlayoffsRoundInfo[] | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isActive, setIsActive] = useState<boolean>(!isPreview);
+	// const [league, setLeague] = useState<string>(bracketChallenge.league);
 
-	const getWinnerPerRounds = (
-		rounds: PlayoffsRoundInfo[] | null
-	): number[][] => {
-		if (!rounds) return [];
+	const league = bracketChallenge.league;
 
-		const winnerIdsPerRound = rounds.map((r) => {
-			const winnerId = r.matchups.flatMap((m) => m.winner_team_id);
-			return winnerId;
-		});
-		return winnerIdsPerRound;
-	};
+	useEffect(() => {
+		const allTeams = bracketChallenge.rounds.flatMap((round) =>
+			round.matchups.flatMap((matchup) => matchup.teams)
+		);
 
-	const submitData = async (id: number, entryData: AnyEntryData) => {
+		if (predictions) {
+			const newRounds = bracketChallenge.rounds.map((round) => {
+				const newMatchups = round.matchups.map((matchup) => {
+					const prediction = predictions.find(
+						(p) => p.matchup_id === matchup.id
+					);
+					if (prediction) {
+						//get teams based from the predictions teams and update winner_team_id
+						const newTeams: AnyPlayoffsTeamInfo[] = [];
+
+						if (round.order_index !== 1) {
+							//get team slot 1
+							const team1 = allTeams.find(
+								(t) => t.id === prediction.teams[0]
+							);
+							const team2 = allTeams.find(
+								(t) => t.id === prediction.teams[1]
+							);
+							if (team1 && team2) {
+								newTeams.push({ ...team1, slot: 1 });
+								newTeams.push({ ...team2, slot: 2 });
+							}
+						}
+						return {
+							...matchup,
+							winner_team_id: prediction.predicted_winner_team_id,
+							teams: newTeams.length > 0 ? newTeams : matchup.teams,
+						};
+					}
+					return matchup;
+				});
+				return {
+					...round,
+					matchups: newMatchups,
+				};
+			});
+			setRounds(newRounds);
+		} else {
+			setRounds(bracketChallenge.rounds);
+		}
+	}, [bracketChallenge, predictions]);
+
+	const submitData = async (data: BracketChallengeEntryData) => {
 		try {
 			setIsLoading(true);
 			const response = await apiClient.post(
 				`/user/bracket-challenge-entries/`,
-				{
-					bracket_challenge_id: id,
-					entry_data: entryData,
-				}
+				data
 			);
 			setSuccess(response.data.message);
 		} catch (error: any) {
@@ -60,36 +96,9 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 			}
 		} finally {
 			setIsLoading(false);
+			setIsActive(false);
 		}
 	};
-
-	const getTeam = useCallback(
-		(
-			roundIndex: number,
-			matchupIndex: number,
-			teamId: number
-		): AnyPlayoffsTeamInfo | null => {
-			if (!rounds) {
-				return null;
-			}
-
-			const round = rounds.find((r) => r.order_index === roundIndex);
-			if (!round) {
-				return null;
-			}
-
-			const matchup = round.matchups.find(
-				(m) => m.matchup_index === matchupIndex
-			);
-			if (!matchup) {
-				return null;
-			}
-
-			const team = matchup.teams.find((t) => t.id === teamId);
-			return team || null;
-		},
-		[rounds]
-	);
 
 	const resetMessage = useCallback(() => {
 		setError(null);
@@ -108,74 +117,6 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 		}
 		return true; // All matchups have a winner
 	}, [rounds]);
-
-	useEffect(() => {
-		if (!rounds) return;
-		if (entryData) {
-			//..
-			if (entryData.league == "NBA") {
-				//..
-			} else if (entryData.league == "PBA") {
-				//..
-				let newRounds = rounds.map((r) => {
-					const roundIndex = r.order_index;
-					const newMatchups = r.matchups.map((m) => {
-						const matchupIndex = m.matchup_index;
-						return {
-							...m,
-							winner_team_id:
-								entryData.rounds[roundIndex - 1][matchupIndex - 1],
-						};
-					});
-					return {
-						...r,
-						matchups: newMatchups,
-					};
-				});
-
-				newRounds = newRounds.map((r) => {
-					if (r.order_index !== 1) {
-						const prevRoundIndex = r.order_index - 1;
-						const newMatchups = r.matchups.map((m) => {
-							const team1 = getTeam(
-								prevRoundIndex,
-								m.matchup_index == 1 ? 1 : 3,
-								entryData.rounds[prevRoundIndex - 1][
-									m.matchup_index == 1 ? 0 : 2
-								]
-							);
-							const team2 = getTeam(
-								prevRoundIndex,
-								m.matchup_index == 1 ? 2 : 4,
-								entryData.rounds[prevRoundIndex - 1][
-									m.matchup_index == 1 ? 1 : 3
-								]
-							);
-
-							const teamSlot1 = team1 ? { ...team1, slot: 1 } : null;
-							const teamSlot2 = team2 ? { ...team2, slot: 2 } : null;
-
-							const teams =
-								teamSlot1 && teamSlot2 ? [teamSlot1, teamSlot2] : [];
-
-							return {
-								...m,
-								teams: teams,
-							};
-							// return m;
-						});
-						return {
-							...r,
-							matchups: newMatchups,
-						};
-					}
-					return r;
-				});
-
-				setRounds(newRounds);
-			}
-		}
-	}, [entryData, bracketChallenge]);
 
 	const resetPicks = () => {
 		setRounds(bracketChallenge.rounds);
@@ -305,35 +246,42 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 				setError("All picks must be completed");
 				return;
 			}
-			let entryData: AnyEntryData;
+			console.log("asdf", league);
+			// if (league === "NBA") {
+			// 	predictions = rounds.flatMap((round) =>
+			// 		round.matchups.map((matchup) => ({
+			// 			predicted_winner_team_id: matchup.winner_team_id,
+			// 			matchup_id: matchup.id,
+			// 			teams: matchup.teams.map((t) => t.id),
+			// 		}))
+			// 	);
+			// } else if (league === "PBA") {
+			// 	predictions = rounds.flatMap((round) =>
+			// 		round.matchups.map((matchup) => ({
+			// 			matchup_id: matchup.id,
+			// 			predicted_winner_team_id: matchup.winner_team_id,
+			// 			teams: matchup.teams.map((t) => t.id),
+			// 		}))
+			// 	);
 
-			if (league === "NBA") {
-				const eastRounds =
-					rounds.filter((r) => r.conference === "EAST") || null;
-				const westRounds =
-					rounds.filter((r) => r.conference === "WEST") || null;
-				const finalRound =
-					rounds.filter((r) => r.name === "Finals") || null;
+			let predictions: BracketChallengeEntryPredictionsInfo[] =
+				rounds.flatMap((round) =>
+					round.matchups.map((matchup) => ({
+						predicted_winner_team_id: matchup.winner_team_id,
+						matchup_id: matchup.id,
+						teams: [
+							matchup.teams.find((t) => t.slot === 1)?.id || 0,
+							matchup.teams.find((t) => t.slot === 2)?.id || 0,
+						],
+					}))
+				);
 
-				entryData = {
-					league: "NBA",
-					east: getWinnerPerRounds(eastRounds),
-					west: getWinnerPerRounds(westRounds),
-					final: getWinnerPerRounds(finalRound),
-				};
-				submitData(bracketChallenge.id, entryData);
-			} else if (league === "PBA") {
-				//
+			console.log(predictions);
 
-				entryData = {
-					league: "PBA",
-					rounds: getWinnerPerRounds(rounds),
-				};
-				submitData(bracketChallenge.id, entryData);
-			} else {
-				setError("Invalid league");
-				return;
-			}
+			submitData({
+				bracket_challenge_id: bracketChallenge.id,
+				predictions: predictions,
+			});
 		},
 		[rounds]
 	);
@@ -345,7 +293,8 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 				error,
 				success,
 				isLoading,
-				activeControls,
+				isActive,
+				league,
 				resetMessage,
 				updatePick,
 				updateFinalsPick,

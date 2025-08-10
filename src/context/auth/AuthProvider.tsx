@@ -11,9 +11,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		localStorage.getItem("token")
 	);
 	const [loading, setLoading] = useState<boolean>(true); // To manage initial loading state
-	const [error, setError] = useState<string | null>(null);
 	const [message, setMessage] = useState<string | null>(null);
-
+	const [error, setError] = useState<string | null>(null);
+	const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({}); // To hold validation errors
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	const isAuthenticated = !!user && !!token;
@@ -41,10 +41,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		fetchUser();
 	}, [token]); // Re-fetch user if token changes
 
+	const processErrors = (error: any, errorMessage?: string) => {
+		if (error.type === "validation") {
+			setFieldErrors(error.errors);
+			setError(errorMessage || "Validation error"); // Often 'The given data was invalid.'
+		} else if (
+			error.type === "server" ||
+			error.type === "general" ||
+			error.type === "network" ||
+			error.type === "client"
+		) {
+			setError(error.message);
+		} else {
+			// Fallback for any other unexpected error type
+			setError("An unknown error occurred.");
+		}
+	};
+
 	const login = async (email: string, password: string): Promise<boolean> => {
 		setIsLoading(true);
 		setError(null);
 		setMessage(null);
+		setFieldErrors({});
 		try {
 			const response = await apiClient.post("/login", { email, password });
 			const receivedToken = response.data.token;
@@ -55,19 +73,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			setMessage("Login succesfull. Redirecting...");
 			return true;
 		} catch (err: any) {
-			const apiErrors = err.response?.data?.errors;
-			if (apiErrors) {
-				let errorMessage = "";
-				for (const key in apiErrors) {
-					errorMessage += apiErrors[key].join(" ") + " ";
-				}
-				setError(errorMessage.trim());
-			} else {
-				setError(
-					err.response?.data?.message ||
-						"Login failed. Please check your credentials."
-				);
-			}
+			processErrors(err, "Login failed");
 			return false; // Indicate failure
 		} finally {
 			setIsLoading(false);
@@ -82,6 +88,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	): Promise<boolean> => {
 		setIsLoading(true);
 		setError(null);
+		setMessage(null);
+		setFieldErrors({});
 		try {
 			const response = await apiClient.post("/register", {
 				username,
@@ -95,19 +103,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			localStorage.setItem("token", receivedToken); // Store token
 			setToken(receivedToken);
 			setUser(userData);
-			console.log("Registered successfully:", userData);
+			setMessage("Registration succesfull. Redirecting...");
+			setError(null);
+			setFieldErrors({});
 			return true;
-		} catch (err: any) {
-			const apiErrors = err.response?.data?.errors;
-			if (apiErrors) {
-				let errorMessage = "";
-				for (const key in apiErrors) {
-					errorMessage += apiErrors[key].join(" ") + " ";
-				}
-				setError(errorMessage.trim());
-			} else {
-				setError(err.response?.data?.message || "Registration failed.");
-			}
+		} catch (error: any) {
+			processErrors(error, "Registration failed");
 			return false;
 		} finally {
 			setIsLoading(false);
@@ -326,6 +327,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	const clearMessages = () => {
 		setError(null);
 		setMessage(null);
+		setFieldErrors({});
 	};
 
 	// Check if user has a specific role
@@ -348,6 +350,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			value={{
 				user,
 				error,
+				fieldErrors,
 				message,
 				token,
 				isAuthenticated,

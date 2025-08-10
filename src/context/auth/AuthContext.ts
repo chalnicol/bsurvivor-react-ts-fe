@@ -18,6 +18,7 @@ export interface AuthContextType {
 	token: string | null;
 	isAuthenticated: boolean;
 	error: string | null;
+	fieldErrors: Record<string, string[]> | null;
 	message: string | null;
 	loading: boolean;
 	isLoading: boolean;

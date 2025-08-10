@@ -18,7 +18,7 @@ interface PBAFinalsProps {
 }
 
 const Finals = ({ league, className }: PBAFinalsProps) => {
-	const { rounds, activeControls } = useBracket();
+	const { rounds, isActive } = useBracket();
 
 	const [matchup, setMatchup] = useState<PlayoffsMatchupInfo | null>(null);
 
@@ -55,7 +55,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 	}, [rounds]);
 
 	useEffect(() => {
-		if (!activeControls) return;
+		if (!isActive) return;
 		if (winningTeam && winningTeamRef.current) {
 			gsap.fromTo(
 				winningTeamRef.current,
@@ -88,7 +88,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 				className={`text-center space-y-10 select-none w-48 ${className}`}
 			>
 				<div>
-					<div className="font-bold text-lg mb-1 flex items-center gap-x-2 justify-center">
+					<div className="font-bold text-white text-xl mb-2 flex items-center gap-x-2 justify-center">
 						<img
 							src={league == "NBA" ? nbaLogo : pbaLogo}
 							alt="finals"
@@ -119,8 +119,8 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 							}
 						/>
 						{/* winning team */}
-						<div className="mt-8">
-							<div className="flex items-center justify-center gap-x-1 mb-1 font-bold">
+						<div className="mt-8 text-white">
+							<div className="flex items-center justify-center gap-x-1 mb-2 font-bold text-xl">
 								<span className="">{league}</span>
 								<img
 									src={league == "NBA" ? nbaThrophy : pbaThrophy}
@@ -133,29 +133,29 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 								ref={winningTeamRef}
 								className={`border-2 rounded-lg shadow px-3 py-1.5 space-y-2 whitespace-nowrap ${
 									winningTeam
-										? "border-gray-400 bg-green-50"
+										? "border-red-500 bg-yellow-200"
 										: "border-gray-300 bg-white"
 								}`}
 							>
 								{winningTeam ? (
-									<div className="flex items-center justify-center gap-x-1">
+									<div className="flex items-center justify-center gap-x-1 text-black">
 										<img
 											src={getTeamLogoSrc(winningTeam.logo || "")}
 											alt={winningTeam.abbr}
 											className="h-9 object-contain"
 										/>
 										<div className="leading-5">
-											<p className="font-bold text-left">
+											<div className="font-bold text-left">
 												{winningTeam.fname}
-											</p>
-											<p className="font-bold text-left">
+											</div>
+											<div className="font-bold text-left">
 												{winningTeam.lname}
-											</p>
+											</div>
 										</div>
 									</div>
 								) : (
-									<p className=" font-bold text-gray-500 h-10 flex items-center justify-center">
-										- CHAMPION -
+									<p className=" font-semibold text-gray-500 h-10 flex items-center justify-center">
+										FINALS WINNER
 									</p>
 								)}
 							</div>

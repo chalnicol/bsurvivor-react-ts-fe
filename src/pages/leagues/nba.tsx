@@ -1,4 +1,4 @@
-import ContentBase from "../../components/ContentBase";
+import ContentBase from "../../components/contentBase";
 
 const NBAPage = () => {
 	return (

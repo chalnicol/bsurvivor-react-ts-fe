@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import BreadCrumbs from "../../../components/breadCrumbs";
 import { useParams } from "react-router-dom";
 import { apiClient } from "../../../utils/api";
@@ -6,8 +6,8 @@ import Loader from "../../../components/loader";
 import type { BracketChallengeEntryInfo } from "../../../data/adminData";
 import Bracket from "../../../components/bracket/bracket";
 import { BracketProvider } from "../../../context/bracket/BracketProvider";
-import ContentBase from "../../../components/ContentBase";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ContentBase from "../../../components/contentBase";
+import Detail from "../../../components/detail";
 
 const ViewBracketChallengeEntry = () => {
 	const { id } = useParams<{ id: string }>();
@@ -31,6 +31,19 @@ const ViewBracketChallengeEntry = () => {
 		}
 	};
 
+	const bgClass = useCallback((status: string): string => {
+		switch (status) {
+			case "success":
+				return "bg-green-600";
+			case "failed":
+				return "bg-red-600";
+			case "active":
+				return "bg-blue-600";
+			default:
+				return "bg-red-200";
+		}
+	}, []);
+
 	useEffect(() => {
 		if (!id) {
 			setIsLoading(false);
@@ -41,7 +54,7 @@ const ViewBracketChallengeEntry = () => {
 
 	return (
 		<ContentBase className="py-7 px-4">
-			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 bg-gray-100 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">
 					<h1 className="text-xl font-bold flex-1">
@@ -52,55 +65,41 @@ const ViewBracketChallengeEntry = () => {
 				<div className="mt-4">
 					{bracketChallengeEntry ? (
 						<>
-							<h2 className="text-2xl font-bold text-gray-600">
-								<FontAwesomeIcon icon="caret-right" />{" "}
-								{bracketChallengeEntry.name}
-							</h2>
-							<hr className="my-3 border-gray-300 shadow" />
-							<div className="grid md:grid-cols-3 grid-cols-1 gap-x-4 gap-y-2 mb-2">
-								<div>
-									<p className="text-sm">User</p>
-									<p
-										className={`px-3 py-2 border border-gray-400 bg-gray-200 font-semibold rounded mt-1`}
-									>
-										{bracketChallengeEntry.user.username}
-									</p>
-								</div>
-								<div>
-									<p className="text-sm">Bracket Challenge Name</p>
-									<p
-										className={`px-3 py-2 border border-gray-400 bg-gray-200 font-semibold rounded mt-1`}
-									>
+							<div className="bg-gray-800 text-white p-4 rounded border text-sm border border-gray-300">
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
+									<Detail label="Entry Name">
+										{bracketChallengeEntry.name}
+									</Detail>
+									<Detail label="Bracket Challenge">
 										{bracketChallengeEntry.bracket_challenge.name}
-									</p>
+									</Detail>
+									<Detail label="User">
+										{bracketChallengeEntry.user.username}
+									</Detail>
+									<Detail label="Status">
+										<span
+											className={`text-xs font-bold select-none rounded px-2 text-white ${bgClass(
+												bracketChallengeEntry.status
+											)}`}
+										>
+											{bracketChallengeEntry.status.toLocaleUpperCase()}
+										</span>
+									</Detail>
 								</div>
+								<hr className="my-2 border-gray-400" />
+								{/* preview */}
 								<div>
-									<p className="text-sm">League</p>
-									<p
-										className={`px-3 py-2 border border-gray-400 bg-gray-200 font-semibold rounded mt-1`}
-									>
-										{bracketChallengeEntry.bracket_challenge.league}
-									</p>
-								</div>
-							</div>
-							{/* preview */}
-							<div>
-								<p className="text-sm">Preview</p>
-								<div className="mt-1">
-									<BracketProvider
-										bracketChallenge={
-											bracketChallengeEntry.bracket_challenge
-										}
-										entryData={bracketChallengeEntry.entry_data}
-										activeControls={false}
-									>
-										<Bracket
-											league={
+									<div>
+										<BracketProvider
+											bracketChallenge={
 												bracketChallengeEntry.bracket_challenge
-													.league
 											}
-										/>
-									</BracketProvider>
+											predictions={bracketChallengeEntry.predictions}
+											isPreview={true}
+										>
+											<Bracket />
+										</BracketProvider>
+									</div>
 								</div>
 							</div>
 						</>

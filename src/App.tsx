@@ -16,7 +16,7 @@ import ProfilePage from "./pages/user/profile";
 import ListBracketChallenges from "./pages/admin/bracketChallengers/listBracketChallenges";
 import CreateBracketChallenge from "./pages/admin/bracketChallengers/createBracketChallenge";
 import EditBracketChallenge from "./pages/admin/bracketChallengers/editBracketChallenge";
-import ViewBracketChallenge from "./pages/admin/bracketChallengers/viewBracketChallenges";
+import ViewBracketChallenge from "./pages/admin/bracketChallengers/viewBracketChallenge";
 import ListLeagues from "./pages/admin/leagues/listLeagues";
 import CreateLeague from "./pages/admin/leagues/createLeague";
 import ViewLeague from "./pages/admin/leagues/viewLeague";
@@ -86,7 +86,7 @@ function App() {
 	return (
 		<>
 			<Navbar />
-			<div className="w-full bg-gray-50">
+			<div className="w-full bg-gray-200">
 				<div className="max-w-7xl mx-auto">
 					<ScrollToTop />
 					<Routes>

@@ -26,12 +26,12 @@ const TeamSlot = ({
 	alignment,
 	placeholderText,
 }: TeamSlotProps) => {
-	const { updatePick, updateFinalsPick, activeControls } = useBracket();
+	const { updatePick, updateFinalsPick, isActive } = useBracket();
 
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (!activeControls) return;
+		if (!isActive) return;
 		if (team && containerRef.current) {
 			if (roundIndex !== 1) {
 				gsap.fromTo(
@@ -89,7 +89,7 @@ const TeamSlot = ({
 	const hoverClass =
 		isClickable && !isSelected ? "cursor-pointer hover:bg-yellow-50" : "";
 
-	const selectClass = isSelected ? "bg-yellow-100" : "";
+	const selectClass = isSelected ? "bg-amber-200" : "";
 
 	const flexDirectionClass = alignment == "right" ? "flex-row-reverse" : "";
 
@@ -97,7 +97,7 @@ const TeamSlot = ({
 		<div
 			ref={containerRef}
 			className={`border rounded shadow select-none h-10 flex items-center overflow-hidden bg-white ${
-				isSelected ? "border-red-600" : "border-gray-300"
+				isSelected ? "border-red-500" : "border-gray-300"
 			} ${getAlignment()}`}
 		>
 			{team ? (

@@ -20,9 +20,15 @@ const SurvivorList = () => {
 						</Link>
 					</div>
 					<div className="text-sm">
-						<p className="p-1 odd:bg-gray-200">chalnicol</p>
-						<p className="p-1 odd:bg-gray-200">chalnicol</p>
-						<p className="p-1 odd:bg-gray-200">chalnicol</p>
+						<p className="p-1 odd:bg-gray-200 even:bg-gray-50">
+							chalnicol
+						</p>
+						<p className="p-1 odd:bg-gray-200 even:bg-gray-50">
+							chalnicol
+						</p>
+						<p className="p-1 odd:bg-gray-200 even:bg-gray-50">
+							chalnicol
+						</p>
 					</div>
 				</div>
 				{/* pba */}
@@ -37,9 +43,15 @@ const SurvivorList = () => {
 						</Link>
 					</div>
 					<div className="text-sm">
-						<p className="p-1 odd:bg-gray-200">chalnicol</p>
-						<p className="p-1 odd:bg-gray-200">chalnicol</p>
-						<p className="p-1 odd:bg-gray-200">chalnicol</p>
+						<p className="p-1 odd:bg-gray-200 even:bg-gray-100">
+							chalnicol
+						</p>
+						<p className="p-1 odd:bg-gray-200 even:bg-gray-100">
+							chalnicol
+						</p>
+						<p className="p-1 odd:bg-gray-200 even:bg-gray-100">
+							chalnicol
+						</p>
 					</div>
 				</div>
 			</div>
