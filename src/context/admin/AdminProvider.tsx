@@ -1,7 +1,12 @@
 import React, { useCallback, useContext, useState } from "react";
 import { AdminContext } from "./AdminContext";
 import { apiClient } from "../../utils/api";
-import type { RoleInfo, AnyTeamInfo, LeagueInfo } from "../../data/adminData";
+import type {
+	RoleInfo,
+	AnyTeamInfo,
+	LeagueInfo,
+	BracketChallengeInfo,
+} from "../../data/adminData";
 
 interface TeamsAndLeaguesResponse {
 	teams: AnyTeamInfo[];
@@ -25,11 +30,16 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 	const [nbaTeams, setNbaTeams] = useState<AnyTeamInfo[]>([]);
 	const [pbaTeams, setPbaTeams] = useState<AnyTeamInfo[]>([]);
 	const [leagues, setLeague] = useState<LeagueInfo[]>([]);
+	const [bracketChallenges, setBracketChallenges] = useState<
+		BracketChallengeInfo[]
+	>([]);
 
 	const isRolesPopulated = roles.length > 0;
 
 	const areTeamsAndLeaguesPopulated =
 		nbaTeams.length > 0 && pbaTeams.length > 0 && leagues.length > 0;
+
+	const isBracketChallengesPopulated = bracketChallenges.length > 0;
 
 	const fetchRoles = useCallback(async () => {
 		if (isRolesPopulated) return;
@@ -69,6 +79,20 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 		}
 	}, [areTeamsAndLeaguesPopulated]);
 
+	const fetchBracketChallenges = useCallback(async () => {
+		console.log("this");
+		setIsLoading(true);
+		setBracketChallenges([]);
+		try {
+			const response = await apiClient.get("/bracket-challenges/active");
+			setBracketChallenges(response.data.challenges);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, []);
+
 	return (
 		<AdminContext.Provider
 			value={{
@@ -80,6 +104,9 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 				error,
 				fetchRoles,
 				fetchTeamsAndLeagues,
+				fetchBracketChallenges,
+				bracketChallenges,
+				isBracketChallengesPopulated,
 				isRolesPopulated,
 				areTeamsAndLeaguesPopulated,
 			}}

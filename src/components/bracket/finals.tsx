@@ -1,16 +1,14 @@
 import TeamSlot from "./teamSlot";
 import { useCallback, useEffect, useRef, useState } from "react";
 import pbaThrophy from "../../assets/pba_trophy.png";
-import pbaLogo from "../../assets/pba.png";
 import nbaThrophy from "../../assets/nba_trophy.png";
-import nbaLogo from "../../assets/nba.png";
 import { useBracket } from "../../context/bracket/BracketProvider";
 import type {
 	AnyPlayoffsTeamInfo,
 	PlayoffsMatchupInfo,
 } from "../../data/adminData";
-import { getTeamLogoSrc } from "../../utils/imageService";
 import gsap from "gsap";
+import TeamSlotCenter from "./teamSlotCenter";
 
 interface PBAFinalsProps {
 	league: "NBA" | "PBA";
@@ -18,7 +16,7 @@ interface PBAFinalsProps {
 }
 
 const Finals = ({ league, className }: PBAFinalsProps) => {
-	const { rounds, isActive } = useBracket();
+	const { rounds, mode } = useBracket();
 
 	const [matchup, setMatchup] = useState<PlayoffsMatchupInfo | null>(null);
 
@@ -55,7 +53,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 	}, [rounds]);
 
 	useEffect(() => {
-		if (!isActive) return;
+		if (mode === "preview") return;
 		if (winningTeam && winningTeamRef.current) {
 			gsap.fromTo(
 				winningTeamRef.current,
@@ -84,22 +82,14 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 
 	return (
 		<>
-			<div
-				className={`text-center space-y-10 select-none w-48 ${className}`}
-			>
+			<div className={`select-none w-48 ${className}`}>
 				<div>
-					<div className="font-bold text-white text-xl mb-2 flex items-center gap-x-2 justify-center">
-						<img
-							src={league == "NBA" ? nbaLogo : pbaLogo}
-							alt="finals"
-							className={`${league == "NBA" ? "h-7" : "h-5"}`}
-						/>
-						<span>FINALS</span>
+					<div className="font-bold text-white text-base mb-0.5 text-center">
+						{league} FINALS
 					</div>
 					<div className="space-y-2 w-full">
 						<TeamSlot
 							team={teamA}
-							// slot={1}
 							alignment="center"
 							isSelected={isSelected(teamA?.id || 0)}
 							isClickable={isClickable()}
@@ -107,10 +97,8 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 								league == "NBA" ? "EAST WINNER" : "R2M1 WINNER"
 							}
 						/>
-
 						<TeamSlot
 							team={teamB}
-							// slot={2}
 							alignment="center"
 							isSelected={isSelected(teamB?.id || 0)}
 							isClickable={isClickable()}
@@ -118,48 +106,34 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 								league == "NBA" ? "WEST WINNER" : "R2M2 WINNER"
 							}
 						/>
-						{/* winning team */}
-						<div className="mt-8 text-white">
-							<div className="flex items-center justify-center gap-x-1 mb-2 font-bold text-xl">
-								<span className="">{league}</span>
-								<img
-									src={league == "NBA" ? nbaThrophy : pbaThrophy}
-									alt="finals"
-									className="h-9"
-								/>
-								<span>CHAMPION</span>
-							</div>
-							<div
-								ref={winningTeamRef}
-								className={`border-2 rounded-lg shadow px-3 py-1.5 space-y-2 whitespace-nowrap ${
-									winningTeam
-										? "border-red-500 bg-yellow-200"
-										: "border-gray-300 bg-white"
-								}`}
-							>
-								{winningTeam ? (
-									<div className="flex items-center justify-center gap-x-1 text-black">
-										<img
-											src={getTeamLogoSrc(winningTeam.logo || "")}
-											alt={winningTeam.abbr}
-											className="h-9 object-contain"
-										/>
-										<div className="leading-5">
-											<div className="font-bold text-left">
-												{winningTeam.fname}
-											</div>
-											<div className="font-bold text-left">
-												{winningTeam.lname}
-											</div>
-										</div>
-									</div>
-								) : (
-									<p className=" font-semibold text-gray-500 h-10 flex items-center justify-center">
-										FINALS WINNER
-									</p>
-								)}
-							</div>
-						</div>
+					</div>
+				</div>
+				{/* winning team */}
+				<div className="mt-6 text-white">
+					<div className="flex items-center justify-center gap-x-1 mb-2 font-bold text-xl">
+						<span className="">{league}</span>
+						<img
+							src={league == "NBA" ? nbaThrophy : pbaThrophy}
+							alt="finals"
+							className="h-9"
+						/>
+						<span>CHAMPION</span>
+					</div>
+					<div
+						ref={winningTeamRef}
+						className={`border-2 rounded shadow relative whitespace-nowrap h-12 overflow-hidden ${
+							winningTeam
+								? "border-yellow-600 bg-yellow-700"
+								: "border-gray-300 bg-gray-600"
+						}`}
+					>
+						{winningTeam ? (
+							<TeamSlotCenter team={winningTeam} isSelected={true} />
+						) : (
+							<p className=" font-semibold text-gray-400 h-full flex items-center justify-center">
+								FINALS WINNER
+							</p>
+						)}
 					</div>
 				</div>
 			</div>

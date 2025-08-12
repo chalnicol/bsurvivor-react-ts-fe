@@ -13,6 +13,7 @@ import Detail from "../../components/detail";
 
 // Import the custom debounce hook
 import useDebounce from "../../hooks/useDebounce"; // Adjust path if needed
+import { displayLocalDate } from "../../utils/dateToLocal";
 
 const BracketEntriesList = () => {
 	const [bracketChallengeEntries, setBracketChallengeEntries] = useState<
@@ -94,13 +95,17 @@ const BracketEntriesList = () => {
 									to={`/bracket-challenge-entries/${entry.name}`}
 									key={entry.id}
 								>
-									<div className="sm:grid md:grid-cols-2 px-4 py-3 space-y-1 border hover:bg-gray-700 mb-1 text-sm bg-gray-800 text-white rounded">
+									<div className="sm:grid md:grid-cols-2 xl:grid-cols-3 px-4 py-3 space-y-1 border hover:bg-gray-700 mb-1 text-sm bg-gray-800 text-white rounded">
 										<Detail label="Entry Name">{entry.name}</Detail>
+										<Detail label="League">
+											{entry.bracket_challenge.league}
+										</Detail>
 										<Detail label="Bracket Challenge">
 											{entry.bracket_challenge.name}
 										</Detail>
-										<Detail label="League">
-											{entry.bracket_challenge.league}
+
+										<Detail label="Date Submitted">
+											{displayLocalDate(entry.created_at)}
 										</Detail>
 										<Detail label="Status">
 											{entry.status == "success" && (
@@ -143,11 +148,11 @@ const BracketEntriesList = () => {
 							/>
 						</>
 					) : (
-						<p className="py-2 px-3 bg-gray-200">
+						<div className="py-2 px-3 bg-gray-300 mt-2">
 							{isLoading
 								? "Loading..."
-								: "No bracket challenge entries found"}
-						</p>
+								: "You have no bracket challenge entries."}
+						</div>
 					)}
 				</div>
 			</div>

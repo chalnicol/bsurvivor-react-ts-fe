@@ -10,10 +10,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { displayLocalDate } from "../utils/dateToLocal";
 import ContentBase from "../components/contentBase";
 import { useAuth } from "../context/auth/AuthProvider";
-import nbaLogo from "../assets/nba.png";
-import pbaLogo from "../assets/pba.png";
 import Detail from "../components/detail";
 import { Link } from "react-router-dom";
+import LoadAuth from "../components/auth/loadAuth";
 
 interface BracketResponse {
 	message: string;
@@ -21,7 +20,7 @@ interface BracketResponse {
 	bracketEntrySlug: string;
 }
 const BracketChallengePage = () => {
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, authLoading } = useAuth();
 	const location = useLocation();
 	const { slug } = useParams<{ slug: string }>();
 
@@ -52,42 +51,28 @@ const BracketChallengePage = () => {
 		}
 	}, [slug]);
 
+	if (authLoading) {
+		return <LoadAuth />;
+	}
+
 	return (
 		<ContentBase className="px-4 py-7">
-			<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+			<div className="p-3 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+				<h1 className="text-xl font-bold flex-1">
+					<FontAwesomeIcon icon="caret-right" /> Bracket Challenge
+				</h1>
 				{bracketChallenge ? (
 					<>
-						<div className="bg-gray-800 text-white p-4 rounded border text-sm border border-gray-300">
-							<div className="flex items-center gap-x-2 space-y-1 md:space-y-0">
-								{bracketChallenge.league == "NBA" && (
-									<img
-										src={nbaLogo}
-										alt="NBA"
-										className="h-12 object-contain"
-									/>
-								)}
-								{bracketChallenge.league == "PBA" && (
-									<img
-										src={pbaLogo}
-										alt="PBA"
-										className="h-7 object-contain"
-									/>
-								)}
-								<div>
-									<h1 className="text-xl font-bold flex-1">
-										{bracketChallenge.name}
-									</h1>
-									{bracketChallenge.description && (
-										<p className="text-sm">
-											{bracketChallenge.description}
-										</p>
-									)}
-								</div>
-							</div>
-
-							<hr className="my-2 border-gray-400" />
-
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
+						<p className="font-medium text-sm my-1">
+							Advance teams by selecting a winner in each matchup. One
+							entry per bracket challenge is allowed, and no changes can
+							be made after submission.
+						</p>
+						<div className="bg-gray-800 text-white p-4 rounded border text-sm border border-gray-300 mt-4">
+							<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-2">
+								<Detail label="Challenge Name">
+									{bracketChallenge.name}
+								</Detail>
 								<Detail label="Start Date">
 									{displayLocalDate(bracketChallenge.start_date)}
 								</Detail>
@@ -95,40 +80,34 @@ const BracketChallengePage = () => {
 									{displayLocalDate(bracketChallenge.end_date)}
 								</Detail>
 							</div>
-							<hr className="my-2 border-gray-400" />
+							<hr className="my-3 border-gray-400" />
 
-							{isAuthenticated && entrySlug !== "" && (
-								<div className="py-1 px-4 py-2 rounded mb-3 bg-rose-600 font-semibold sm:flex items-center justify-between space-y-2 sm:space-y-0">
-									<div className="text-white">
-										You already have an entry for this challenge.
+							{isAuthenticated ? (
+								entrySlug !== "" && (
+									<div className="py-1 px-4 py-2 rounded mb-3 bg-rose-600 font-semibold sm:flex items-center justify-between space-y-2 sm:space-y-0">
+										<div className="text-white">
+											You already have an entry for this challenge.
+										</div>
+										<Link
+											to={`/bracket-challenge-entries/${entrySlug}`}
+											className="bg-gray-800 font-semibold text-white px-2 py-1 rounded text-xs hover:bg-gray-700 block text-center w-26 mb-1 sm:mb-0"
+										>
+											VIEW ENTRY
+										</Link>
 									</div>
-									<Link
-										to={`/bracket-challenge-entries/${entrySlug}`}
-										className="bg-gray-800 font-semibold text-white px-2 py-1 rounded text-xs hover:bg-gray-700 block text-center w-26 mb-1 sm:mb-0"
-									>
-										VIEW ENTRY
-									</Link>
-								</div>
-							)}
-
-							{!isAuthenticated && (
-								<div className="py-2 px-4 bg-teal-600 font-semibold rounded mb-3 sm:flex items-center justify-between space-y-2 sm:space-y-0">
-									<span className="text-white">
-										To join the bracket challenge, you must be
+								)
+							) : (
+								<div className="py-2 px-4 bg-teal-400 font-semibold rounded mb-3 md:flex items-center justify-between">
+									<span className="text-gray-600">
+										To join this bracket challenge, you must be
 										registered and logged in.
 									</span>
-									<div className="mb-1 sm:mb-0 space-x-1">
-										{/* <button
-											className="bg-teal-800 font-semibold text-white px-2 py-1 rounded text-xs hover:bg-teal-700"
-											onClick={() => handleAuthButtonClick("login")}
-										>
-											LOG IN
-										</button> */}
+									<div className="my-2 md:my-0 space-x-1">
 										<Link
 											to="/login"
 											state={{ from: location }}
 											replace={true}
-											className="bg-gray-800 font-semibold text-white px-2 py-1 rounded text-xs hover:bg-gray-700"
+											className="bg-gray-600 font-semibold text-white px-2 py-1 rounded text-xs hover:bg-gray-500"
 										>
 											LOG IN
 										</Link>
@@ -136,7 +115,7 @@ const BracketChallengePage = () => {
 											to="/register"
 											state={{ from: location }}
 											replace={true}
-											className="bg-gray-800 font-semibold text-white px-2 py-1 rounded text-xs hover:bg-gray-700"
+											className="bg-gray-600 font-semibold text-white px-2 py-1 rounded text-xs hover:bg-gray-500"
 										>
 											REGISTER
 										</Link>
@@ -148,7 +127,7 @@ const BracketChallengePage = () => {
 							<div>
 								<BracketProvider
 									bracketChallenge={bracketChallenge}
-									isPreview={entrySlug !== ""}
+									bracketMode={entrySlug !== "" ? "preview" : "submit"}
 								>
 									<Bracket />
 								</BracketProvider>
@@ -156,19 +135,12 @@ const BracketChallengePage = () => {
 						</div>
 					</>
 				) : (
-					<>
-						<h1 className="text-xl font-bold flex-1">
-							<FontAwesomeIcon icon="caret-right" /> Bracket Challenge
-						</h1>
-						<p className="mt-2 p-3 bg-gray-300 rounded">
-							{isLoading
-								? "Loading..."
-								: "Error fetching bracket challenge"}
-						</p>
-					</>
+					<div className="py-2 px-3 bg-gray-300 mt-4">
+						{isLoading ? "Loading..." : "Bracket challenge not found."}
+					</div>
 				)}
 			</div>
-			{isLoading && <Loader />}
+			{(isLoading || authLoading) && <Loader />}
 		</ContentBase>
 	);
 };

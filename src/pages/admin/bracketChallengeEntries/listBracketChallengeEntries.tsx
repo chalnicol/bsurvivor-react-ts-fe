@@ -16,6 +16,7 @@ import ToDelete from "../../../components/toDelete";
 import StatusMessage from "../../../components/statusMessage";
 import ContentBase from "../../../components/contentBase";
 import { Link } from "react-router-dom";
+import { displayLocalDate } from "../../../utils/dateToLocal";
 
 const ListBracketChallengeEntries = () => {
 	const [bracketChallengeEntries, setBracketChallengeEntries] = useState<
@@ -183,8 +184,8 @@ const ListBracketChallengeEntries = () => {
 								<tr>
 									<td className="px-2 py-1">ID</td>
 									<td className="px-2 py-1">Name</td>
-
 									<td className="px-2 py-1">Bracket Challenge</td>
+									<td className="px-2 py-1">Date Submitted</td>
 									<td className="px-2 py-1">League</td>
 									<td className="px-2 py-1">User</td>
 									<td className="px-2 py-1">Status</td>
@@ -199,6 +200,9 @@ const ListBracketChallengeEntries = () => {
 
 										<td className="px-2 py-1">
 											{entry.bracket_challenge.name}
+										</td>
+										<td className="px-2 py-1">
+											{displayLocalDate(entry.created_at)}
 										</td>
 										<td className="px-2 py-1">
 											{entry.bracket_challenge.league}

@@ -85,8 +85,8 @@ library.add(
 function App() {
 	return (
 		<>
-			<Navbar />
 			<div className="w-full bg-gray-200">
+				<Navbar />
 				<div className="max-w-7xl mx-auto">
 					<ScrollToTop />
 					<Routes>
@@ -208,8 +208,8 @@ function App() {
 						</Route>
 					</Routes>
 				</div>
+				<Footer />
 			</div>
-			<Footer />
 		</>
 	);
 }

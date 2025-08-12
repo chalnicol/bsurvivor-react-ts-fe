@@ -1,20 +1,15 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/auth/AuthProvider";
+import LoadAuth from "./auth/loadAuth";
 // import { useLocation } from "react-router-dom";
 const PublicOnlyRoute: React.FC = () => {
-	const { isAuthenticated, loading } = useAuth();
+	const { isAuthenticated, authLoading } = useAuth();
 
 	// If still loading auth state, render nothing or a loader
 	// This prevents flickering or premature redirection
-	if (loading) {
-		return (
-			<div className="py-7 min-h-[calc(100dvh-57px)] flex items-center justify-center">
-				<p className="font-medium xl:text-lg border border-gray-400 rounded p-2">
-					Loading Authentication...
-				</p>
-			</div>
-		);
+	if (authLoading) {
+		return <LoadAuth />;
 	}
 
 	// If authenticated, redirect to the home page (or dashboard)

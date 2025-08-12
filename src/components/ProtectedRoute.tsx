@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/auth/AuthProvider";
+import LoadAuth from "./auth/loadAuth";
 
 interface ProtectedRouteProps {
 	// Optional: A single role or an array of roles required
@@ -12,18 +13,12 @@ const ProtectedRoute = ({
 	requiredRoles,
 	requiredPermissions,
 }: ProtectedRouteProps) => {
-	const { isAuthenticated, loading, hasRole, can } = useAuth();
+	const { authLoading, isAuthenticated, hasRole, can } = useAuth();
 	const location = useLocation();
 
-	if (loading) {
+	if (authLoading) {
 		// return <div className="py-3">Loading authentication...</div>; // Or a spinner/loading component
-		return (
-			<div className="py-7 min-h-[calc(100dvh-57px)] flex items-center justify-center">
-				<p className="font-medium xl:text-lg border border-gray-400 rounded px-4 py-2 shadow">
-					Loading Authentication...
-				</p>
-			</div>
-		);
+		return <LoadAuth />;
 	}
 
 	if (!isAuthenticated) {

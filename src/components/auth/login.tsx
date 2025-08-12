@@ -4,11 +4,13 @@ import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import ContentBase from "../contentBase";
 import ErrorDisplay from "../errorDisplay";
+import LoadAuth from "./loadAuth";
 
 const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const {
+		authLoading,
 		isAuthenticated,
 		isLoading,
 		error,
@@ -20,8 +22,6 @@ const Login = () => {
 	const location = useLocation();
 
 	const from = location.state?.from?.pathname || "/"; // Default to /dashboard
-
-	// console.log("loc", location.state?.from?.pathname);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -42,6 +42,10 @@ const Login = () => {
 			clearMessages();
 		};
 	}, []);
+
+	if (authLoading) {
+		return <LoadAuth />;
+	}
 
 	return (
 		<ContentBase className="flex items-center justify-center p-4">

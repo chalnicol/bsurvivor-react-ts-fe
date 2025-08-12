@@ -2,11 +2,19 @@ import BracketChallengeActiveList from "../components/homepage/bracketChallenges
 import Hero from "../components/hero";
 import SurvivorList from "../components/homepage/survivorList";
 import ContentBase from "../components/contentBase";
+import { useAuth } from "../context/auth/AuthProvider";
+import LoadAuth from "../components/auth/loadAuth";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const HomePage = () => {
+	const { authLoading } = useAuth();
+
+	if (authLoading) {
+		return <LoadAuth />;
+	}
+
 	return (
-		<ContentBase className="px-4">
+		<ContentBase className="py-0 px-4">
 			<Hero />
 			<div className="border border-gray-400 bg-gray-100 shadow px-4 pt-4 md:px-6 md:pt-6 rounded-lg mb-12 mt-6">
 				<h1 className="text-4xl font-bold">

@@ -36,7 +36,7 @@ const ViewLeague = () => {
 
 	return (
 		<ContentBase className="py-7 px-4">
-			<div className="p-3 lg:p-5 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+			<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">
 					<h1 className="text-xl font-bold flex-1">League Details</h1>

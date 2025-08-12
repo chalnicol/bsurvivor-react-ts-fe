@@ -20,8 +20,8 @@ export interface AuthContextType {
 	error: string | null;
 	fieldErrors: Record<string, string[]> | null;
 	message: string | null;
-	loading: boolean;
 	isLoading: boolean;
+	authLoading: boolean;
 	login: (email: string, password: string) => Promise<boolean>;
 	register: (
 		username: string,

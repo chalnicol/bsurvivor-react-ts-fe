@@ -2,6 +2,7 @@ import type { AnyPlayoffsTeamInfo } from "../../data/adminData";
 import { useBracket } from "../../context/bracket/BracketProvider";
 import gsap from "gsap";
 import { useEffect, useRef } from "react";
+import TeamSlotCenter from "./teamSlotCenter";
 
 interface TeamSlotProps {
 	team: AnyPlayoffsTeamInfo | null;
@@ -26,27 +27,29 @@ const TeamSlot = ({
 	alignment,
 	placeholderText,
 }: TeamSlotProps) => {
-	const { updatePick, updateFinalsPick, isActive } = useBracket();
+	const { updatePick, updateFinalsPick, mode } = useBracket();
 
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (!isActive) return;
-		if (team && containerRef.current) {
-			if (roundIndex !== 1) {
-				gsap.fromTo(
-					containerRef.current,
-					{ scale: 0 },
-					{ scale: 1, duration: 0.5, ease: "elastic.out(1.1, 0.6)" }
-				);
-			}
+		if (mode == "preview") return;
+		if (team && roundIndex !== 1 && containerRef.current) {
+			gsap.fromTo(
+				containerRef.current,
+				{ scale: 0 },
+				{
+					scale: 1,
+					duration: 0.5,
+					ease: "elastic.out(1.1, 0.6)",
+				}
+			);
 		}
 		return () => {
 			if (containerRef.current) {
 				gsap.killTweensOf(containerRef.current);
 			}
 		};
-	}, [roundIndex, team, containerRef.current]);
+	}, [team]);
 
 	const getImageURL = (logo: string) => {
 		//get nba logo if team logo is undefined
@@ -55,24 +58,10 @@ const TeamSlot = ({
 		return logo;
 	};
 
-	const getAlignment = (): string => {
-		switch (alignment) {
-			case "right":
-				return "justify-end";
-			case "center":
-				return "justify-center";
-			default:
-				return "";
-		}
-	};
-
 	const handleClick = () => {
+		if (!team) return;
 		if (isClickable) {
-			if (!team) return;
-
 			if (roundIndex && matchupIndex) {
-				// console.log("hey", slot, roundIndex, matchupIndex, conference);
-
 				updatePick(
 					conference || null,
 					roundIndex || 0,
@@ -87,43 +76,49 @@ const TeamSlot = ({
 	};
 
 	const hoverClass =
-		isClickable && !isSelected ? "cursor-pointer hover:bg-yellow-50" : "";
+		isClickable && !isSelected ? "cursor-pointer hover:bg-gray-500" : "";
 
-	const selectClass = isSelected ? "bg-amber-200" : "";
+	const bgClass = isSelected ? "bg-yellow-700" : "bg-gray-600";
 
-	const flexDirectionClass = alignment == "right" ? "flex-row-reverse" : "";
+	const flexDirectionClass =
+		alignment == "right" ? "flex-row-reverse" : "flex-row";
+
+	const flexAlignment = alignment == "center" ? "justify-center" : "";
+
+	const borderClass = isSelected ? "border-yellow-600" : "border-gray-300";
 
 	return (
 		<div
 			ref={containerRef}
-			className={`border rounded shadow select-none h-10 flex items-center overflow-hidden bg-white ${
-				isSelected ? "border-red-500" : "border-gray-300"
-			} ${getAlignment()}`}
+			className={`border rounded shadow text-white select-none h-10 overflow-hidden flex items-center gap-x-1.5 ${flexDirectionClass} ${flexAlignment} ${hoverClass} ${bgClass} ${borderClass}`}
+			onClick={handleClick}
 		>
 			{team ? (
-				<div
-					className={`flex items-center gap-x-2 w-full h-full px-2 ${flexDirectionClass} ${selectClass} ${getAlignment()} ${hoverClass}`}
-					title={`${team.fname} ${team.lname}`}
-					onClick={handleClick}
-				>
-					<img
-						src={getImageURL(team.logo || "")}
-						alt={team.abbr}
-						className="h-6"
-					/>
-					<p className="text-lg font-bold">{team.abbr}</p>
-					{alignment !== "center" && team.seed && (
-						<p
-							className={`text-xs px-1 font-bold text-[0.6rem] leading-4 w-4 h-4 text-center rounded-full bg-gray-600 text-white ${
-								alignment == "right" ? "me-auto" : "ms-auto"
-							}`}
-						>
-							{team.seed}
-						</p>
+				<>
+					{alignment !== "center" ? (
+						<>
+							<div className="h-full px-0.5 bg-gray-300">
+								<img
+									src={getImageURL(team.logo || "")}
+									alt={team.abbr}
+									className={`h-full w-auto aspect-square object-contain`}
+								/>
+							</div>
+							<div
+								className={`flex gap-x-[0.1rem] items-baseline ${flexDirectionClass}`}
+							>
+								<span className="text-[0.6rem] font-semibold">
+									{team.seed}
+								</span>
+								<span className="text-2xl font-bold">{team.abbr}</span>
+							</div>
+						</>
+					) : (
+						<TeamSlotCenter team={team} isSelected={isSelected} />
 					)}
-				</div>
+				</>
 			) : (
-				<span className="text-xs px-2 font-semibold text-gray-600">
+				<span className="text-xs px-2 font-semibold text-gray-400">
 					{placeholderText}
 				</span>
 			)}

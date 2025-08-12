@@ -9,7 +9,8 @@ interface BracketContextType {
 	error: string | null;
 	success: string | null;
 	isLoading: boolean;
-	isActive: boolean;
+	// isActive: boolean;
+	mode: "update" | "submit" | "preview";
 	league: string;
 	updatePick: (
 		conference: "EAST" | "WEST" | null,
@@ -19,7 +20,9 @@ interface BracketContextType {
 	) => void;
 	updateFinalsPick: (team: AnyPlayoffsTeamInfo) => void;
 	resetPicks: () => void;
-	submitPicks: (league: string) => void;
+	resetBracket: () => void;
+	updateBracket: () => void;
+	submitPicks: () => void;
 	resetMessage: () => void;
 }
 

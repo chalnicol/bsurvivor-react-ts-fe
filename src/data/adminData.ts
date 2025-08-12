@@ -71,15 +71,31 @@ export interface PlayoffsRoundInfo {
 	matchups: PlayoffsMatchupInfo[];
 }
 
-export interface BracketChallengeEntryPredictionsInfo {
-	predicted_winner_team_id: number;
+export interface BracketChallengeMatchupsDataInfo {
 	matchup_id: number;
-	teams: number[];
+	teams: {
+		id: number;
+		slot?: number;
+		seed?: number;
+	}[];
+}
+export interface BracketChallengeEntryPredictionsInfo
+	extends BracketChallengeMatchupsDataInfo {
+	predicted_winner_team_id: number;
+}
+export interface BracketUpdateMatchupsData
+	extends BracketChallengeMatchupsDataInfo {
+	winner_team_id: number;
 }
 
 export interface BracketChallengeEntryData {
 	bracket_challenge_id: number;
 	predictions: BracketChallengeEntryPredictionsInfo[];
+}
+
+export interface BracketUpdateData {
+	bracket_challenge_id: number;
+	matchups: BracketUpdateMatchupsData[];
 }
 
 // export type AnyEntryData = NBAEntryData | PBAEntryData;
@@ -96,6 +112,9 @@ export interface BracketChallengeInfo {
 	is_public: boolean;
 	bracket_data: AnyTeamData;
 	rounds: PlayoffsRoundInfo[];
+	created_at: string;
+	updated_at: string;
+	entries: BracketChallengeEntryInfo[];
 }
 
 export interface BracketChallengeEntryInfo {
@@ -108,6 +127,8 @@ export interface BracketChallengeEntryInfo {
 	last_round_survive: number;
 	status: "active" | "failed" | "success";
 	predictions: BracketChallengeEntryPredictionsInfo[];
+	created_at: string;
+	updated_at: string;
 }
 
 //...

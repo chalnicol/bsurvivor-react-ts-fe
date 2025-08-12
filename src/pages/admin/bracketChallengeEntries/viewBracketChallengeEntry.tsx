@@ -95,7 +95,7 @@ const ViewBracketChallengeEntry = () => {
 												bracketChallengeEntry.bracket_challenge
 											}
 											predictions={bracketChallengeEntry.predictions}
-											isPreview={true}
+											bracketMode={"preview"}
 										>
 											<Bracket />
 										</BracketProvider>

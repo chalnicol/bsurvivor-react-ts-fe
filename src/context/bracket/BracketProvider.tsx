@@ -5,6 +5,8 @@ import type {
 	BracketChallengeEntryData,
 	BracketChallengeEntryPredictionsInfo,
 	BracketChallengeInfo,
+	BracketUpdateData,
+	BracketUpdateMatchupsData,
 	// NBAEntryData,
 	PlayoffsRoundInfo,
 } from "../../data/adminData";
@@ -14,13 +16,13 @@ interface BracketProviderProps {
 	// data: PlayoffsRoundInfo[];
 	bracketChallenge: BracketChallengeInfo;
 	predictions?: BracketChallengeEntryPredictionsInfo[];
-	isPreview: boolean;
 	children: React.ReactNode;
+	bracketMode: "update" | "submit" | "preview";
 }
 
 export const BracketProvider: React.FC<BracketProviderProps> = ({
 	bracketChallenge,
-	isPreview,
+	bracketMode,
 	children,
 	predictions,
 }) => {
@@ -28,8 +30,9 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
-	const [isActive, setIsActive] = useState<boolean>(!isPreview);
-	// const [league, setLeague] = useState<string>(bracketChallenge.league);
+	const [mode, setMode] = useState<"update" | "submit" | "preview">(
+		bracketMode
+	);
 
 	const league = bracketChallenge.league;
 
@@ -51,10 +54,10 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 						if (round.order_index !== 1) {
 							//get team slot 1
 							const team1 = allTeams.find(
-								(t) => t.id === prediction.teams[0]
+								(t) => t.id === prediction.teams[0].id
 							);
 							const team2 = allTeams.find(
-								(t) => t.id === prediction.teams[1]
+								(t) => t.id === prediction.teams[1].id
 							);
 							if (team1 && team2) {
 								newTeams.push({ ...team1, slot: 1 });
@@ -88,6 +91,7 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 				data
 			);
 			setSuccess(response.data.message);
+			setMode("preview");
 		} catch (error: any) {
 			if (error.type === "validation") {
 				setError(error.message);
@@ -96,7 +100,23 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 			}
 		} finally {
 			setIsLoading(false);
-			setIsActive(false);
+		}
+	};
+
+	const submitUpdateData = async (data: BracketUpdateData) => {
+		setIsLoading(true);
+		try {
+			const response = await apiClient.put(
+				`/admin/bracket-challenges/${bracketChallenge.id}/update`,
+				data
+			);
+			setSuccess(response.data.message);
+			// setRounds(response.data.rounds);
+			// setMode("preview");
+		} catch (error: any) {
+			setError(error.message);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -117,10 +137,6 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 		}
 		return true; // All matchups have a winner
 	}, [rounds]);
-
-	const resetPicks = () => {
-		setRounds(bracketChallenge.rounds);
-	};
 
 	const updatePick = useCallback(
 		(
@@ -235,56 +251,83 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 		[rounds]
 	);
 
-	const submitPicks = useCallback(
-		(league: string) => {
-			//get all matchup picks..
-			if (!rounds) {
-				setError("No rounds found");
-				return;
-			}
-			if (!picksCompleted()) {
-				setError("All picks must be completed");
-				return;
-			}
-			console.log("asdf", league);
-			// if (league === "NBA") {
-			// 	predictions = rounds.flatMap((round) =>
-			// 		round.matchups.map((matchup) => ({
-			// 			predicted_winner_team_id: matchup.winner_team_id,
-			// 			matchup_id: matchup.id,
-			// 			teams: matchup.teams.map((t) => t.id),
-			// 		}))
-			// 	);
-			// } else if (league === "PBA") {
-			// 	predictions = rounds.flatMap((round) =>
-			// 		round.matchups.map((matchup) => ({
-			// 			matchup_id: matchup.id,
-			// 			predicted_winner_team_id: matchup.winner_team_id,
-			// 			teams: matchup.teams.map((t) => t.id),
-			// 		}))
-			// 	);
+	const submitPicks = useCallback(() => {
+		//get all matchup picks..
+		if (!rounds) {
+			setError("No rounds found");
+			return;
+		}
+		if (!picksCompleted()) {
+			setError("All picks must be completed");
+			return;
+		}
+		// console.log("asdf", league);
 
-			let predictions: BracketChallengeEntryPredictionsInfo[] =
-				rounds.flatMap((round) =>
-					round.matchups.map((matchup) => ({
-						predicted_winner_team_id: matchup.winner_team_id,
-						matchup_id: matchup.id,
-						teams: [
-							matchup.teams.find((t) => t.slot === 1)?.id || 0,
-							matchup.teams.find((t) => t.slot === 2)?.id || 0,
-						],
-					}))
-				);
+		const predictions: BracketChallengeEntryPredictionsInfo[] =
+			rounds.flatMap((round) =>
+				round.matchups.map((matchup) => ({
+					predicted_winner_team_id: matchup.winner_team_id,
+					matchup_id: matchup.id,
+					teams: matchup.teams
+						.sort((a, b) => a.slot - b.slot)
+						.map((team) => ({
+							id: team.id,
+							// slot: team.slot,
+							// seed: team.seed,
+						})),
+				}))
+			);
 
-			console.log(predictions);
+		// console.log(predictions);
 
-			submitData({
-				bracket_challenge_id: bracketChallenge.id,
-				predictions: predictions,
-			});
-		},
-		[rounds]
-	);
+		submitData({
+			bracket_challenge_id: bracketChallenge.id,
+			predictions: predictions,
+		});
+	}, [rounds, bracketChallenge.id]);
+
+	const resetPicks = useCallback(() => {
+		setRounds(bracketChallenge.rounds);
+	}, [rounds]);
+
+	const updateBracket = useCallback(() => {
+		if (!rounds) return;
+		const matchups: BracketUpdateMatchupsData[] = rounds.flatMap((round) =>
+			round.matchups
+				.filter(
+					(matchup) =>
+						matchup.winner_team_id !== null || matchup.teams.length > 0
+				)
+				.map((matchup) => ({
+					winner_team_id: matchup.winner_team_id,
+					matchup_id: matchup.id,
+					teams: matchup.teams.map((team) => ({
+						id: team.id,
+						slot: team.slot,
+						seed: team.seed,
+					})),
+				}))
+		);
+		submitUpdateData({
+			bracket_challenge_id: bracketChallenge.id,
+			matchups: matchups,
+		});
+	}, [rounds, bracketChallenge.id]);
+
+	const resetBracket = async () => {
+		try {
+			setIsLoading(true);
+			const response = await apiClient.put(
+				`/admin/bracket-challenges/${bracketChallenge.id}/reset`
+			);
+			setRounds(response.data.rounds);
+			setSuccess(response.data.message);
+		} catch (error: any) {
+			setError(error.message);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	return (
 		<BracketContext.Provider
@@ -293,12 +336,14 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 				error,
 				success,
 				isLoading,
-				isActive,
+				mode,
 				league,
 				resetMessage,
 				updatePick,
 				updateFinalsPick,
 				resetPicks,
+				updateBracket,
+				resetBracket,
 				submitPicks,
 			}}
 		>

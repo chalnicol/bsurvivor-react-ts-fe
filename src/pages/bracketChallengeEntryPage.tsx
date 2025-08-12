@@ -7,9 +7,8 @@ import Bracket from "../components/bracket/bracket";
 import { BracketProvider } from "../context/bracket/BracketProvider";
 import ContentBase from "../components/contentBase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import nbaLogo from "../assets/nba.png";
-import pbaLogo from "../assets/pba.png";
 import Detail from "../components/detail";
+import { displayLocalDate } from "../utils/dateToLocal";
 
 const BracketChallengeEntryPage = () => {
 	const { slug } = useParams<{ slug: string }>();
@@ -60,40 +59,32 @@ const BracketChallengeEntryPage = () => {
 
 	return (
 		<ContentBase className="px-4 py-7">
-			<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+			<div className="p-3 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+				<h1 className="text-xl font-bold flex-1">
+					<FontAwesomeIcon icon="caret-right" /> Bracket Challenge Entry
+				</h1>
+
 				{bracketChallengeEntry ? (
 					<>
-						<div className="bg-gray-800 text-white p-4 rounded border text-sm border border-gray-300">
-							<div className="flex justify-center">
-								{bracketChallengeEntry.bracket_challenge.league ==
-									"NBA" && (
-									<img
-										src={nbaLogo}
-										alt="NBA"
-										className="h-12 object-contain"
-									/>
-								)}
-								{bracketChallengeEntry.bracket_challenge.league ==
-									"PBA" && (
-									<img
-										src={pbaLogo}
-										alt="PBA"
-										className="h-8 object-contain"
-									/>
-								)}
-							</div>
-
-							<hr className="my-2 border-gray-400" />
-
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
+						<p className="text-sm font-medium my-1">
+							View your bracket challenge entry below.
+						</p>
+						<div className="bg-gray-800 text-white p-4 rounded border text-sm border border-gray-300 mt-4">
+							<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-2">
 								<Detail label="Entry Name">
 									{bracketChallengeEntry.name}
+								</Detail>
+								<Detail label="Entry By">
+									{bracketChallengeEntry.user.username}
+								</Detail>
+								<Detail label="League">
+									{bracketChallengeEntry.bracket_challenge.league}
 								</Detail>
 								<Detail label="Bracket Challenge">
 									{bracketChallengeEntry.bracket_challenge.name}
 								</Detail>
-								<Detail label="User">
-									{bracketChallengeEntry.user.username}
+								<Detail label="Date Submitted">
+									{displayLocalDate(bracketChallengeEntry.created_at)}
 								</Detail>
 								<Detail label="Status">
 									<span
@@ -105,7 +96,7 @@ const BracketChallengeEntryPage = () => {
 									</span>
 								</Detail>
 							</div>
-							<hr className="my-2 border-gray-400" />
+							<hr className="my-4 border-gray-400" />
 							{/* preview */}
 							<div>
 								<BracketProvider
@@ -113,7 +104,7 @@ const BracketChallengeEntryPage = () => {
 										bracketChallengeEntry.bracket_challenge
 									}
 									predictions={bracketChallengeEntry.predictions}
-									isPreview={true}
+									bracketMode={"preview"}
 								>
 									<Bracket />
 								</BracketProvider>
@@ -122,14 +113,10 @@ const BracketChallengeEntryPage = () => {
 					</>
 				) : (
 					<>
-						<h1 className="text-xl font-bold flex-1">
-							<FontAwesomeIcon icon="caret-right" /> Bracket Challenge
-							Entry
-						</h1>
 						<p className="mt-2 p-3 bg-gray-300 rounded">
 							{isLoading
 								? "Loading..."
-								: "Error fetching bracket challenge entry"}
+								: "Bracket challenge entry not found."}
 						</p>
 					</>
 				)}

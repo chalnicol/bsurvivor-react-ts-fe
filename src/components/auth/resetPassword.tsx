@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
-import ContentBase from "../ContentBase";
+import ContentBase from "../contentBase";
 
 const resetPassword = () => {
 	const location = useLocation();

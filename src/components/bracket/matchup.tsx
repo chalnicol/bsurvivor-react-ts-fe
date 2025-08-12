@@ -12,7 +12,7 @@ interface MatchupProps {
 	conference?: "EAST" | "WEST";
 }
 const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
-	const { isActive } = useBracket();
+	const { mode } = useBracket();
 	const alignment = conference === "WEST" ? "right" : "left";
 	const textAlignment = conference === "WEST" ? "text-right" : "text-left";
 
@@ -49,7 +49,7 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 	if (!matchup) return;
 
 	const isClickable = useCallback(() => {
-		if (isActive && matchup) {
+		if (mode !== "preview" && matchup) {
 			return matchup.teams.length >= 2 && matchup.winner_team_id === null;
 		}
 		return false;
@@ -94,7 +94,7 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 				</div>
 
 				<div
-					className={`text-[10px] mt-0.5 px-0.5 text-white font-semibold ${textAlignment}`}
+					className={`select-none text-[10px] mt-0.5 px-0.5 text-white font-semibold ${textAlignment}`}
 				>
 					Match ID : <span className="text-red-400">{matchup.name}</span>
 				</div>

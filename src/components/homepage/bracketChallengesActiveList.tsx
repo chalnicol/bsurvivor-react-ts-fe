@@ -1,41 +1,45 @@
 import { Link } from "react-router-dom";
-import { apiClient } from "../../utils/api";
-import { useEffect, useState } from "react";
-import { type BracketChallengeInfo } from "../../data/adminData";
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAdmin } from "../../context/admin/AdminProvider";
 
 const BracketChallengeActiveList = () => {
-	const [bracketChallenges, setBracketChallenges] = useState<
-		BracketChallengeInfo[]
-	>([]);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const {
+		bracketChallenges,
+		isLoading,
+		isBracketChallengesPopulated,
+		fetchBracketChallenges,
+	} = useAdmin();
 
 	useEffect(() => {
-		//fetch all active bracket challenges
-		const fetchActiveBracketChallenges = async () => {
-			setIsLoading(true);
-			try {
-				const response = await apiClient.get("/bracket-challenges/active");
-				// console.log(response.data.challenges);
-				setBracketChallenges(response.data.challenges);
-			} catch (error) {
-				console.error(error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-		fetchActiveBracketChallenges();
-	}, []);
+		if (!isBracketChallengesPopulated) {
+			fetchBracketChallenges();
+		}
+	}, [isBracketChallengesPopulated]);
 
 	return (
 		<>
 			<div className="w-full">
-				<h3 className="font-bold text-lg mb-1">
-					<FontAwesomeIcon icon="caret-right" /> Active Bracket Challenges
-				</h3>
-
+				<div className="sm:flex items-center gap-x-3 space-y-2">
+					<h3 className="font-bold text-xl mb-1">
+						<FontAwesomeIcon icon="caret-right" /> Active Bracket
+						Challenges
+					</h3>
+					<button
+						className={`font-bold text-xs px-2 py-0.5 block rounded text-white ${
+							isLoading
+								? "bg-amber-500 opacity-70"
+								: "bg-amber-600 hover:bg-amber-500 cursor-pointer"
+						}`}
+						onClick={() => fetchBracketChallenges()}
+						disabled={isLoading}
+					>
+						REFRESH LIST
+					</button>
+				</div>
+				<hr className="my-2 border-gray-400" />
 				{bracketChallenges.length > 0 ? (
-					<div className="mb-4">
+					<div className="my-3">
 						{bracketChallenges.map((bracketChallenge) => (
 							<div
 								key={bracketChallenge.id}
@@ -54,11 +58,11 @@ const BracketChallengeActiveList = () => {
 						))}
 					</div>
 				) : (
-					<p>
+					<div className="py-2 px-3 bg-gray-200">
 						{isLoading
-							? "Loading..."
-							: "No active bracket challenges found."}
-					</p>
+							? "Fetching active bracket challenges..."
+							: "No active bracket challenges to display."}
+					</div>
 				)}
 			</div>
 		</>

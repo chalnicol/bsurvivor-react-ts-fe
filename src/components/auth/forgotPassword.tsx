@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
-import ContentBase from "../ContentBase";
+import ContentBase from "../contentBase";
 
 const ForgotPassword = () => {
 	const [email, setEmail] = useState("");

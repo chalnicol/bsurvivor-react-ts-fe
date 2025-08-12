@@ -205,7 +205,7 @@ const ListBracketChallenges = () => {
 												to={`/admin/bracket-challenges/${challenge.id}`}
 												className="block shadow cursor-pointer hover:bg-teal-500 bg-teal-600 text-center text-white rounded px-2 py-0.5 text-xs font-bold"
 											>
-												view
+												view | update
 											</Link>
 											<Link
 												to={`/admin/bracket-challenges/${challenge.id}/edit`}

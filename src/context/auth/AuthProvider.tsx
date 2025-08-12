@@ -10,13 +10,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	const [token, setToken] = useState<string | null>(
 		localStorage.getItem("token")
 	);
-	const [loading, setLoading] = useState<boolean>(true); // To manage initial loading state
+	const [authLoading, setAuthLoading] = useState<boolean>(true); // To manage initial loading state
 	const [message, setMessage] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({}); // To hold validation errors
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const isAuthenticated = !!user && !!token;
+	// const isAuthenticated = !!user && !!token;
+	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
 	// Function to fetch user data if a token exists (on app load/refresh)
 	const fetchUser = async () => {
@@ -24,16 +25,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			try {
 				const response = await apiClient.get("/user"); // Protected route to get user details
 				setUser(response.data.data);
+				setIsAuthenticated(true);
 			} catch (error) {
 				console.error("Failed to fetch user:", error);
 				localStorage.removeItem("token"); // Clear invalid token
 				setToken(null);
 				setUser(null);
+				setIsAuthenticated(false);
 			} finally {
-				setLoading(false);
+				setAuthLoading(false);
 			}
 		} else {
-			setLoading(false);
+			setAuthLoading(false);
 		}
 	};
 
@@ -128,6 +131,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			localStorage.removeItem("token"); // Clear token from storage
 			setToken(null);
 			setUser(null);
+			setIsAuthenticated(false);
 			setIsLoading(false);
 			console.log("Logged out successfully.");
 		}
@@ -300,10 +304,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		clearMessages();
 		try {
 			await apiClient.delete("/user");
-
 			localStorage.removeItem("token"); // Clear token from storage
 			setUser(null);
 			setToken(null);
+			setIsAuthenticated(false);
 			return true; // Indicate success
 		} catch (err: any) {
 			const apiErrors = err.response?.data?.errors;
@@ -366,8 +370,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				updateUser,
 				hasRole,
 				can,
-				loading,
 				isLoading,
+				authLoading,
 			}}
 		>
 			{children}

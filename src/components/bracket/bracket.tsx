@@ -1,33 +1,28 @@
 import { useBracket } from "../../context/bracket/BracketProvider";
 import { useAuth } from "../../context/auth/AuthProvider";
-
 import Conference from "./conference";
 import Finals from "./finals";
 import StatusMessage from "../statusMessage";
-// import { useLocation, useNavigate } from "react-router-dom";
 
 const Bracket = () => {
 	const { isAuthenticated } = useAuth();
 	const { league } = useBracket();
-	// const navigate = useNavigate();
-	// const location = useLocation();
 
 	const {
 		error,
 		success,
 		isLoading,
-		isActive,
+		mode,
 		resetMessage,
-		resetPicks,
+		updateBracket,
+		resetBracket,
 		submitPicks,
+		resetPicks,
 	} = useBracket();
 
 	const handleSubmit = () => {
-		if (!isAuthenticated) {
-			// navigate("/login", { state: { from: location }, replace: true });
-			return;
-		}
-		submitPicks(league);
+		if (!isAuthenticated) return;
+		submitPicks();
 	};
 
 	return (
@@ -46,7 +41,8 @@ const Bracket = () => {
 					onClose={resetMessage}
 				/>
 			)}
-			<div className="w-full rounded relative text-black py-2">
+
+			<div className="w-full rounded relative text-black select-none">
 				<div className="overflow-x-auto">
 					{league == "NBA" && (
 						<div className="flex gap-x-6 items-center min-w-4xl mb-3">
@@ -72,24 +68,26 @@ const Bracket = () => {
 				</div>
 				{isLoading && (
 					<div className="absolute top-0 left-0 w-full h-full">
-						<div className="absolute top-0 left-0 w-full h-full bg-gray-900 opacity-70"></div>
+						<div className="absolute top-0 left-0 w-full h-full bg-black opacity-70"></div>
 						<div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
 							<div className="px-4 py-3 bg-white rounded">
-								<p className="font-semibold">Submitting..</p>
+								<p className="font-semibold">
+									{mode === "submit" ? "Submitting..." : "Saving..."}.
+								</p>
 							</div>
 						</div>
 					</div>
 				)}
 			</div>
-			{isActive && (
+			{mode == "submit" && (
 				<>
 					<hr className="my-2 border-gray-400" />
 					<div className="flex items-center space-x-2 mt-3">
 						<button
-							className={`px-3 py-2  text-white min-w-30 rounded  font-bold transition duration-200 ${
+							className={`px-3 py-2 text-white min-w-30 rounded font-bold transition duration-200 ${
 								isLoading
-									? "opacity-70 bg-red-400"
-									: " bg-red-600 hover:bg-red-500 cursor-pointer"
+									? "bg-rose-400 opacity-70"
+									: " bg-rose-600 hover:bg-rose-500 cursor-pointer"
 							}`}
 							onClick={resetPicks}
 							disabled={isLoading}
@@ -100,8 +98,8 @@ const Bracket = () => {
 							<button
 								className={`px-3 py-2 text-white min-w-30 rounded font-bold transition duration-200 ${
 									isLoading
-										? "bg-green-400 opacity-70"
-										: "bg-green-500 hover:bg-green-400 cursor-pointer"
+										? "bg-sky-400 opacity-70"
+										: "bg-sky-600 hover:bg-sky-500 cursor-pointer"
 								}`}
 								onClick={handleSubmit}
 								disabled={isLoading}
@@ -109,6 +107,35 @@ const Bracket = () => {
 								SUBMIT PICKS
 							</button>
 						)}
+					</div>
+				</>
+			)}
+			{mode == "update" && (
+				<>
+					<hr className="my-2 border-gray-400" />
+					<div className="space-x-2 mt-3">
+						<button
+							className={`px-3 py-2 text-white min-w-30 rounded font-bold transition duration-200 ${
+								isLoading
+									? "bg-orange-400 opacity-70"
+									: " bg-orange-600 hover:bg-orange-500 cursor-pointer"
+							}`}
+							onClick={resetBracket}
+							disabled={isLoading}
+						>
+							RESET BRACKET
+						</button>
+						<button
+							className={`px-3 py-2 text-white min-w-30 rounded font-bold transition duration-200 ${
+								isLoading
+									? "bg-green-400 opacity-70"
+									: "bg-green-600 hover:bg-green-500 cursor-pointer"
+							}`}
+							onClick={updateBracket}
+							disabled={isLoading}
+						>
+							UPDATE BRACKET
+						</button>
 					</div>
 				</>
 			)}
