@@ -16,7 +16,7 @@ import ToDelete from "../../../components/toDelete";
 import StatusMessage from "../../../components/statusMessage";
 import ContentBase from "../../../components/contentBase";
 import { Link } from "react-router-dom";
-import { displayLocalDate } from "../../../utils/dateToLocal";
+import { displayLocalDate } from "../../../utils/dateTime";
 
 const ListBracketChallengeEntries = () => {
 	const [bracketChallengeEntries, setBracketChallengeEntries] = useState<
@@ -123,16 +123,16 @@ const ListBracketChallengeEntries = () => {
 		// setCurrentPage(1);
 	}, [debouncedSearchTerm]);
 
-	const textClass = useCallback((status: string): string => {
+	const bgClass = useCallback((status: string): string => {
 		switch (status) {
-			case "success":
-				return "text-green-600";
-			case "failed":
-				return "text-red-600";
+			case "won":
+				return "bg-green-600";
+			case "eliminated":
+				return "bg-red-600";
 			case "active":
-				return "text-blue-600";
+				return "bg-blue-600";
 			default:
-				return "text-red-200";
+				return "";
 		}
 	}, []);
 
@@ -212,7 +212,7 @@ const ListBracketChallengeEntries = () => {
 										</td>
 										<td className="px-2 py-1">
 											<span
-												className={`text-xs font-bold select-none rounded px-2 ${textClass(
+												className={`text-xs font-bold select-none rounded text-white px-2 ${bgClass(
 													entry.status
 												)}`}
 											>

@@ -7,10 +7,12 @@ import type {
 	BracketChallengeInfo,
 	BracketUpdateData,
 	BracketUpdateMatchupsData,
+	PlayoffsMatchupInfo,
 	// NBAEntryData,
 	PlayoffsRoundInfo,
 } from "../../data/adminData";
 import { apiClient } from "../../utils/api";
+import { checkIsActive } from "../../utils/dateTime";
 
 interface BracketProviderProps {
 	// data: PlayoffsRoundInfo[];
@@ -27,61 +29,94 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 	predictions,
 }) => {
 	const [rounds, setRounds] = useState<PlayoffsRoundInfo[] | null>(null);
+	const [currentRounds, setCurrentRounds] = useState<
+		PlayoffsRoundInfo[] | null
+	>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [mode, setMode] = useState<"update" | "submit" | "preview">(
 		bracketMode
 	);
+	const [hasProgressed, setHasProgressed] = useState<boolean>(false);
 
 	const league = bracketChallenge.league;
 
+	const isActive = checkIsActive(
+		bracketChallenge.start_date,
+		bracketChallenge.end_date
+	);
+
 	useEffect(() => {
-		const allTeams = bracketChallenge.rounds.flatMap((round) =>
-			round.matchups.flatMap((matchup) => matchup.teams)
-		);
-
 		if (predictions) {
-			const newRounds = bracketChallenge.rounds.map((round) => {
-				const newMatchups = round.matchups.map((matchup) => {
-					const prediction = predictions.find(
-						(p) => p.matchup_id === matchup.id
-					);
-					if (prediction) {
-						//get teams based from the predictions teams and update winner_team_id
-						const newTeams: AnyPlayoffsTeamInfo[] = [];
+			const allTeams = bracketChallenge.rounds.flatMap((round) =>
+				round.matchups.flatMap((matchup) => matchup.teams)
+			);
+			const newRounds: PlayoffsRoundInfo[] = bracketChallenge.rounds.map(
+				(round) => {
+					const newMatchups: PlayoffsMatchupInfo[] = round.matchups.map(
+						(matchup) => {
+							const prediction = predictions.find(
+								(p) => p.matchup_id === matchup.id
+							);
+							console.log(prediction);
+							if (prediction) {
+								//get teams based from the predictions teams and update winner_team_id
+								const newTeams: AnyPlayoffsTeamInfo[] = [];
 
-						if (round.order_index !== 1) {
-							//get team slot 1
-							const team1 = allTeams.find(
-								(t) => t.id === prediction.teams[0].id
-							);
-							const team2 = allTeams.find(
-								(t) => t.id === prediction.teams[1].id
-							);
-							if (team1 && team2) {
-								newTeams.push({ ...team1, slot: 1 });
-								newTeams.push({ ...team2, slot: 2 });
+								if (round.order_index !== 1) {
+									//get team slot 1
+									const team1 = allTeams.find(
+										(t) => t.id === prediction.teams[0].id
+									);
+									const team2 = allTeams.find(
+										(t) => t.id === prediction.teams[1].id
+									);
+									if (team1 && team2) {
+										newTeams.push({ ...team1, slot: 1 });
+										newTeams.push({ ...team2, slot: 2 });
+									}
+								}
+
+								const isPredicted =
+									matchup.winner_team_id !== null
+										? prediction.predicted_winner_team_id ===
+										  matchup.winner_team_id
+										: null;
+
+								return {
+									...matchup,
+									winner_team_id: prediction.predicted_winner_team_id,
+									teams:
+										newTeams.length > 0 ? newTeams : matchup.teams,
+									isPredicted: isPredicted,
+								};
 							}
+							return matchup;
 						}
-						return {
-							...matchup,
-							winner_team_id: prediction.predicted_winner_team_id,
-							teams: newTeams.length > 0 ? newTeams : matchup.teams,
-						};
-					}
-					return matchup;
-				});
-				return {
-					...round,
-					matchups: newMatchups,
-				};
-			});
+					);
+					return {
+						...round,
+						matchups: newMatchups,
+					};
+				}
+			);
 			setRounds(newRounds);
 		} else {
 			setRounds(bracketChallenge.rounds);
 		}
-	}, [bracketChallenge, predictions]);
+		setCurrentRounds(bracketChallenge.rounds);
+	}, [bracketChallenge.rounds, predictions]);
+
+	useEffect(() => {
+		if (!currentRounds) return;
+		const matchups = currentRounds.flatMap((round) => {
+			return round.matchups.filter(
+				(matchup) => matchup.winner_team_id !== null
+			);
+		});
+		setHasProgressed(matchups.length > 0);
+	}, [currentRounds]);
 
 	const submitData = async (data: BracketChallengeEntryData) => {
 		try {
@@ -111,8 +146,7 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 				data
 			);
 			setSuccess(response.data.message);
-			// setRounds(response.data.rounds);
-			// setMode("preview");
+			setCurrentRounds(response.data.rounds);
 		} catch (error: any) {
 			setError(error.message);
 		} finally {
@@ -120,10 +154,10 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 		}
 	};
 
-	const resetMessage = useCallback(() => {
+	const resetMessage = () => {
 		setError(null);
 		setSuccess(null);
-	}, []);
+	};
 
 	const picksCompleted = useCallback(() => {
 		if (!rounds) return false;
@@ -146,17 +180,41 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 			team: AnyPlayoffsTeamInfo
 		) => {
 			setRounds((prev) => {
-				if (prev) {
-					let newRounds = prev.map((r) => {
+				if (!prev) return prev;
+				let newRounds = prev.map((r) => {
+					if (r.conference == conference && r.order_index == roundIndex) {
+						const newMatchups = r.matchups.map((m) => {
+							if (m.matchup_index == matchupIndex) {
+								return {
+									...m,
+									winner_team_id: team.id,
+								};
+							}
+							return m;
+						});
+						return { ...r, matchups: newMatchups };
+					}
+					return r;
+				});
+
+				//advance team to next round.
+				if (roundIndex && roundIndex < 3) {
+					// if not advancing to finals..
+					const nextRoundIndex = roundIndex + 1;
+					const nextMatchupIndex = matchupIndex <= 2 ? 1 : 2;
+					const nextTeamSlot = matchupIndex % 2 == 0 ? 2 : 1;
+
+					newRounds = newRounds.map((r) => {
 						if (
 							r.conference === conference &&
-							r.order_index === roundIndex
+							r.order_index === nextRoundIndex
 						) {
 							const newMatchups = r.matchups.map((m) => {
-								if (m.matchup_index === matchupIndex) {
+								if (m.matchup_index === nextMatchupIndex) {
+									const newTeam = { ...team, slot: nextTeamSlot };
 									return {
 										...m,
-										winner_team_id: team.id,
+										teams: [...m.teams, newTeam],
 									};
 								}
 								return m;
@@ -168,88 +226,56 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 						}
 						return r;
 					});
+				} else {
+					//now advancing to finals..
+					const finalSlot = conference === "EAST" ? 1 : 2;
 
-					if (roundIndex < 3) {
-						const nextRoundIndex = roundIndex + 1;
-						const nextMatchupIndex = matchupIndex <= 2 ? 1 : 2;
-						const nextTeamSlot = matchupIndex % 2 == 0 ? 2 : 1;
-
-						newRounds = newRounds.map((r) => {
-							if (
-								r.conference === conference &&
-								r.order_index === nextRoundIndex
-							) {
-								const newMatchups = r.matchups.map((m) => {
-									if (m.matchup_index === nextMatchupIndex) {
-										const newTeam = { ...team, slot: nextTeamSlot };
-										return {
-											...m,
-											teams: [...m.teams, newTeam],
-										};
-									}
-									return m;
-								});
-								return {
-									...r,
-									matchups: newMatchups,
-								};
-							}
-							return r;
-						});
-					} else {
-						const finalSlot = conference === "EAST" ? 1 : 2;
-
-						newRounds = newRounds.map((r) => {
-							if (r.name === "Finals") {
-								const newMatchups = r.matchups.map((m) => {
-									if (m.matchup_index === 1) {
-										const newTeam = { ...team, slot: finalSlot };
-										return {
-											...m,
-											teams: [...m.teams, newTeam],
-										};
-									}
-									return m;
-								});
-								return {
-									...r,
-									matchups: newMatchups,
-								};
-							}
-							return r;
-						});
-					}
-					return newRounds;
-				}
-				return prev;
-			});
-		},
-		[rounds]
-	);
-
-	const updateFinalsPick = useCallback(
-		(team: AnyPlayoffsTeamInfo) => {
-			//..
-			setRounds((prev) => {
-				if (prev) {
-					const newRounds = prev.map((r) => {
+					newRounds = newRounds.map((r) => {
 						if (r.name === "Finals") {
-							const matchup = r.matchups[0];
-							matchup.winner_team_id = team.id;
+							const newMatchups = r.matchups.map((m) => {
+								if (m.matchup_index === 1) {
+									const newTeam = { ...team, slot: finalSlot };
+									return {
+										...m,
+										teams: [...m.teams, newTeam],
+									};
+								}
+								return m;
+							});
 							return {
 								...r,
-								matchups: [matchup],
+								matchups: newMatchups,
 							};
 						}
 						return r;
 					});
-					return newRounds;
 				}
-				return prev;
+				return newRounds;
 			});
 		},
-		[rounds]
+		[]
 	);
+
+	const updateFinalsPick = useCallback((team: AnyPlayoffsTeamInfo) => {
+		//..
+		setRounds((prev) => {
+			if (prev) {
+				const newRounds = prev.map((r) => {
+					if (r.name === "Finals") {
+						const matchup = r.matchups[0];
+						matchup.winner_team_id = team.id;
+						return {
+							...r,
+							matchups: [matchup],
+						};
+					}
+					return r;
+				});
+				return newRounds;
+			}
+			return prev;
+		});
+	}, []);
 
 	const submitPicks = useCallback(() => {
 		//get all matchup picks..
@@ -266,7 +292,7 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 		const predictions: BracketChallengeEntryPredictionsInfo[] =
 			rounds.flatMap((round) =>
 				round.matchups.map((matchup) => ({
-					predicted_winner_team_id: matchup.winner_team_id,
+					predicted_winner_team_id: matchup.winner_team_id || 0,
 					matchup_id: matchup.id,
 					teams: matchup.teams
 						.sort((a, b) => a.slot - b.slot)
@@ -286,48 +312,162 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 		});
 	}, [rounds, bracketChallenge.id]);
 
-	const resetPicks = useCallback(() => {
-		setRounds(bracketChallenge.rounds);
-	}, [rounds]);
+	const resetBracket = useCallback(() => {
+		setRounds((prev) => {
+			if (!prev) return prev;
+			let newRounds = prev.map((r) => {
+				let newMatchups = r.matchups.map((m) => {
+					if (r.order_index !== 1 || r.name === "Finals") {
+						return {
+							...m,
+							winner_team_id: null,
+							teams: [],
+						};
+					}
+					if (r.order_index === 1) {
+						return {
+							...m,
+							winner_team_id: null,
+						};
+					}
+					return m;
+				});
+				return {
+					...r,
+					matchups: newMatchups,
+				};
+			});
+			return newRounds;
+		});
+	}, []);
 
 	const updateBracket = useCallback(() => {
 		if (!rounds) return;
 		const matchups: BracketUpdateMatchupsData[] = rounds.flatMap((round) =>
-			round.matchups
-				.filter(
-					(matchup) =>
-						matchup.winner_team_id !== null || matchup.teams.length > 0
-				)
-				.map((matchup) => ({
-					winner_team_id: matchup.winner_team_id,
-					matchup_id: matchup.id,
-					teams: matchup.teams.map((team) => ({
-						id: team.id,
-						slot: team.slot,
-						seed: team.seed,
-					})),
-				}))
+			// round.matchups
+			// 	.filter(
+			// 		(matchup) =>
+			// 			matchup.winner_team_id !== null || matchup.teams.length > 0
+			// 	)
+			round.matchups.map((matchup) => ({
+				winner_team_id: matchup.winner_team_id,
+				matchup_id: matchup.id,
+				teams: matchup.teams.map((team) => ({
+					id: team.id,
+					slot: team.slot,
+					seed: team.seed,
+				})),
+			}))
 		);
+		// console.log(matchups);
+
 		submitUpdateData({
 			bracket_challenge_id: bracketChallenge.id,
 			matchups: matchups,
 		});
 	}, [rounds, bracketChallenge.id]);
 
-	const resetBracket = async () => {
-		try {
-			setIsLoading(true);
-			const response = await apiClient.put(
-				`/admin/bracket-challenges/${bracketChallenge.id}/reset`
-			);
-			setRounds(response.data.rounds);
-			setSuccess(response.data.message);
-		} catch (error: any) {
-			setError(error.message);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	const refreshBracket = useCallback(() => {
+		if (!currentRounds) return;
+		setRounds(currentRounds);
+	}, [currentRounds]);
+
+	const clearMatchup = useCallback(
+		(
+			conference: "EAST" | "WEST" | null,
+			roundIndex: number,
+			matchupIndex: number
+		) => {
+			// We now use the functional update form of setRounds
+			setRounds((prevRounds) => {
+				// Safely handle the case where prevRounds is null
+				if (!prevRounds) {
+					return prevRounds;
+				}
+				const prevRoundIndex = roundIndex - 1;
+				const originMatchupIndexes: number[] = [
+					2 * (matchupIndex - 1) + 1,
+					2 * (matchupIndex - 1) + 2,
+				];
+
+				const newRounds = prevRounds.map((r) => {
+					if (
+						r.conference === conference &&
+						(r.order_index === roundIndex ||
+							r.order_index === prevRoundIndex)
+					) {
+						const newMatchups = r.matchups.map((m) => {
+							if (
+								r.order_index === roundIndex &&
+								m.matchup_index === matchupIndex
+							) {
+								return {
+									...m,
+									teams: [],
+									winner_team_id: null,
+								};
+							}
+							if (
+								r.order_index === prevRoundIndex &&
+								originMatchupIndexes.includes(m.matchup_index)
+							) {
+								return {
+									...m,
+									winner_team_id: null,
+								};
+							}
+							return m;
+						});
+						return { ...r, matchups: newMatchups };
+					}
+					return r;
+				});
+				return newRounds;
+			});
+		},
+		[] // The dependency array can now be empty!
+	);
+
+	const clearFinalsMatchup = useCallback(() => {
+		const prevRoundIndex = bracketChallenge.league === "NBA" ? 3 : 2;
+		setRounds((prev) => {
+			if (!prev) return prev;
+			let newRounds = prev.map((r) => {
+				if (r.name === "Finals" || r.order_index === prevRoundIndex) {
+					const newMatchups = r.matchups.map((m) => {
+						if (r.name === "Finals") {
+							return {
+								...m,
+								teams: [],
+								winner_team_id: null,
+							};
+						}
+
+						if (r.order_index === prevRoundIndex) {
+							return {
+								...m,
+								winner_team_id: null,
+							};
+						}
+						return m;
+					});
+					return { ...r, matchups: newMatchups };
+				}
+				return r;
+			});
+
+			return newRounds;
+		});
+	}, [bracketChallenge.league]);
+
+	// const hasProgressed = useCallback(() => {
+	// 	const matchups = bracketChallenge.rounds.flatMap((round) => {
+	// 		return round.matchups.filter(
+	// 			(matchup) => matchup.winner_team_id !== null
+	// 		);
+	// 	});
+	// 	return matchups.length > 0;
+	// }, [bracketChallenge.rounds]);
 
 	return (
 		<BracketContext.Provider
@@ -338,13 +478,17 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 				isLoading,
 				mode,
 				league,
+				isActive,
+				hasProgressed,
+				refreshBracket,
 				resetMessage,
 				updatePick,
 				updateFinalsPick,
-				resetPicks,
 				updateBracket,
 				resetBracket,
 				submitPicks,
+				clearMatchup,
+				clearFinalsMatchup,
 			}}
 		>
 			{children}

@@ -11,15 +11,19 @@ interface AdminContextType {
 	nbaTeams: AnyTeamInfo[];
 	pbaTeams: AnyTeamInfo[];
 	leagues: LeagueInfo[];
-	bracketChallenges: BracketChallengeInfo[];
 	isLoading: boolean;
+	isOngoingLoading: boolean;
 	error: string | null;
-	fetchRoles: () => Promise<void>;
-	fetchTeamsAndLeagues: () => Promise<void>;
 	isRolesPopulated: boolean;
 	areTeamsAndLeaguesPopulated: boolean;
-	fetchBracketChallenges: () => Promise<void>;
-	isBracketChallengesPopulated: boolean;
+	isActiveChallengesPopulated: boolean;
+	isOngoingChallengesPopulated: boolean;
+	activeChallenges: BracketChallengeInfo[];
+	ongoingChallenges: BracketChallengeInfo[];
+	fetchRoles: () => Promise<void>;
+	fetchTeamsAndLeagues: () => Promise<void>;
+	fetchBracketChallenges: (type: "active" | "ongoing") => Promise<void>;
+	fetchTopEntries: (id: number) => Promise<void>;
 }
 
 export const AdminContext = createContext<AdminContextType | undefined>(

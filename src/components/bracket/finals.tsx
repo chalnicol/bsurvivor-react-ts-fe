@@ -1,14 +1,10 @@
-import TeamSlot from "./teamSlot";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import pbaThrophy from "../../assets/pba_trophy.png";
 import nbaThrophy from "../../assets/nba_trophy.png";
 import { useBracket } from "../../context/bracket/BracketProvider";
-import type {
-	AnyPlayoffsTeamInfo,
-	PlayoffsMatchupInfo,
-} from "../../data/adminData";
-import gsap from "gsap";
+import type { AnyPlayoffsTeamInfo } from "../../data/adminData";
 import TeamSlotCenter from "./teamSlotCenter";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface PBAFinalsProps {
 	league: "NBA" | "PBA";
@@ -16,95 +12,120 @@ interface PBAFinalsProps {
 }
 
 const Finals = ({ league, className }: PBAFinalsProps) => {
-	const { rounds, mode } = useBracket();
+	const { rounds, mode, clearFinalsMatchup } = useBracket();
 
-	const [matchup, setMatchup] = useState<PlayoffsMatchupInfo | null>(null);
-
+	// const [matchup, setMatchup] = useState<PlayoffsMatchupInfo | null>(null);
 	const [teamA, setTeamA] = useState<AnyPlayoffsTeamInfo | null>(null);
 	const [teamB, setTeamB] = useState<AnyPlayoffsTeamInfo | null>(null);
-
 	const [winningTeam, setWinningTeam] = useState<AnyPlayoffsTeamInfo | null>(
 		null
 	);
+	const [showClearButton, setShowClearButton] = useState<boolean>(false);
 
-	const winningTeamRef = useRef<HTMLDivElement>(null);
+	const [isClickable, setIsClickable] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (!rounds) return;
 
-		const finalRound =
-			rounds.find((round) => round.name === "Finals") || null;
+		const finalRounds = rounds.find((r) => r.name === "Finals");
 
-		if (finalRound && finalRound.matchups.length > 0) {
-			setMatchup(finalRound.matchups[0]);
-			setTeamA(
-				finalRound.matchups[0].teams.find((t) => t.slot == 1) || null
-			);
-			setTeamB(
-				finalRound.matchups[0].teams.find((t) => t.slot == 2) || null
-			);
+		if (finalRounds) {
+			const finalMatchup = finalRounds.matchups[0];
 
+			// setMatchup(finalMatchup);
+			setTeamA(finalMatchup.teams.find((t) => t.slot == 1) || null);
+			setTeamB(finalMatchup.teams.find((t) => t.slot == 2) || null);
 			setWinningTeam(
-				finalRound.matchups[0].teams.find(
-					(t) => t.id == matchup?.winner_team_id
+				finalMatchup.teams.find(
+					(t) => t.id == finalMatchup.winner_team_id
 				) || null
+			);
+			setIsClickable(
+				mode !== "preview" &&
+					finalMatchup.teams.length >= 2 &&
+					finalMatchup.winner_team_id === null
+			);
+			setShowClearButton(
+				mode !== "preview" && finalMatchup.teams.length >= 1
 			);
 		}
 	}, [rounds]);
 
-	useEffect(() => {
-		if (mode === "preview") return;
-		if (winningTeam && winningTeamRef.current) {
-			gsap.fromTo(
-				winningTeamRef.current,
-				{ scale: 0 },
-				{ scale: 1, duration: 0.5, ease: "elastic.out(1.1, 0.6)" }
-			);
+	const getTeamMode = (
+		team: AnyPlayoffsTeamInfo | null
+	): "active" | "mistaken" | "predicted" | "selected" => {
+		if (!team || !rounds) {
+			return "active";
 		}
-	}, [winningTeam, winningTeamRef.current]);
 
-	const isClickable = useCallback(() => {
-		if (matchup) {
-			return matchup.teams.length >= 2 && matchup.winner_team_id == null;
+		const finalRounds = rounds.find((r) => r.name === "Finals");
+		if (!finalRounds) {
+			return "active";
 		}
-		return false;
-	}, [matchup]);
 
-	const isSelected = useCallback(
-		(teamId: number): boolean => {
-			if (matchup) {
-				return matchup.winner_team_id == teamId;
+		const finalMatchup = finalRounds.matchups[0];
+		if (!finalMatchup) {
+			return "active";
+		}
+
+		// Use a temporary variable for clarity
+		const isPredictedDefined =
+			finalMatchup.isPredicted !== null &&
+			finalMatchup.isPredicted !== undefined;
+
+		if (isPredictedDefined) {
+			if (
+				finalMatchup.isPredicted &&
+				finalMatchup.winner_team_id === team.id
+			) {
+				return "predicted";
 			}
-			return false;
-		},
-		[matchup]
-	);
+			if (
+				finalMatchup.isPredicted &&
+				finalMatchup.winner_team_id !== team.id
+			) {
+				return "mistaken";
+			}
+		} else {
+			if (finalMatchup.winner_team_id === team.id) {
+				return "selected";
+			}
+		}
+
+		return "active";
+	};
 
 	return (
 		<>
 			<div className={`select-none w-48 ${className}`}>
 				<div>
-					<div className="font-bold text-white text-base mb-0.5 text-center">
-						{league} FINALS
+					<div className="my-1 text-xs text-white flex justify-center items-center gap-x-2">
+						<div className="font-bold text-lg text-center">
+							{league} FINALS
+						</div>
+						{showClearButton && (
+							<button
+								className="cursor-pointer hover:text-gray-400 bg-gray-500 leading-0 px-1"
+								onClick={clearFinalsMatchup}
+								title="CLEAR TEAMS"
+							>
+								<FontAwesomeIcon icon="xmark" />
+							</button>
+						)}
 					</div>
+
 					<div className="space-y-2 w-full">
-						<TeamSlot
+						<TeamSlotCenter
 							team={teamA}
-							alignment="center"
-							isSelected={isSelected(teamA?.id || 0)}
-							isClickable={isClickable()}
-							placeholderText={
-								league == "NBA" ? "EAST WINNER" : "R2M1 WINNER"
-							}
+							mode={getTeamMode(teamA)}
+							isClickable={isClickable}
+							placeholderText="R2M1 WINNER"
 						/>
-						<TeamSlot
+						<TeamSlotCenter
 							team={teamB}
-							alignment="center"
-							isSelected={isSelected(teamB?.id || 0)}
-							isClickable={isClickable()}
-							placeholderText={
-								league == "NBA" ? "WEST WINNER" : "R2M2 WINNER"
-							}
+							mode={getTeamMode(teamB)}
+							isClickable={isClickable}
+							placeholderText="R2M2 WINNER"
 						/>
 					</div>
 				</div>
@@ -119,22 +140,13 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 						/>
 						<span>CHAMPION</span>
 					</div>
-					<div
-						ref={winningTeamRef}
-						className={`border-2 rounded shadow relative whitespace-nowrap h-12 overflow-hidden ${
-							winningTeam
-								? "border-yellow-600 bg-yellow-700"
-								: "border-gray-300 bg-gray-600"
-						}`}
-					>
-						{winningTeam ? (
-							<TeamSlotCenter team={winningTeam} isSelected={true} />
-						) : (
-							<p className=" font-semibold text-gray-400 h-full flex items-center justify-center">
-								FINALS WINNER
-							</p>
-						)}
-					</div>
+					<TeamSlotCenter
+						team={winningTeam}
+						isClickable={false}
+						placeholderText="FINALS WINNER"
+						mode={getTeamMode(winningTeam)}
+						size="lg"
+					/>
 				</div>
 			</div>
 		</>

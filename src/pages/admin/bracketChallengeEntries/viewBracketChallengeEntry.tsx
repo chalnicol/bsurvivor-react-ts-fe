@@ -35,7 +35,7 @@ const ViewBracketChallengeEntry = () => {
 		switch (status) {
 			case "success":
 				return "bg-green-600";
-			case "failed":
+			case "eliminated":
 				return "bg-red-600";
 			case "active":
 				return "bg-blue-600";
@@ -70,11 +70,11 @@ const ViewBracketChallengeEntry = () => {
 									<Detail label="Entry Name">
 										{bracketChallengeEntry.name}
 									</Detail>
+									<Detail label="Entry By">
+										{bracketChallengeEntry.user.username}
+									</Detail>
 									<Detail label="Bracket Challenge">
 										{bracketChallengeEntry.bracket_challenge.name}
-									</Detail>
-									<Detail label="User">
-										{bracketChallengeEntry.user.username}
 									</Detail>
 									<Detail label="Status">
 										<span

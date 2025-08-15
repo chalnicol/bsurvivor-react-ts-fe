@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import img from "../assets/bsurvivor.png";
 import ModalBase from "./modalBase";
 
-const Loader = () => {
+interface LoaderProps {
+	prompt?: string;
+}
+const Loader = ({ prompt }: LoaderProps) => {
 	const [ellipsis, setEllipsis] = useState<string>(".");
 
 	useEffect(() => {
@@ -30,7 +33,7 @@ const Loader = () => {
 					className="h-8 mx-auto"
 				/>
 				<div className="flex justify-center text-white font-semibold">
-					<p>LOADING</p>
+					<p>{prompt || "LOADING"}</p>
 					<p className="w-6 text-left">{ellipsis}</p>
 				</div>
 			</div>

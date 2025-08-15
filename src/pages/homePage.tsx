@@ -1,10 +1,10 @@
 import BracketChallengeActiveList from "../components/homepage/bracketChallengesActiveList";
 import Hero from "../components/hero";
-import SurvivorList from "../components/homepage/survivorList";
+import TopEntries from "../components/homepage/topEntries";
 import ContentBase from "../components/contentBase";
 import { useAuth } from "../context/auth/AuthProvider";
 import LoadAuth from "../components/auth/loadAuth";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import EndOfPage from "../components/endOfPage";
 
 const HomePage = () => {
 	const { authLoading } = useAuth();
@@ -16,7 +16,7 @@ const HomePage = () => {
 	return (
 		<ContentBase className="py-0 px-4">
 			<Hero />
-			<div className="border border-gray-400 bg-gray-100 shadow px-4 pt-4 md:px-6 md:pt-6 rounded-lg mb-12 mt-6">
+			<div className="border border-gray-400 bg-gray-100 shadow px-4 pt-4 md:px-6 md:pt-6 rounded-lg mt-6">
 				<h1 className="text-4xl font-bold">
 					Welcome to Basketball Survivor!
 				</h1>
@@ -29,9 +29,11 @@ const HomePage = () => {
 
 				<div className="space-y-8 my-8">
 					<BracketChallengeActiveList />
-					<SurvivorList />
+					<TopEntries />
 				</div>
 			</div>
+
+			<EndOfPage className="my-4" />
 		</ContentBase>
 	);
 };

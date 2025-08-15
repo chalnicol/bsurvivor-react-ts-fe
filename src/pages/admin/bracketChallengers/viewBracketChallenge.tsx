@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import type { BracketChallengeInfo } from "../../../data/adminData";
 import Bracket from "../../../components/bracket/bracket";
 import { BracketProvider } from "../../../context/bracket/BracketProvider";
-import { displayLocalDate } from "../../../utils/dateToLocal";
+import { displayLocalDate } from "../../../utils/dateTime";
 import ContentBase from "../../../components/contentBase";
 import Detail from "../../../components/detail";
 
@@ -73,10 +73,10 @@ const ViewBracketChallenge = () => {
 								<Detail label="League">
 									{bracketChallenge.league}
 								</Detail>
-								<Detail label="Start Date">
+								<Detail label="Submission Opens">
 									{displayLocalDate(bracketChallenge.start_date)}
 								</Detail>
-								<Detail label="End Date">
+								<Detail label="Submission Closes">
 									{displayLocalDate(bracketChallenge.end_date)}
 								</Detail>
 

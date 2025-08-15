@@ -24,22 +24,27 @@ interface AdminProviderProps {
 }
 export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 	const [roles, setRoles] = useState<RoleInfo[]>([]);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 	// const [teams, setTeams] = useState<AnyTeamInfo[]>([]);
 	const [nbaTeams, setNbaTeams] = useState<AnyTeamInfo[]>([]);
 	const [pbaTeams, setPbaTeams] = useState<AnyTeamInfo[]>([]);
 	const [leagues, setLeague] = useState<LeagueInfo[]>([]);
-	const [bracketChallenges, setBracketChallenges] = useState<
+	const [activeChallenges, setActiveChallenges] = useState<
 		BracketChallengeInfo[]
 	>([]);
+	const [ongoingChallenges, setOngoingChallenges] = useState<
+		BracketChallengeInfo[]
+	>([]);
+	const [isOngoingLoading, setIsOngoingLoading] = useState<boolean>(false);
 
 	const isRolesPopulated = roles.length > 0;
 
 	const areTeamsAndLeaguesPopulated =
 		nbaTeams.length > 0 && pbaTeams.length > 0 && leagues.length > 0;
 
-	const isBracketChallengesPopulated = bracketChallenges.length > 0;
+	const isActiveChallengesPopulated = activeChallenges.length > 0;
+	const isOngoingChallengesPopulated = ongoingChallenges.length > 0;
 
 	const fetchRoles = useCallback(async () => {
 		if (isRolesPopulated) return;
@@ -79,14 +84,42 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 		}
 	}, [areTeamsAndLeaguesPopulated]);
 
-	const fetchBracketChallenges = useCallback(async () => {
-		console.log("this");
+	const fetchBracketChallenges = useCallback(
+		async (type: "active" | "ongoing") => {
+			if (type == "active") {
+				setActiveChallenges([]);
+				setIsLoading(true);
+			}
+			if (type == "ongoing") {
+				setIsOngoingLoading(true);
+				setOngoingChallenges([]);
+			}
+			try {
+				const response = await apiClient.get(`/bracket-challenges/${type}`);
+				if (type == "active") {
+					setActiveChallenges(response.data.challenges);
+				}
+				if (type == "ongoing") {
+					setOngoingChallenges(response.data.challenges);
+				}
+			} catch (error) {
+				console.error(error);
+			} finally {
+				setIsLoading(false);
+				setIsOngoingLoading(false);
+			}
+		},
+		[]
+	);
+
+	const fetchTopEntries = useCallback(async (id: number) => {
 		setIsLoading(true);
-		setBracketChallenges([]);
 		try {
-			const response = await apiClient.get("/bracket-challenges/active");
-			setBracketChallenges(response.data.challenges);
-		} catch (error) {
+			const response = await apiClient.get(
+				`/bracket-challenges/${id}/top-entries`
+			);
+			console.log(response.data);
+		} catch (error: any) {
 			console.error(error);
 		} finally {
 			setIsLoading(false);
@@ -101,14 +134,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 				pbaTeams,
 				leagues,
 				isLoading,
+				isOngoingLoading,
 				error,
+				isRolesPopulated,
+				areTeamsAndLeaguesPopulated,
+				activeChallenges,
+				ongoingChallenges,
+				isActiveChallengesPopulated,
+				isOngoingChallengesPopulated,
 				fetchRoles,
 				fetchTeamsAndLeagues,
 				fetchBracketChallenges,
-				bracketChallenges,
-				isBracketChallengesPopulated,
-				isRolesPopulated,
-				areTeamsAndLeaguesPopulated,
+				fetchTopEntries,
 			}}
 		>
 			{children}

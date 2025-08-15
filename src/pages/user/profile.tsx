@@ -2,6 +2,7 @@ import ProfileInformation from "../../components/profile/profileInformation";
 import ChangePassword from "../../components/profile/changePassword";
 import DeleteAccount from "../../components/profile/deleteAccount";
 import ContentBase from "../../components/contentBase";
+import EndOfPage from "../../components/endOfPage";
 
 const ProfilePage = () => {
 	return (
@@ -12,6 +13,7 @@ const ProfilePage = () => {
 			<ChangePassword />
 			{/* delete account */}
 			<DeleteAccount />
+			<EndOfPage />
 		</ContentBase>
 	);
 };

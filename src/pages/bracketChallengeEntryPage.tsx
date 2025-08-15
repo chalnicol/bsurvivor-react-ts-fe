@@ -8,7 +8,8 @@ import { BracketProvider } from "../context/bracket/BracketProvider";
 import ContentBase from "../components/contentBase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Detail from "../components/detail";
-import { displayLocalDate } from "../utils/dateToLocal";
+import { displayLocalDate } from "../utils/dateTime";
+import EndOfPage from "../components/endOfPage";
 
 const BracketChallengeEntryPage = () => {
 	const { slug } = useParams<{ slug: string }>();
@@ -44,12 +45,12 @@ const BracketChallengeEntryPage = () => {
 		switch (status) {
 			case "success":
 				return "bg-green-600";
-			case "failed":
+			case "eliminated":
 				return "bg-red-600";
 			case "active":
-				return "bg-blue-500";
+				return "bg-blue-600";
 			default:
-				return "bg-red-200";
+				return "bg-gray-500";
 		}
 	}, []);
 
@@ -113,14 +114,15 @@ const BracketChallengeEntryPage = () => {
 					</>
 				) : (
 					<>
-						<p className="mt-2 p-3 bg-gray-300 rounded">
+						<div className="mt-2 p-3 bg-gray-300 rounded">
 							{isLoading
 								? "Loading..."
 								: "Bracket challenge entry not found."}
-						</p>
+						</div>
 					</>
 				)}
 			</div>
+			<EndOfPage />
 			{isLoading && <Loader />}
 		</ContentBase>
 	);

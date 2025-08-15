@@ -6,7 +6,7 @@ import ForgotPassword from "./components/auth/forgotPassword";
 import ResetPassword from "./components/auth/resetPassword";
 import ProtectedRoute from "./components/protectedRoute";
 import PublicOnlyRoute from "./components/publicOnlyRoute";
-import Unauthorized from "./components/unauthorized";
+import Unauthorized from "./pages/unauthorized";
 import PageNotFound from "./components/pageNotFound";
 import AdminDashboard from "./pages/admin/adminDashboard";
 import About from "./pages/about";
@@ -58,6 +58,9 @@ import {
 	faXmarkCircle,
 	faLock,
 	faCaretRight,
+	faStar,
+	faAsterisk,
+	faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
 import BracketChallengeEntryPage from "./pages/bracketChallengeEntryPage";
 
@@ -79,7 +82,10 @@ library.add(
 	faCircleCheck,
 	faXmarkCircle,
 	faLock,
-	faCaretRight
+	faCaretRight,
+	faStar,
+	faAsterisk,
+	faRotateRight
 );
 
 function App() {

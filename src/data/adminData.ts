@@ -59,8 +59,9 @@ export interface PlayoffsMatchupInfo {
 	matchup_index: number;
 	wins_teams_1: number;
 	wins_teams_2: number;
-	winner_team_id: number;
+	winner_team_id: number | null;
 	teams: AnyPlayoffsTeamInfo[];
+	isPredicted: boolean | null;
 }
 
 export interface PlayoffsRoundInfo {
@@ -85,7 +86,7 @@ export interface BracketChallengeEntryPredictionsInfo
 }
 export interface BracketUpdateMatchupsData
 	extends BracketChallengeMatchupsDataInfo {
-	winner_team_id: number;
+	winner_team_id: number | null;
 }
 
 export interface BracketChallengeEntryData {
@@ -124,8 +125,8 @@ export interface BracketChallengeEntryInfo {
 	user: UserInfo;
 	bracket_challenge_id: number;
 	bracket_challenge: BracketChallengeInfo;
-	last_round_survive: number;
-	status: "active" | "failed" | "success";
+	correct_predictions_count: number;
+	status: "active" | "eliminated" | "won";
 	predictions: BracketChallengeEntryPredictionsInfo[];
 	created_at: string;
 	updated_at: string;

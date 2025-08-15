@@ -13,7 +13,9 @@ import Detail from "../../components/detail";
 
 // Import the custom debounce hook
 import useDebounce from "../../hooks/useDebounce"; // Adjust path if needed
-import { displayLocalDate } from "../../utils/dateToLocal";
+import { displayLocalDate } from "../../utils/dateTime";
+import EndOfPage from "../../components/endOfPage";
+import FailPrompt from "../../components/failPrompt";
 
 const BracketEntriesList = () => {
 	const [bracketChallengeEntries, setBracketChallengeEntries] = useState<
@@ -72,6 +74,19 @@ const BracketEntriesList = () => {
 		// setCurrentPage(1);
 	}, [debouncedSearchTerm]);
 
+	const getStatusBgColorClass = (status: string) => {
+		switch (status) {
+			case "won":
+				return "bg-green-600";
+			case "eliminated":
+				return "bg-red-600";
+			case "active":
+				return "bg-blue-600";
+			default:
+				return "bg-gray-600";
+		}
+	};
+
 	return (
 		<ContentBase className="py-7 px-4">
 			<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
@@ -108,21 +123,13 @@ const BracketEntriesList = () => {
 											{displayLocalDate(entry.created_at)}
 										</Detail>
 										<Detail label="Status">
-											{entry.status == "success" && (
-												<span className="bg-green-600 text-white font-bold px-3 rounded text-xs select-none">
-													SUCCESS
-												</span>
-											)}
-											{entry.status == "failed" && (
-												<span className="bg-red-600 text-white font-bold px-3 rounded text-xs select-none">
-													FAILED
-												</span>
-											)}
-											{entry.status == "active" && (
-												<span className="bg-blue-600 text-white font-bold px-3 rounded text-xs select-none">
-													ACTIVE
-												</span>
-											)}
+											<span
+												className={`${getStatusBgColorClass(
+													entry.status
+												)} text-white font-bold px-3 rounded text-xs select-none`}
+											>
+												{entry.status.toLocaleUpperCase()}
+											</span>
 										</Detail>
 
 										{/* <div className="space-y-0.5">
@@ -148,14 +155,17 @@ const BracketEntriesList = () => {
 							/>
 						</>
 					) : (
-						<div className="py-2 px-3 bg-gray-300 mt-2">
-							{isLoading
-								? "Loading..."
-								: "You have no bracket challenge entries."}
+						<div className="mt-3">
+							{isLoading ? (
+								<p className="p-3 bg-gray-300 rounded">Loading..</p>
+							) : (
+								<FailPrompt message="You have not submitted any entries yet." />
+							)}
 						</div>
 					)}
 				</div>
 			</div>
+			<EndOfPage />
 			{isLoading && <Loader />}
 		</ContentBase>
 	);

@@ -7,12 +7,13 @@ import { BracketProvider } from "../context/bracket/BracketProvider";
 import Loader from "../components/loader";
 import Bracket from "../components/bracket/bracket";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { displayLocalDate } from "../utils/dateToLocal";
+import { displayLocalDate } from "../utils/dateTime";
 import ContentBase from "../components/contentBase";
 import { useAuth } from "../context/auth/AuthProvider";
 import Detail from "../components/detail";
 import { Link } from "react-router-dom";
 import LoadAuth from "../components/auth/loadAuth";
+import EndOfPage from "../components/endOfPage";
 
 interface BracketResponse {
 	message: string;
@@ -73,10 +74,10 @@ const BracketChallengePage = () => {
 								<Detail label="Challenge Name">
 									{bracketChallenge.name}
 								</Detail>
-								<Detail label="Start Date">
+								<Detail label="Submission Opens">
 									{displayLocalDate(bracketChallenge.start_date)}
 								</Detail>
-								<Detail label="End Date">
+								<Detail label="Submission Closes">
 									{displayLocalDate(bracketChallenge.end_date)}
 								</Detail>
 							</div>
@@ -140,7 +141,8 @@ const BracketChallengePage = () => {
 					</div>
 				)}
 			</div>
-			{(isLoading || authLoading) && <Loader />}
+			<EndOfPage />
+			{isLoading && <Loader />}
 		</ContentBase>
 	);
 };

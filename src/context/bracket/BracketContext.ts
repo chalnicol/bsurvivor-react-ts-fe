@@ -18,12 +18,20 @@ interface BracketContextType {
 		matchupIndex: number,
 		team: AnyPlayoffsTeamInfo
 	) => void;
+	isActive: boolean;
+	hasProgressed: boolean;
 	updateFinalsPick: (team: AnyPlayoffsTeamInfo) => void;
-	resetPicks: () => void;
 	resetBracket: () => void;
 	updateBracket: () => void;
 	submitPicks: () => void;
 	resetMessage: () => void;
+	clearMatchup: (
+		conference: "EAST" | "WEST" | null,
+		roundIndex: number,
+		matchupIndex: number
+	) => void;
+	clearFinalsMatchup: () => void;
+	refreshBracket: () => void;
 }
 
 export const BracketContext = createContext<BracketContextType | undefined>(

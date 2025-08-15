@@ -5,17 +5,17 @@ import { useAdmin } from "../../context/admin/AdminProvider";
 
 const BracketChallengeActiveList = () => {
 	const {
-		bracketChallenges,
+		activeChallenges,
 		isLoading,
-		isBracketChallengesPopulated,
+		isActiveChallengesPopulated,
 		fetchBracketChallenges,
 	} = useAdmin();
 
 	useEffect(() => {
-		if (!isBracketChallengesPopulated) {
-			fetchBracketChallenges();
+		if (!isActiveChallengesPopulated) {
+			fetchBracketChallenges("active");
 		}
-	}, [isBracketChallengesPopulated]);
+	}, [isActiveChallengesPopulated]);
 
 	return (
 		<>
@@ -31,19 +31,23 @@ const BracketChallengeActiveList = () => {
 								? "bg-amber-500 opacity-70"
 								: "bg-amber-600 hover:bg-amber-500 cursor-pointer"
 						}`}
-						onClick={() => fetchBracketChallenges()}
+						onClick={() => fetchBracketChallenges("active")}
 						disabled={isLoading}
 					>
 						REFRESH LIST
 					</button>
 				</div>
-				<hr className="my-2 border-gray-400" />
-				{bracketChallenges.length > 0 ? (
+				{/* <p className="text-sm my-1">
+					Take a look and submit your bracket challenge entry
+				</p> */}
+				<hr className="my-2 border-gray-400 text-gray-500" />
+
+				{activeChallenges.length > 0 ? (
 					<div className="my-3">
-						{bracketChallenges.map((bracketChallenge) => (
+						{activeChallenges.map((bracketChallenge) => (
 							<div
 								key={bracketChallenge.id}
-								className="sm:flex items-center space-y-1 md:space-y-0 even:bg-gray-300 odd:bg-gray-200 px-3 py-3 md:py-2  border-b border-gray-300"
+								className="sm:flex items-center space-y-1 md:space-y-0 even:bg-gray-300 odd:bg-gray-200 px-3 py-3 md:py-2 border-b border-gray-300"
 							>
 								<div className="flex-1 font-semibold text-gray-600">
 									{bracketChallenge.name}

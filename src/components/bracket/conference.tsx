@@ -29,7 +29,7 @@ const Conference = ({ conference, league, className }: ConferenceProps) => {
 		} else if (league == "PBA") {
 			setRounds(roundsData.filter((round) => round.order_index < 3));
 		}
-	}, [roundsData, league, conference]);
+	}, [roundsData]);
 
 	const spacingClass = (roundIndex: number): string => {
 		switch (roundIndex) {

@@ -16,7 +16,7 @@ import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
 import ToDelete from "../../../components/toDelete";
 import StatusMessage from "../../../components/statusMessage";
 import ContentBase from "../../../components/contentBase";
-import { displayLocalDate } from "../../../utils/dateToLocal";
+import { displayLocalDate } from "../../../utils/dateTime";
 
 const ListBracketChallenges = () => {
 	const [bracketChallenges, setBracketChallenges] = useState<

@@ -5,7 +5,7 @@ interface DetailProps {
 const Detail = ({ label, children }: DetailProps) => {
 	return (
 		<div className="flex items-center space-x-1.5">
-			<span className="flex-none w-30 bg-gray-600 ps-1">{label}</span>
+			<span className="flex-none w-34 bg-gray-600 ps-1">{label}</span>
 			<div>{children}</div>
 		</div>
 	);

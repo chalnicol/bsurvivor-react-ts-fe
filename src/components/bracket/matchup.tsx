@@ -5,6 +5,7 @@ import type {
 } from "../../data/adminData";
 import TeamSlot from "./teamSlot";
 import { useBracket } from "../../context/bracket/BracketProvider";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface MatchupProps {
 	roundIndex: number;
@@ -12,17 +13,30 @@ interface MatchupProps {
 	conference?: "EAST" | "WEST";
 }
 const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
-	const { mode } = useBracket();
+	const { mode, clearMatchup } = useBracket();
 	const alignment = conference === "WEST" ? "right" : "left";
 	const textAlignment = conference === "WEST" ? "text-right" : "text-left";
 
 	const [team1, setTeam1] = useState<AnyPlayoffsTeamInfo | null>(null);
 	const [team2, setTeam2] = useState<AnyPlayoffsTeamInfo | null>(null);
-
+	const [showClearButton, setShowClearButton] = useState<boolean>(false);
+	const [isClickable, setIsClickable] = useState<boolean>(false);
 	useEffect(() => {
 		if (!matchup) return;
 		setTeam1(matchup.teams.find((t) => t.slot == 1) || null);
 		setTeam2(matchup.teams.find((t) => t.slot == 2) || null);
+
+		setShowClearButton(
+			roundIndex > 1 &&
+				matchup.winner_team_id === null &&
+				matchup.teams.length >= 1
+		);
+
+		setIsClickable(
+			mode !== "preview" &&
+				matchup.teams.length >= 2 &&
+				matchup.winner_team_id === null
+		);
 	}, [matchup]);
 
 	const getPlaceHolderText = useCallback(
@@ -46,37 +60,41 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 		[roundIndex, matchup]
 	);
 
-	if (!matchup) return;
-
-	const isClickable = useCallback(() => {
-		if (mode !== "preview" && matchup) {
-			return matchup.teams.length >= 2 && matchup.winner_team_id === null;
-		}
-		return false;
-	}, [matchup]);
-
-	const isSelected = useCallback(
-		(teamId: number) => {
-			if (matchup) {
-				return matchup.winner_team_id === teamId;
+	const getTeamSlotStyle = useCallback(
+		(
+			team: AnyPlayoffsTeamInfo | null
+		): "predicted" | "mistaken" | "selected" | "active" => {
+			if (matchup && team) {
+				if (matchup.winner_team_id === team.id) return "selected";
 			}
-			return false;
+			return "active";
 		},
 		[matchup]
 	);
 
+	const handleClearButton = useCallback(() => {
+		if (!matchup) return;
+		clearMatchup(conference || null, roundIndex, matchup.matchup_index);
+	}, [conference, matchup, roundIndex]);
+
+	const flexClass = alignment == "right" ? "flex-row-reverse" : "flex-row";
+
+	const borderClass = alignment == "right" ? "border-l pl-2" : "border-r pr-2";
+
+	if (!matchup) return;
+
 	return (
 		<>
 			<div>
-				<div className="space-y-1.5">
+				<div className={`space-y-1.5 border-gray-500 ${borderClass}`}>
 					<TeamSlot
 						team={team1}
 						// slot={1}
 						roundIndex={roundIndex}
 						matchupIndex={matchup.matchup_index}
 						conference={conference}
-						isClickable={isClickable()}
-						isSelected={isSelected(team1?.id || 0)}
+						isClickable={isClickable}
+						slotMode={getTeamSlotStyle(team1)}
 						alignment={alignment}
 						placeholderText={getPlaceHolderText(1)}
 					/>
@@ -86,17 +104,27 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 						roundIndex={roundIndex}
 						matchupIndex={matchup.matchup_index}
 						conference={conference}
-						isClickable={isClickable()}
-						isSelected={isSelected(team2?.id || 0)}
+						isClickable={isClickable}
+						slotMode={getTeamSlotStyle(team2)}
 						alignment={alignment}
 						placeholderText={getPlaceHolderText(2)}
 					/>
 				</div>
-
 				<div
-					className={`select-none text-[10px] mt-0.5 px-0.5 text-white font-semibold ${textAlignment}`}
+					className={`select-none text-[10px] mt-1 px-0.5 text-white font-semibold flex items-center ${flexClass} ${textAlignment}`}
 				>
-					Match ID : <span className="text-red-400">{matchup.name}</span>
+					<p className="flex-1">
+						Match : <span className="text-red-400">{matchup.name}</span>
+					</p>
+					{showClearButton && (
+						<button
+							className="text-xs text-white cursor-pointer hover:text-gray-400 bg-gray-500 leading-0 px-1"
+							onClick={handleClearButton}
+							title="CLEAR TEAMS"
+						>
+							<FontAwesomeIcon icon="xmark" />
+						</button>
+					)}
 				</div>
 			</div>
 		</>

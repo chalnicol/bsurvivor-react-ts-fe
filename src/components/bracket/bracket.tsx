@@ -13,11 +13,13 @@ const Bracket = () => {
 		success,
 		isLoading,
 		mode,
+		isActive,
+		hasProgressed,
 		resetMessage,
+		refreshBracket,
 		updateBracket,
-		resetBracket,
 		submitPicks,
-		resetPicks,
+		resetBracket,
 	} = useBracket();
 
 	const handleSubmit = () => {
@@ -47,14 +49,14 @@ const Bracket = () => {
 					{league == "NBA" && (
 						<div className="flex gap-x-6 items-center min-w-4xl mb-3">
 							<Conference
-								league="NBA"
-								conference="EAST"
+								league={"NBA"}
+								conference={"EAST"}
 								className="flex-1"
 							/>
 							<Finals league="NBA" className="flex-none" />
 							<Conference
-								league="NBA"
-								conference="WEST"
+								league={"NBA"}
+								conference={"WEST"}
 								className="flex-1"
 							/>
 						</div>
@@ -79,7 +81,7 @@ const Bracket = () => {
 					</div>
 				)}
 			</div>
-			{mode == "submit" && (
+			{mode == "submit" && isActive && (
 				<>
 					<hr className="my-2 border-gray-400" />
 					<div className="flex items-center space-x-2 mt-3">
@@ -89,10 +91,10 @@ const Bracket = () => {
 									? "bg-rose-400 opacity-70"
 									: " bg-rose-600 hover:bg-rose-500 cursor-pointer"
 							}`}
-							onClick={resetPicks}
+							onClick={resetBracket}
 							disabled={isLoading}
 						>
-							RESET PICKS
+							RESET
 						</button>
 						{isAuthenticated && (
 							<button
@@ -113,9 +115,9 @@ const Bracket = () => {
 			{mode == "update" && (
 				<>
 					<hr className="my-2 border-gray-400" />
-					<div className="space-x-2 mt-3">
+					<div className="flex items-center space-x-2 mt-3">
 						<button
-							className={`px-3 py-2 text-white min-w-30 rounded font-bold transition duration-200 ${
+							className={`px-3 py-2 text-white flex-1 w-full sm:flex-none sm:w-auto sm:min-w-30 rounded font-bold transition duration-200 ${
 								isLoading
 									? "bg-orange-400 opacity-70"
 									: " bg-orange-600 hover:bg-orange-500 cursor-pointer"
@@ -125,8 +127,21 @@ const Bracket = () => {
 						>
 							RESET BRACKET
 						</button>
+						{hasProgressed && (
+							<button
+								className={`px-3 py-2 text-white flex-1 w-full sm:flex-none sm:w-auto sm:min-w-30 rounded font-bold transition duration-200 ${
+									isLoading
+										? "bg-blue-400 opacity-70"
+										: " bg-blue-600 hover:bg-blue-500 cursor-pointer"
+								}`}
+								onClick={refreshBracket}
+								disabled={isLoading}
+							>
+								REVERT TO SAVED
+							</button>
+						)}
 						<button
-							className={`px-3 py-2 text-white min-w-30 rounded font-bold transition duration-200 ${
+							className={`px-3 py-2 text-white flex-1 w-full sm:flex-none sm:w-auto sm:min-w-30 rounded font-bold transition duration-200 ${
 								isLoading
 									? "bg-green-400 opacity-70"
 									: "bg-green-600 hover:bg-green-500 cursor-pointer"
