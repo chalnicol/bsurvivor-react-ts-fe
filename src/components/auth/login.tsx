@@ -26,9 +26,7 @@ const Login = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const success = await login(email, password);
-		if (success) {
-			navigate(from, { replace: true });
-		}
+		if (success) navigate(from, { replace: true });
 	};
 
 	useEffect(() => {

@@ -61,7 +61,9 @@ export interface PlayoffsMatchupInfo {
 	wins_teams_2: number;
 	winner_team_id: number | null;
 	teams: AnyPlayoffsTeamInfo[];
-	isPredicted: boolean | null;
+	// isPredicted: boolean | null;
+	predicted_winner_team_id: number | null;
+	isCorrect: boolean | null;
 }
 
 export interface PlayoffsRoundInfo {
@@ -127,6 +129,7 @@ export interface BracketChallengeEntryInfo {
 	bracket_challenge: BracketChallengeInfo;
 	correct_predictions_count: number;
 	status: "active" | "eliminated" | "won";
+	slug: string;
 	predictions: BracketChallengeEntryPredictionsInfo[];
 	created_at: string;
 	updated_at: string;
@@ -148,6 +151,9 @@ export interface UserInfo {
 	email: string;
 	roles: string[];
 	is_blocked: boolean;
+	email_verified_at: string | null;
+	created_at: string;
+	updated_at: string;
 }
 
 export interface RoleInfo {
@@ -195,6 +201,15 @@ export interface ResourcesResponseInfo {
 	message: string;
 	totals: TotalsInfo;
 }
+
+export type SlotModeType =
+	| "correct"
+	| "incorrect"
+	| "idle"
+	| "selected"
+	| "void";
+
+export type ProfileWindow = "details" | "password" | "delete" | null;
 
 // export interface GeneralApiErrorResponse {
 // 	message: string;

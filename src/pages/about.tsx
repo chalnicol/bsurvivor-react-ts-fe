@@ -5,20 +5,18 @@ const About = () => {
 	return (
 		<ContentBase className="p-4">
 			<div className="border border-gray-400 bg-gray-100 px-4 md:px-6 pt-5 pb-6 mt-3 mb-6 rounded-lg shadow">
-				<h1 className="text-3xl font-bold mb-3">
-					About Our Bracket Challenge
-				</h1>
-
-				<p className="font-medium">
-					Welcome to the ultimate hub for basketball fanatics and
-					prediction pros! Our Bracket Challenge is designed by fans, for
-					fans, to bring an extra layer of excitement to every thrilling
-					moment of the NBA Playoffs. We believe in the power of friendly
-					competition, the agony of a busted bracket, and the sheer joy of
-					watching your dark horse pick defy the odds.
-				</p>
+				<h1 className="text-3xl font-bold mb-3">About Page</h1>
 
 				<div className="bg-gray-800 text-white rounded px-6 py-6 pb-12 mt-4">
+					<p className="font-medium mb-5">
+						Welcome to the ultimate hub for basketball fanatics and
+						prediction pros! Our Bracket Challenge is designed by fans,
+						for fans, to bring an extra layer of excitement to every
+						thrilling moment of the NBA Playoffs. We believe in the power
+						of friendly competition, the agony of a busted bracket, and
+						the sheer joy of watching your dark horse pick defy the odds.
+					</p>
+
 					<h2 className="text-xl font-bold mb-2">Our Mission</h2>
 					<p className="font-medium">
 						Our mission is simple: to provide the most engaging,

@@ -27,8 +27,10 @@ const Navbar = () => {
 	const handleLogout = async () => {
 		setShowDropdown(false);
 		closeMenuAnim();
-		await logout();
-		navigate("/login");
+		const response = await logout();
+		if (response) {
+			navigate("/login");
+		}
 	};
 
 	const handleMenuClick = (route: string) => {

@@ -63,6 +63,9 @@ const ListBracketChallenges = () => {
 		setIsLoading(true);
 		try {
 			await apiClient.delete(`/admin/bracket-challenges/${toDelete.id}`);
+			setBracketChallenges((prev) =>
+				prev.filter((c) => c.id !== toDelete.id)
+			);
 			setSuccess("Bracket Challenge deleted successfully");
 			setToDelete(null);
 			if (meta) {

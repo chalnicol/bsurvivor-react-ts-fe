@@ -4,7 +4,7 @@ const Hero = () => {
 			<img
 				src={"/images/hero_image.png"}
 				alt=""
-				className="w-full h-full object-cover rounded-b-xl"
+				className="w-full h-full object-cover rounded-b-lg"
 			/>
 		</div>
 	);

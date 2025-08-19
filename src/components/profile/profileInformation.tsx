@@ -1,20 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
-import { type Response } from "../../data/userData";
+// import { useNavigate } from "react-router-dom";
 
 const ProfileInformation = () => {
-	const { user, isLoading, updateProfile } = useAuth();
-
+	const { user, message, error, profileWindow, isLoading, updateProfile } =
+		useAuth();
+	// const navigate = useNavigate();
 	const [username, setUsername] = useState<string>("");
 	const [email, setEmail] = useState<string>("");
-
-	const [response, setResponse] = useState<Response | null>(null);
-
-	// useEffect(() => {
-	// 	return () => {
-	// 		setShowMessage(false);
-	// 	};
-	// }, []);
 
 	useEffect(() => {
 		if (user) {
@@ -25,11 +18,7 @@ const ProfileInformation = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-
-		const resp = await updateProfile(username, email);
-		if (resp) {
-			setResponse(resp);
-		}
+		await updateProfile(username, email);
 	};
 
 	return (
@@ -82,15 +71,11 @@ const ProfileInformation = () => {
 								SAVE
 							</button>
 						</form>
-						{response?.error && (
-							<p className="my-3 text-sm text-red-500">
-								{response.error}
-							</p>
+						{profileWindow === "details" && error && (
+							<p className="my-3 text-sm text-red-500">{error}</p>
 						)}
-						{response?.success && (
-							<p className="my-3 text-sm text-green-700">
-								{response.success}
-							</p>
+						{profileWindow === "details" && message && (
+							<p className="my-3 text-sm text-green-700">{message}</p>
 						)}
 					</div>
 				) : (

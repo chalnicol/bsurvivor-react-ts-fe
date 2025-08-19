@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BreadCrumbs from "../../../components/breadCrumbs";
 import { useParams } from "react-router-dom";
 import { apiClient } from "../../../utils/api";
@@ -8,6 +8,7 @@ import Bracket from "../../../components/bracket/bracket";
 import { BracketProvider } from "../../../context/bracket/BracketProvider";
 import ContentBase from "../../../components/contentBase";
 import Detail from "../../../components/detail";
+import StatusPills from "../../../components/statusPills";
 
 const ViewBracketChallengeEntry = () => {
 	const { id } = useParams<{ id: string }>();
@@ -30,19 +31,6 @@ const ViewBracketChallengeEntry = () => {
 			setIsLoading(false);
 		}
 	};
-
-	const bgClass = useCallback((status: string): string => {
-		switch (status) {
-			case "success":
-				return "bg-green-600";
-			case "eliminated":
-				return "bg-red-600";
-			case "active":
-				return "bg-blue-600";
-			default:
-				return "bg-red-200";
-		}
-	}, []);
 
 	useEffect(() => {
 		if (!id) {
@@ -77,13 +65,9 @@ const ViewBracketChallengeEntry = () => {
 										{bracketChallengeEntry.bracket_challenge.name}
 									</Detail>
 									<Detail label="Status">
-										<span
-											className={`text-xs font-bold select-none rounded px-2 text-white ${bgClass(
-												bracketChallengeEntry.status
-											)}`}
-										>
-											{bracketChallengeEntry.status.toLocaleUpperCase()}
-										</span>
+										<StatusPills
+											status={bracketChallengeEntry.status}
+										/>
 									</Detail>
 								</div>
 								<hr className="my-2 border-gray-400" />

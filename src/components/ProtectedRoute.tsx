@@ -13,12 +13,17 @@ const ProtectedRoute = ({
 	requiredRoles,
 	requiredPermissions,
 }: ProtectedRouteProps) => {
-	const { authLoading, isAuthenticated, hasRole, can } = useAuth();
+	const { authLoading, isAuthenticated, toVerifyEmail, hasRole, can } =
+		useAuth();
 	const location = useLocation();
 
 	if (authLoading) {
 		// return <div className="py-3">Loading authentication...</div>; // Or a spinner/loading component
 		return <LoadAuth />;
+	}
+
+	if (toVerifyEmail) {
+		return <Navigate to="/email-verification-notice" replace />;
 	}
 
 	if (!isAuthenticated) {

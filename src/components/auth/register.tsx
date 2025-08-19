@@ -47,9 +47,7 @@ const Register = () => {
 			passwordConfirmation
 		);
 		if (success) {
-			navigate("/");
-		} else {
-			console.log("e", error);
+			navigate("/email-verification-notice");
 		}
 	};
 

@@ -7,21 +7,29 @@ interface StatusMessageProps {
 	message: string;
 	type?: string;
 	onClose: () => void;
+	fixed?: boolean;
+	children?: React.ReactNode;
 }
 
 gsap.registerPlugin(ScrollToPlugin);
 
-const StatusMessage = ({ message, type, onClose }: StatusMessageProps) => {
+const StatusMessage = ({
+	message,
+	type,
+	children,
+	onClose,
+	fixed,
+}: StatusMessageProps) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const bgClr = () => {
 		switch (type) {
 			case "success":
-				return "bg-green-500";
+				return "bg-green-600";
 			case "error":
-				return "bg-red-500";
+				return "bg-red-600";
 			default:
-				return "bg-green-500";
+				return "bg-gray-600";
 		}
 	};
 
@@ -65,7 +73,7 @@ const StatusMessage = ({ message, type, onClose }: StatusMessageProps) => {
 
 		openAnim();
 		scrollAnim();
-		let timer = setTimeout(() => closeAnim(), 5000);
+		let timer = fixed ? null : setTimeout(() => closeAnim(), 5000);
 
 		return () => {
 			if (timer) {
@@ -80,9 +88,12 @@ const StatusMessage = ({ message, type, onClose }: StatusMessageProps) => {
 	return (
 		<div
 			ref={containerRef}
-			className={`w-full my-2 relative flex justify-between items-center text-white font-semibold px-3 py-2 rounded ${bgClr()}`}
+			className={`w-full my-2 relative flex items-center justify-between gap-x-2 text-white font-semibold px-3 py-2 rounded ${bgClr()}`}
 		>
-			<p>{message}</p>
+			<div className="md:flex items-center w-full space-y-1 md:space-y-0">
+				<p className="flex-1">{message}</p>
+				{children}
+			</div>
 			<button
 				className={`px-1 cursor-pointer  ${
 					type == "success" ? "hover:bg-green-300" : "hover:bg-red-300"

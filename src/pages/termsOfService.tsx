@@ -6,15 +6,17 @@ const TermsOfServicePage = () => {
 		<ContentBase className="p-4">
 			<div className="border border-gray-400 bg-gray-100 px-3 md:px-8 pt-2 pb-6 mt-4 mb-7 rounded-lg shadow">
 				<h1 className="text-3xl font-bold mt-4 mb-2">Terms of Service</h1>
-				<p className="mb-2">
-					Welcome to BasketballSurvivor! These Terms of Service ("Terms")
-					govern your access to and use of our website, services, and
-					applications (collectively, the "Service"). By accessing or using
-					the Service, you agree to be bound by these Terms.
-				</p>
-				<p className="mb-2">Please read them carefully.</p>
 
-				<div className="bg-gray-800 text-white rounded px-8 py-6 mt-4">
+				<div className="bg-gray-800 text-white rounded px-8 py-6 mt-3">
+					<p className="mb-2">
+						Welcome to BasketballSurvivor! These Terms of Service
+						("Terms") govern your access to and use of our website,
+						services, and applications (collectively, the "Service"). By
+						accessing or using the Service, you agree to be bound by these
+						Terms.
+					</p>
+					<p className="mb-2">Please read them carefully.</p>
+
 					<h2 className="text-2xl font-semibold mb-4">
 						1. Acceptance of Terms
 					</h2>

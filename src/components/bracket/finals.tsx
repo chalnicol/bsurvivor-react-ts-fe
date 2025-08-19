@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import pbaThrophy from "../../assets/pba_trophy.png";
 import nbaThrophy from "../../assets/nba_trophy.png";
 import { useBracket } from "../../context/bracket/BracketProvider";
-import type { AnyPlayoffsTeamInfo } from "../../data/adminData";
+import type { AnyPlayoffsTeamInfo, SlotModeType } from "../../data/adminData";
 import TeamSlotCenter from "./teamSlotCenter";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -12,7 +12,7 @@ interface PBAFinalsProps {
 }
 
 const Finals = ({ league, className }: PBAFinalsProps) => {
-	const { rounds, mode, clearFinalsMatchup } = useBracket();
+	const { rounds, mode, hasPredictions, clearFinalsMatchup } = useBracket();
 
 	// const [matchup, setMatchup] = useState<PlayoffsMatchupInfo | null>(null);
 	const [teamA, setTeamA] = useState<AnyPlayoffsTeamInfo | null>(null);
@@ -35,11 +35,15 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 			// setMatchup(finalMatchup);
 			setTeamA(finalMatchup.teams.find((t) => t.slot == 1) || null);
 			setTeamB(finalMatchup.teams.find((t) => t.slot == 2) || null);
+
+			const team_id = hasPredictions
+				? finalMatchup.predicted_winner_team_id
+				: finalMatchup.winner_team_id;
+
 			setWinningTeam(
-				finalMatchup.teams.find(
-					(t) => t.id == finalMatchup.winner_team_id
-				) || null
+				finalMatchup.teams.find((t) => t.id == team_id) || null
 			);
+
 			setIsClickable(
 				mode !== "preview" &&
 					finalMatchup.teams.length >= 2 &&
@@ -51,48 +55,55 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 		}
 	}, [rounds]);
 
-	const getTeamMode = (
-		team: AnyPlayoffsTeamInfo | null
-	): "active" | "mistaken" | "predicted" | "selected" => {
+	const getTeamMode = (team: AnyPlayoffsTeamInfo | null): SlotModeType => {
 		if (!team || !rounds) {
-			return "active";
+			return "idle";
 		}
 
 		const finalRounds = rounds.find((r) => r.name === "Finals");
 		if (!finalRounds) {
-			return "active";
+			return "idle";
 		}
 
 		const finalMatchup = finalRounds.matchups[0];
 		if (!finalMatchup) {
-			return "active";
+			return "idle";
 		}
 
-		// Use a temporary variable for clarity
-		const isPredictedDefined =
-			finalMatchup.isPredicted !== null &&
-			finalMatchup.isPredicted !== undefined;
+		if (hasPredictions) {
+			if (
+				!finalMatchup.isCorrect &&
+				finalMatchup.winner_team_id &&
+				finalMatchup.predicted_winner_team_id == team.id
+			)
+				return "void";
 
-		if (isPredictedDefined) {
 			if (
-				finalMatchup.isPredicted &&
-				finalMatchup.winner_team_id === team.id
-			) {
-				return "predicted";
-			}
+				finalMatchup.isCorrect &&
+				finalMatchup.winner_team_id &&
+				finalMatchup.predicted_winner_team_id == team.id &&
+				finalMatchup.predicted_winner_team_id == finalMatchup.winner_team_id
+			)
+				return "correct";
+
 			if (
-				finalMatchup.isPredicted &&
-				finalMatchup.winner_team_id !== team.id
-			) {
-				return "mistaken";
-			}
-		} else {
-			if (finalMatchup.winner_team_id === team.id) {
+				finalMatchup.isCorrect &&
+				finalMatchup.winner_team_id &&
+				finalMatchup.predicted_winner_team_id == team.id &&
+				finalMatchup.predicted_winner_team_id != finalMatchup.winner_team_id
+			)
+				return "incorrect";
+
+			if (
+				!finalMatchup.winner_team_id &&
+				finalMatchup.predicted_winner_team_id == team.id
+			)
 				return "selected";
-			}
+		} else {
+			if (finalMatchup.winner_team_id === team.id) return "selected";
 		}
 
-		return "active";
+		return "idle";
 	};
 
 	return (

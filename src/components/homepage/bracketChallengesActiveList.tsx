@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAdmin } from "../../context/admin/AdminProvider";
+import { displayLocalDate } from "../../utils/dateTime";
+import Detail from "../detail";
 
 const BracketChallengeActiveList = () => {
 	const {
@@ -41,33 +43,45 @@ const BracketChallengeActiveList = () => {
 					Take a look and submit your bracket challenge entry
 				</p> */}
 				<hr className="my-2 border-gray-400 text-gray-500" />
-
-				{activeChallenges.length > 0 ? (
-					<div className="my-3">
-						{activeChallenges.map((bracketChallenge) => (
-							<div
-								key={bracketChallenge.id}
-								className="sm:flex items-center space-y-1 md:space-y-0 even:bg-gray-300 odd:bg-gray-200 px-3 py-3 md:py-2 border-b border-gray-300"
-							>
-								<div className="flex-1 font-semibold text-gray-600">
-									{bracketChallenge.name}
-								</div>
-								<Link
-									to={`/bracket-challenges/${bracketChallenge.slug}`}
-									className="bg-teal-700 font-bold hover:bg-teal-600 text-xs px-3 py-1 block w-26 md:w-18 rounded text-white text-center cursor-pointer"
-								>
-									VIEW
-								</Link>
+				<div className="overflow-x-hidden">
+					<div className="min-w-xl">
+						{activeChallenges.length > 0 ? (
+							<>
+								{activeChallenges.map((bracketChallenge) => (
+									<Link
+										to={`/bracket-challenges/${bracketChallenge.slug}`}
+										key={bracketChallenge.id}
+									>
+										<div className="sm:grid md:grid-cols-2 px-3 py-2 space-y-1 border border-gray-400 bg-gray-800 hover:bg-gray-700 text-sm text-white rounded mb-1 shadow">
+											<Detail label="Name">
+												{bracketChallenge.name}
+											</Detail>
+											<Detail label="League">
+												{bracketChallenge.league}
+											</Detail>
+											<Detail label="Start Date">
+												{displayLocalDate(
+													bracketChallenge.start_date
+												)}
+											</Detail>
+											<Detail label="End Date">
+												{displayLocalDate(
+													bracketChallenge.end_date
+												)}
+											</Detail>
+										</div>
+									</Link>
+								))}
+							</>
+						) : (
+							<div className="py-2 px-3 bg-gray-200">
+								{isLoading
+									? "Fetching active bracket challenges..."
+									: "No active bracket challenges to display."}
 							</div>
-						))}
+						)}
 					</div>
-				) : (
-					<div className="py-2 px-3 bg-gray-200">
-						{isLoading
-							? "Fetching active bracket challenges..."
-							: "No active bracket challenges to display."}
-					</div>
-				)}
+				</div>
 			</div>
 		</>
 	);

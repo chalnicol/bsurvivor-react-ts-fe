@@ -36,7 +36,7 @@ const resetPassword = () => {
 			setEmail("");
 			setPassword("");
 			setPasswordConfirmation("");
-			// setTimeout(() => navigate("/login"));
+			setTimeout(() => navigate("/login"), 2000);
 		}
 	};
 

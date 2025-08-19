@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type {
 	AnyPlayoffsTeamInfo,
 	PlayoffsMatchupInfo,
+	SlotModeType,
 } from "../../data/adminData";
 import TeamSlot from "./teamSlot";
 import { useBracket } from "../../context/bracket/BracketProvider";
@@ -13,7 +14,7 @@ interface MatchupProps {
 	conference?: "EAST" | "WEST";
 }
 const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
-	const { mode, clearMatchup } = useBracket();
+	const { mode, hasPredictions, clearMatchup } = useBracket();
 	const alignment = conference === "WEST" ? "right" : "left";
 	const textAlignment = conference === "WEST" ? "text-right" : "text-left";
 
@@ -27,9 +28,11 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 		setTeam2(matchup.teams.find((t) => t.slot == 2) || null);
 
 		setShowClearButton(
-			roundIndex > 1 &&
-				matchup.winner_team_id === null &&
-				matchup.teams.length >= 1
+			mode == "preview"
+				? false
+				: roundIndex > 1 &&
+						matchup.winner_team_id === null &&
+						matchup.teams.length >= 1
 		);
 
 		setIsClickable(
@@ -61,13 +64,42 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 	);
 
 	const getTeamSlotStyle = useCallback(
-		(
-			team: AnyPlayoffsTeamInfo | null
-		): "predicted" | "mistaken" | "selected" | "active" => {
+		(team: AnyPlayoffsTeamInfo | null): SlotModeType => {
 			if (matchup && team) {
-				if (matchup.winner_team_id === team.id) return "selected";
+				if (hasPredictions) {
+					if (
+						matchup.isCorrect == false &&
+						matchup.winner_team_id &&
+						matchup.predicted_winner_team_id == team.id
+					)
+						return "void";
+
+					if (
+						matchup.isCorrect &&
+						matchup.winner_team_id &&
+						matchup.predicted_winner_team_id == team.id &&
+						matchup.predicted_winner_team_id == matchup.winner_team_id
+					)
+						return "correct";
+
+					if (
+						matchup.isCorrect &&
+						matchup.winner_team_id &&
+						matchup.predicted_winner_team_id == team.id &&
+						matchup.predicted_winner_team_id != matchup.winner_team_id
+					)
+						return "incorrect";
+
+					if (
+						!matchup.winner_team_id &&
+						matchup.predicted_winner_team_id == team.id
+					)
+						return "selected";
+				} else {
+					if (matchup.winner_team_id == team.id) return "selected";
+				}
 			}
-			return "active";
+			return "idle";
 		},
 		[matchup]
 	);

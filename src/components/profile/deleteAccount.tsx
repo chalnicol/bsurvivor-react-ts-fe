@@ -41,13 +41,24 @@ const DeleteAccount = () => {
 						DELETE ACCOUNT
 					</button>
 				) : (
-					<div className="p-3 border border-gray-300 mt-6 rounded bg-gray-100 shadow">
+					<div className="px-4 py-3 border border-gray-300 mt-6 rounded bg-gray-600 text-white shadow">
 						<p>
 							Are you absolutely sure you want to delete your account?
 						</p>
 						<div className="space-x-2 mt-3">
 							<button
-								className={`px-4 py-2 rounded text-white font-bold  ${
+								className={`px-4 py-1 rounded text-white font-bold  ${
+									isLoading
+										? "bg-amber-300 opacity-70"
+										: "bg-amber-500 hover:bg-amber-400 cursor-pointer"
+								}`}
+								onClick={() => setShowConfirmation(false)}
+								disabled={isLoading}
+							>
+								Cancel
+							</button>
+							<button
+								className={`px-4 py-1 rounded text-white font-bold  ${
 									isLoading
 										? "bg-red-400 opacity-70"
 										: "bg-red-500 hover:bg-red-400 cursor-pointer"
@@ -56,17 +67,6 @@ const DeleteAccount = () => {
 								disabled={isLoading}
 							>
 								Delete
-							</button>
-							<button
-								className={`px-4 py-2 rounded text-white font-bold  ${
-									isLoading
-										? "bg-gray-600 opacity-70"
-										: "bg-gray-700 hover:bg-gray-700 cursor-pointer"
-								}`}
-								onClick={() => setShowConfirmation(false)}
-								disabled={isLoading}
-							>
-								Cancel
 							</button>
 						</div>
 					</div>

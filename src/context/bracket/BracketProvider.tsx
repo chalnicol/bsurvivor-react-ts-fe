@@ -12,7 +12,6 @@ import type {
 	PlayoffsRoundInfo,
 } from "../../data/adminData";
 import { apiClient } from "../../utils/api";
-import { checkIsActive } from "../../utils/dateTime";
 
 interface BracketProviderProps {
 	// data: PlayoffsRoundInfo[];
@@ -34,7 +33,9 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 	>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
+	const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+
 	const [mode, setMode] = useState<"update" | "submit" | "preview">(
 		bracketMode
 	);
@@ -42,10 +43,12 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 
 	const league = bracketChallenge.league;
 
-	const isActive = checkIsActive(
-		bracketChallenge.start_date,
-		bracketChallenge.end_date
-	);
+	const hasPredictions = !!predictions;
+
+	// const isActive = checkIsActive(
+	// 	bracketChallenge.start_date,
+	// 	bracketChallenge.end_date
+	// );
 
 	useEffect(() => {
 		if (predictions) {
@@ -59,7 +62,7 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 							const prediction = predictions.find(
 								(p) => p.matchup_id === matchup.id
 							);
-							console.log(prediction);
+
 							if (prediction) {
 								//get teams based from the predictions teams and update winner_team_id
 								const newTeams: AnyPlayoffsTeamInfo[] = [];
@@ -72,24 +75,33 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 									const team2 = allTeams.find(
 										(t) => t.id === prediction.teams[1].id
 									);
-									if (team1 && team2) {
+									if (team1) {
 										newTeams.push({ ...team1, slot: 1 });
+									}
+									if (team2) {
 										newTeams.push({ ...team2, slot: 2 });
 									}
 								}
 
-								const isPredicted =
-									matchup.winner_team_id !== null
-										? prediction.predicted_winner_team_id ===
-										  matchup.winner_team_id
-										: null;
+								const actualMatchup = matchup.teams
+									.flatMap((t) => t.id)
+									.sort()
+									.toString();
+								const predictedMatchup = prediction.teams
+									.flatMap((t) => t.id)
+									.sort()
+									.toString();
+
+								// console.log(actualMatchup, predictedMatchup);
 
 								return {
 									...matchup,
-									winner_team_id: prediction.predicted_winner_team_id,
+									// winner_team_id: prediction.predicted_winner_team_id,
 									teams:
 										newTeams.length > 0 ? newTeams : matchup.teams,
-									isPredicted: isPredicted,
+									predicted_winner_team_id:
+										prediction.predicted_winner_team_id,
+									isCorrect: actualMatchup === predictedMatchup,
 								};
 							}
 							return matchup;
@@ -121,11 +133,14 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 	const submitData = async (data: BracketChallengeEntryData) => {
 		try {
 			setIsLoading(true);
+			setSuccess(null);
+			setError(null);
+			setSubmitSuccess(null);
 			const response = await apiClient.post(
 				`/user/bracket-challenge-entries/`,
 				data
 			);
-			setSuccess(response.data.message);
+			setSubmitSuccess(response.data.message);
 			setMode("preview");
 		} catch (error: any) {
 			if (error.type === "validation") {
@@ -157,6 +172,7 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 	const resetMessage = () => {
 		setError(null);
 		setSuccess(null);
+		setSubmitSuccess(null);
 	};
 
 	const picksCompleted = useCallback(() => {
@@ -287,7 +303,6 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 			setError("All picks must be completed");
 			return;
 		}
-		// console.log("asdf", league);
 
 		const predictions: BracketChallengeEntryPredictionsInfo[] =
 			rounds.flatMap((round) =>
@@ -303,8 +318,6 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 						})),
 				}))
 			);
-
-		// console.log(predictions);
 
 		submitData({
 			bracket_challenge_id: bracketChallenge.id,
@@ -460,15 +473,6 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 		});
 	}, [bracketChallenge.league]);
 
-	// const hasProgressed = useCallback(() => {
-	// 	const matchups = bracketChallenge.rounds.flatMap((round) => {
-	// 		return round.matchups.filter(
-	// 			(matchup) => matchup.winner_team_id !== null
-	// 		);
-	// 	});
-	// 	return matchups.length > 0;
-	// }, [bracketChallenge.rounds]);
-
 	return (
 		<BracketContext.Provider
 			value={{
@@ -478,8 +482,10 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 				isLoading,
 				mode,
 				league,
-				isActive,
+				// isActive,
+				submitSuccess,
 				hasProgressed,
+				hasPredictions,
 				refreshBracket,
 				resetMessage,
 				updatePick,

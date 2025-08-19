@@ -18,7 +18,8 @@ interface BracketContextType {
 		matchupIndex: number,
 		team: AnyPlayoffsTeamInfo
 	) => void;
-	isActive: boolean;
+	hasPredictions: boolean;
+	submitSuccess: string | null;
 	hasProgressed: boolean;
 	updateFinalsPick: (team: AnyPlayoffsTeamInfo) => void;
 	resetBracket: () => void;

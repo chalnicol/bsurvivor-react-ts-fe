@@ -66,10 +66,10 @@ const ViewBracketChallenge = () => {
 								<Detail label="Challenge Name">
 									{bracketChallenge.name}
 								</Detail>
-								<Detail label="Description">
+								{/* <Detail label="Description">
 									{bracketChallenge.description ||
 										"No description provided."}
-								</Detail>
+								</Detail> */}
 								<Detail label="League">
 									{bracketChallenge.league}
 								</Detail>

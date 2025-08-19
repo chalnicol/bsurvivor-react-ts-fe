@@ -61,6 +61,7 @@ const ListLeagues = () => {
 		setLoading(true);
 		try {
 			await apiClient.delete(`/admin/leagues/${toDelete.id}`);
+			setLeagues((prev) => prev.filter((l) => l.id !== toDelete.id));
 			setToDelete(null);
 			setSuccess("League deleted successfully!");
 			if (meta) {

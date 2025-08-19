@@ -27,7 +27,7 @@ const TopEntries = () => {
 			</p> */}
 			<hr className="my-2 border-gray-400" />
 			{ongoingChallenges.length > 0 ? (
-				<div className="md:flex gap-x-4 space-y-2 mb-4">
+				<div className="space-y-6 mb-4">
 					{ongoingChallenges.map((bracketChallenge) => (
 						<TopEntryList
 							key={bracketChallenge.id}

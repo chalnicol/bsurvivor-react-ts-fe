@@ -1,14 +1,15 @@
 import { useEffect, useRef } from "react";
-import type { AnyPlayoffsTeamInfo } from "../../data/adminData";
+import type { AnyPlayoffsTeamInfo, SlotModeType } from "../../data/adminData";
 import { getTeamLogoSrc } from "../../utils/imageService";
 import { useBracket } from "../../context/bracket/BracketProvider";
 import gsap from "gsap";
+import { getSlotBgClass } from "../../utils/slots";
 
 interface TeamSlotCenterProps {
 	team: AnyPlayoffsTeamInfo | null;
 	placeholderText: string;
 	isClickable: boolean;
-	mode: "predicted" | "mistaken" | "selected" | "active";
+	mode: SlotModeType;
 	size?: "lg" | null;
 }
 
@@ -66,26 +67,12 @@ const TeamSlotCenter = ({
 		return "text-lg";
 	};
 
-	// const bgClass = !isSelected ? "bg-gray-400" : "";
-	const getBgClass = () => {
-		switch (mode) {
-			case "predicted":
-				return "bg-green-700";
-			case "mistaken":
-				return "bg-red-600";
-			case "selected":
-				return "bg-yellow-700 border-yellow-600";
-			case "active":
-				return "bg-gray-600 border-gray-400";
-			default:
-				return "";
-		}
-	};
+	const getBgClass = getSlotBgClass(mode);
 
 	const heightClass = size == "lg" ? "h-12 border-2" : "h-10 border";
 
 	const hoverClass =
-		isClickable && mode == "active" ? "cursor-pointer hover:bg-gray-500" : "";
+		isClickable && mode == "idle" ? "cursor-pointer hover:bg-gray-500" : "";
 
 	const handleClick = () => {
 		if (!team) return;
@@ -98,7 +85,7 @@ const TeamSlotCenter = ({
 		<div
 			ref={containerRef}
 			onClick={handleClick}
-			className={`rounded w-full relative overflow-hidden ${heightClass} ${hoverClass} ${getBgClass()}`}
+			className={`rounded w-full relative overflow-hidden ${heightClass} ${hoverClass} ${getBgClass}`}
 		>
 			{team ? (
 				<>

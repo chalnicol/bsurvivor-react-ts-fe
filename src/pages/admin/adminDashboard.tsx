@@ -7,29 +7,32 @@ import {
 import { useEffect, useState } from "react";
 import Loader from "../../components/loader";
 import ContentBase from "../../components/contentBase";
+import { useAuth } from "../../context/auth/AuthProvider";
 
 const AdminDashboard = () => {
+	const { isAuthenticated } = useAuth();
 	const [totals, setTotals] = useState<TotalsInfo | null>(null);
 	// const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const fetchResourcesTotals = async () => {
-		try {
-			setTotals(null);
-			// setIsLoading(true);
-			const response = await apiClient.get<ResourcesResponseInfo>(
-				"/admin/totals"
-			);
-			setTotals(response.data.totals);
-		} catch (error) {
-			console.log(error);
-		} finally {
-			// setIsLoading(false);
-		}
-	};
-
 	useEffect(() => {
-		fetchResourcesTotals();
-	}, []);
+		const fetchResourcesTotals = async () => {
+			try {
+				setTotals(null);
+				// setIsLoading(true);
+				const response = await apiClient.get<ResourcesResponseInfo>(
+					"/admin/totals"
+				);
+				setTotals(response.data.totals);
+			} catch (error) {
+				console.log(error);
+			} finally {
+				// setIsLoading(false);
+			}
+		};
+		if (isAuthenticated) {
+			fetchResourcesTotals();
+		}
+	}, [isAuthenticated]);
 
 	return (
 		<ContentBase className="py-7 px-4">
@@ -83,7 +86,7 @@ const AdminDashboard = () => {
 						/>
 					</div>
 				) : (
-					<div className="mt-6 flex border border-gray-400 text-gray-400 rounded justify-center items-center h-42">
+					<div className="mt-6 flex border border-gray-400 bg-gray-200 text-gray-400 rounded justify-center items-center h-42">
 						<p className="font-semibold text-lg">
 							Loading admin resources..
 						</p>

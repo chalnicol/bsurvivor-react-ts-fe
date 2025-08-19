@@ -16,7 +16,7 @@ const HomePage = () => {
 	return (
 		<ContentBase className="py-0 px-4">
 			<Hero />
-			<div className="border border-gray-400 bg-gray-100 shadow px-4 pt-4 md:px-6 md:pt-6 rounded-lg mt-6">
+			<div className="border border-gray-400 bg-gray-100 shadow px-4 pt-4 md:px-6 md:pt-6 rounded-lg mt-4">
 				<h1 className="text-4xl font-bold">
 					Welcome to Basketball Survivor!
 				</h1>
@@ -33,7 +33,7 @@ const HomePage = () => {
 				</div>
 			</div>
 
-			<EndOfPage className="my-4" />
+			<EndOfPage className="my-6" />
 		</ContentBase>
 	);
 };

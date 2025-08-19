@@ -5,7 +5,9 @@ export async function getCsrfToken(): Promise<void> {
 	try {
 		// This request sets the XSRF-TOKEN cookie. Axios will then automatically
 		// read it and include it as X-XSRF-TOKEN header on subsequent requests.
-		await apiClient.get("/sanctum/csrf-cookie");
+		await apiClient.get("http://localhost/sanctum/csrf-cookie", {
+			withCredentials: true,
+		});
 	} catch (error) {
 		console.error("Failed to get CSRF token:", error);
 		throw new Error("Failed to get CSRF token.");

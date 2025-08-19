@@ -3,55 +3,53 @@ import axios from "axios";
 // Create an Axios instance with a base URL
 const apiClient = axios.create({
 	baseURL: "http://localhost/api", // Your Laravel API base URL
-	withCredentials: true,
+	withCredentials: true, // This is crucial for sending cookies
+	withXSRFToken: true,
 	headers: {
 		Accept: "application/json",
-		// "Content-Type": "application/json",
 	},
 });
 
-// Add a request interceptor to include the token
-apiClient.interceptors.request.use(
-	(config) => {
-		const token = localStorage.getItem("token");
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`;
-		}
-		return config;
-	},
-	(error) => {
-		return Promise.reject(error);
-	}
-);
+// With httpOnly cookies managed by the browser, you no longer need to
+// manually add the Authorization header. The browser will handle sending
+// the session cookie on its own, thanks to `withCredentials: true`.
+// The request interceptor for adding the token is no longer needed.
 
 // Optional: Add a response interceptor for global error handling (e.g., 401 Unauthorized)
+// apiClient.interceptors.request.use(
+// 	function (config) {
+// 		const csrfToken = document.cookie
+// 			.split("; ")
+// 			.find((row) => row.startsWith("XSRF-TOKEN"));
+// 		if (csrfToken) {
+// 			config.headers["X-XSRF-TOKEN"] = decodeURIComponent(
+// 				csrfToken.split("=")[1]
+// 			);
+// 		}
+// 		return config;
+// 	},
+// 	function (error) {
+// 		return Promise.reject(error);
+// 	}
+// );
+
 apiClient.interceptors.response.use(
 	(response) => response,
 	(error) => {
-		// if (error.response && error.response.status === 401) {
-		// 	// Handle unauthorized errors, e.g., redirect to login or clear token
-		// 	console.log(
-		// 		"Unauthorized request. Redirecting to login or clearing token."
-		// 	);
-		// 	localStorage.removeItem("token");
-		// 	// You might want to dispatch an action or use a context to update auth state
-		// 	// window.location.href = '/login'; // Or use navigate from react-router-dom
-		// }
 		if (error.response) {
 			const { status, data } = error.response;
-			if (status == 401) {
-				localStorage.removeItem("token");
-				console.error(
-					"Unauthorized request. Redirecting to login or clearing token."
-				);
+			if (status === 401) {
+				// When using httpOnly cookies, the client can't delete them.
+				// A 401 response means the session is invalid. The user should be
+				// considered logged out. Your app should clear its user state.
 				throw {
 					type: "general",
 					errors: data.errors,
 					message: data.message,
 				};
 				//window.location.href = '/login';
-			} else if (status == 422) {
-				console.error("Validation Errors:", data.errors);
+			} else if (status === 422) {
+				// Validation Errors
 				throw {
 					type: "validation",
 					errors: data.errors,
@@ -59,21 +57,13 @@ apiClient.interceptors.response.use(
 				};
 			} else if (status >= 500) {
 				// General server error (5xx errors)
-				console.error(
-					"Server Error:",
-					data.message || "Something went wrong on the server."
-				);
 				throw {
 					type: "server",
 					message:
 						"A general server error occurred. Please try again later.",
 				};
 			} else {
-				// Other client errors (4xx like 401, 403, 404, etc.)
-				console.error(
-					"Request Error:",
-					data.message || "An unexpected error occurred."
-				);
+				// Other client errors (4xx like 403, 404, etc.)
 				throw {
 					type: "general",
 					message: data.message || "An unexpected error occurred.",

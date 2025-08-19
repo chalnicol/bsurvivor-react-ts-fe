@@ -87,7 +87,7 @@ const BracketChallengePage = () => {
 								entrySlug !== "" && (
 									<div className="py-1 px-4 py-2 rounded mb-3 bg-rose-600 font-semibold sm:flex items-center justify-between space-y-2 sm:space-y-0">
 										<div className="text-white">
-											You already have an entry for this challenge.
+											You have an entry for this bracket challenge.
 										</div>
 										<Link
 											to={`/bracket-challenge-entries/${entrySlug}`}

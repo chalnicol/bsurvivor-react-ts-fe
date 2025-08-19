@@ -35,6 +35,9 @@ import TermsOfServicePage from "./pages/termsOfService";
 import PrivacyPolicyPage from "./pages/privacyPolicy";
 import ListBracketChallengeEntries from "./pages/admin/bracketChallengeEntries/listBracketChallengeEntries";
 import ViewBracketChallengeEntry from "./pages/admin/bracketChallengeEntries/viewBracketChallengeEntry";
+import BracketChallengeEntryPage from "./pages/bracketChallengeEntryPage";
+import EmailVerificationNotice from "./components/auth/emailVerificationNotice";
+import VerifyEmail from "./components/auth/verifyEmail";
 
 import { Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/scrollToTop";
@@ -62,7 +65,6 @@ import {
 	faAsterisk,
 	faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
-import BracketChallengeEntryPage from "./pages/bracketChallengeEntryPage";
 
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 
@@ -122,8 +124,17 @@ function App() {
 						<Route path="/register" element={<Register />} />
 						<Route path="/login" element={<Login />} />
 
+						{/* <Route path="/email-verified" element={<EmailVerified />} /> */}
+
+						<Route path="/verify" element={<VerifyEmail />} />
+
 						{/* Public routes */}
 						<Route element={<PublicOnlyRoute />}>
+							<Route
+								path="/email-verification-notice"
+								element={<EmailVerificationNotice />}
+							/>
+
 							<Route
 								path="/forgot-password"
 								element={<ForgotPassword />}

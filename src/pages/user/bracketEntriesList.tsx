@@ -16,8 +16,11 @@ import useDebounce from "../../hooks/useDebounce"; // Adjust path if needed
 import { displayLocalDate } from "../../utils/dateTime";
 import EndOfPage from "../../components/endOfPage";
 import FailPrompt from "../../components/failPrompt";
+import { useAuth } from "../../context/auth/AuthProvider";
 
 const BracketEntriesList = () => {
+	const { isAuthenticated } = useAuth();
+
 	const [bracketChallengeEntries, setBracketChallengeEntries] = useState<
 		BracketChallengeEntryInfo[]
 	>([]);
@@ -50,8 +53,10 @@ const BracketEntriesList = () => {
 	};
 
 	useEffect(() => {
-		fetchBracketChallengeEntries(currentPage, debouncedSearchTerm);
-	}, [currentPage, debouncedSearchTerm]);
+		if (isAuthenticated) {
+			fetchBracketChallengeEntries(currentPage, debouncedSearchTerm);
+		}
+	}, [currentPage, debouncedSearchTerm, isAuthenticated]);
 
 	const handlePageClick = (page: number) => {
 		// fetchBracketChallengeEntries(page);
@@ -105,34 +110,38 @@ const BracketEntriesList = () => {
 				<div className="mt-3">
 					{bracketChallengeEntries.length > 0 ? (
 						<>
-							{bracketChallengeEntries.map((entry) => (
-								<Link
-									to={`/bracket-challenge-entries/${entry.name}`}
-									key={entry.id}
-								>
-									<div className="sm:grid md:grid-cols-2 xl:grid-cols-3 px-4 py-3 space-y-1 border hover:bg-gray-700 mb-1 text-sm bg-gray-800 text-white rounded">
-										<Detail label="Entry Name">{entry.name}</Detail>
-										<Detail label="League">
-											{entry.bracket_challenge.league}
-										</Detail>
-										<Detail label="Bracket Challenge">
-											{entry.bracket_challenge.name}
-										</Detail>
+							<div className="overflow-x-hidden">
+								<div className="min-w-xl">
+									{bracketChallengeEntries.map((entry) => (
+										<Link
+											to={`/bracket-challenge-entries/${entry.name}`}
+											key={entry.id}
+										>
+											<div className="sm:grid md:grid-cols-2 xl:grid-cols-3 px-4 py-3 space-y-1 border hover:bg-gray-700 mb-1 text-sm bg-gray-800 text-white rounded">
+												<Detail label="Entry Name">
+													{entry.name}
+												</Detail>
+												<Detail label="League">
+													{entry.bracket_challenge.league}
+												</Detail>
+												<Detail label="Bracket Challenge">
+													{entry.bracket_challenge.name}
+												</Detail>
 
-										<Detail label="Date Submitted">
-											{displayLocalDate(entry.created_at)}
-										</Detail>
-										<Detail label="Status">
-											<span
-												className={`${getStatusBgColorClass(
-													entry.status
-												)} text-white font-bold px-3 rounded text-xs select-none`}
-											>
-												{entry.status.toLocaleUpperCase()}
-											</span>
-										</Detail>
+												<Detail label="Date Submitted">
+													{displayLocalDate(entry.created_at)}
+												</Detail>
+												<Detail label="Status">
+													<span
+														className={`${getStatusBgColorClass(
+															entry.status
+														)} text-white font-bold px-3 rounded text-xs select-none`}
+													>
+														{entry.status.toLocaleUpperCase()}
+													</span>
+												</Detail>
 
-										{/* <div className="space-y-0.5">
+												{/* <div className="space-y-0.5">
 											<div className="text-xs font-semibold text-gray-500">
 												Actions
 											</div>
@@ -145,9 +154,11 @@ const BracketEntriesList = () => {
 												</Link>
 											</div>
 										</div> */}
-									</div>
-								</Link>
-							))}
+											</div>
+										</Link>
+									))}
+								</div>
+							</div>
 							<Pagination
 								meta={meta}
 								onPageChange={handlePageClick}

@@ -1,8 +1,9 @@
-import type { AnyPlayoffsTeamInfo } from "../../data/adminData";
+import type { AnyPlayoffsTeamInfo, SlotModeType } from "../../data/adminData";
 import { useBracket } from "../../context/bracket/BracketProvider";
 import gsap from "gsap";
 import { useEffect, useRef } from "react";
 import { getTeamLogoSrc } from "../../utils/imageService";
+import { getSlotBgClass } from "../../utils/slots";
 
 interface TeamSlotProps {
 	team: AnyPlayoffsTeamInfo | null;
@@ -13,7 +14,7 @@ interface TeamSlotProps {
 	isClickable: boolean;
 	placeholderText: string;
 	alignment?: "left" | "right" | "center";
-	slotMode: "predicted" | "mistaken" | "selected" | "active";
+	slotMode: SlotModeType;
 }
 
 const TeamSlot = ({
@@ -79,7 +80,7 @@ const TeamSlot = ({
 	};
 
 	const hoverClass =
-		isClickable && slotMode == "active"
+		isClickable && slotMode == "idle"
 			? "cursor-pointer hover:bg-gray-500"
 			: "";
 
@@ -88,25 +89,12 @@ const TeamSlot = ({
 
 	const flexAlignment = alignment == "center" ? "justify-center" : "";
 
-	const getstyle = () => {
-		switch (slotMode) {
-			case "predicted":
-				return "bg-green-700 border-green-400";
-			case "mistaken":
-				return "bg-red-800 border-red-500";
-			case "selected":
-				return "bg-yellow-700 border-yellow-600";
-			case "active":
-				return "bg-gray-600 border-gray-500";
-			default:
-				return "";
-		}
-	};
+	const getBgClass = getSlotBgClass(slotMode);
 
 	return (
 		<div
 			ref={containerRef}
-			className={`border rounded shadow text-white select-none h-10 overflow-hidden flex items-center gap-x-1.5 ${flexDirectionClass} ${flexAlignment} ${hoverClass} ${getstyle()}`}
+			className={`border rounded shadow text-white select-none h-10 overflow-hidden flex items-center gap-x-1.5 ${flexDirectionClass} ${flexAlignment} ${hoverClass} ${getBgClass}`}
 			onClick={handleClick}
 		>
 			{team ? (

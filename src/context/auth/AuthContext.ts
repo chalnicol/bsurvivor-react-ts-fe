@@ -1,5 +1,5 @@
 import React from "react";
-import { type Response } from "../../data/userData";
+import type { ProfileWindow } from "../../data/adminData";
 
 export interface User {
 	id: number;
@@ -15,7 +15,7 @@ export interface User {
 
 export interface AuthContextType {
 	user: User | null;
-	token: string | null;
+	// token: string | null;
 	isAuthenticated: boolean;
 	error: string | null;
 	fieldErrors: Record<string, string[]> | null;
@@ -29,7 +29,7 @@ export interface AuthContextType {
 		password: string,
 		password_confirmation: string
 	) => Promise<boolean>;
-	logout: () => Promise<void>;
+	logout: () => Promise<boolean>;
 	forgotPassword: (email: string) => Promise<boolean>;
 	resetPassword: (
 		email: string,
@@ -37,17 +37,21 @@ export interface AuthContextType {
 		password: string,
 		password_confirmation: string
 	) => Promise<boolean>;
-	updateProfile: (email: string, username: string) => Promise<Response | null>;
+	updateProfile: (email: string, username: string) => Promise<boolean>;
 	updatePassword: (
 		currentPassword: string,
 		password: string,
 		password_confirmation: string
-	) => Promise<Response | null>;
+	) => Promise<boolean>;
 	deleteAccount: () => Promise<boolean>;
 	clearMessages: () => void;
 	updateUser: (updatedUser: User) => void;
 	hasRole: (role: string) => boolean;
 	can: (permission: string) => boolean;
+	sendVerificationEmail: () => Promise<boolean>;
+	verifyEmail: (email: string, token: string) => Promise<boolean>;
+	profileWindow: ProfileWindow;
+	toVerifyEmail: string | null;
 }
 
 export const AuthContext = React.createContext<AuthContextType | undefined>(

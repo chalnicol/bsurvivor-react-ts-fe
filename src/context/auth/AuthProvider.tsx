@@ -1,53 +1,48 @@
 import React, { useContext, useState, useEffect, type ReactNode } from "react";
 import { AuthContext, type User } from "./AuthContext";
-import { type Response } from "../../data/userData";
-import { apiClient } from "../../utils/api"; // Import your configured axios instance
+import { apiClient, getCsrfToken } from "../../utils/api"; // Import your configured axios instance
+import { type ProfileWindow } from "../../data/adminData";
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	children,
 }) => {
 	const [user, setUser] = useState<User | null>(null);
-	const [token, setToken] = useState<string | null>(
-		localStorage.getItem("token")
-	);
+	// const [token, setToken] = useState<string | null>(
+	// 	localStorage.getItem("token")
+	// );
 	const [authLoading, setAuthLoading] = useState<boolean>(true); // To manage initial loading state
 	const [message, setMessage] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({}); // To hold validation errors
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-
-	// const isAuthenticated = !!user && !!token;
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+	const [profileWindow, setProfileWindow] = useState<ProfileWindow>(null);
+	const [toVerifyEmail, setToVerifyEmail] = useState<string | null>(null);
 
 	// Function to fetch user data if a token exists (on app load/refresh)
-	const fetchUser = async () => {
-		if (token) {
+
+	useEffect(() => {
+		const fetchUser = async () => {
 			try {
 				const response = await apiClient.get("/user"); // Protected route to get user details
 				setUser(response.data.data);
 				setIsAuthenticated(true);
 			} catch (error) {
-				console.error("Failed to fetch user:", error);
-				localStorage.removeItem("token"); // Clear invalid token
-				setToken(null);
+				console.log(error);
 				setUser(null);
 				setIsAuthenticated(false);
 			} finally {
 				setAuthLoading(false);
 			}
-		} else {
-			setAuthLoading(false);
-		}
-	};
-
-	useEffect(() => {
+		};
+		console.log("asdf asdf");
 		fetchUser();
-	}, [token]); // Re-fetch user if token changes
+	}, []);
 
 	const processErrors = (error: any, errorMessage?: string) => {
 		if (error.type === "validation") {
 			setFieldErrors(error.errors);
-			setError(errorMessage || "Validation error"); // Often 'The given data was invalid.'
+			setError(error.message || errorMessage); // Often 'The given data was invalid.'
 		} else if (
 			error.type === "server" ||
 			error.type === "general" ||
@@ -67,12 +62,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setMessage(null);
 		setFieldErrors({});
 		try {
+			await getCsrfToken();
 			const response = await apiClient.post("/login", { email, password });
-			const receivedToken = response.data.token;
-			const userData = response.data.user;
-			localStorage.setItem("token", receivedToken); // Store token
-			setToken(receivedToken);
-			setUser(userData);
+			setUser(response.data.user);
+			setIsAuthenticated(true);
 			setMessage("Login succesfull. Redirecting...");
 			return true;
 		} catch (err: any) {
@@ -100,13 +93,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				password,
 				password_confirmation,
 			});
-			const receivedToken = response.data.token;
-			const userData = response.data.user;
-
-			localStorage.setItem("token", receivedToken); // Store token
-			setToken(receivedToken);
-			setUser(userData);
-			setMessage("Registration succesfull. Redirecting...");
+			setToVerifyEmail(email);
+			setMessage(response.data.message || "Registration successful!");
 			setError(null);
 			setFieldErrors({});
 			return true;
@@ -118,22 +106,76 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		}
 	};
 
-	const logout = async () => {
+	const verifyEmail = async (
+		email: string,
+		token: string
+	): Promise<boolean> => {
 		setIsLoading(true);
 		try {
-			if (token) {
-				await apiClient.post("/logout"); // Invalidate token on backend
-			}
+			await getCsrfToken();
+			const response = await apiClient.post("/email/verify", {
+				email,
+				token,
+			});
+			setUser(response.data.user);
+			setMessage(response.data.message || "Email verification successful!");
+			setToVerifyEmail("");
+			setIsAuthenticated(true);
+			return true;
+		} catch (error: any) {
+			console.log(error);
+			processErrors(error, "Email verification failed");
+			return false;
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const logout = async (): Promise<boolean> => {
+		setIsLoading(true);
+		try {
+			await apiClient.post("/logout");
+			return true;
 		} catch (error) {
 			console.error("Logout failed on server:", error);
-			// Even if backend logout fails, clear client-side state
+			return false;
 		} finally {
-			localStorage.removeItem("token"); // Clear token from storage
-			setToken(null);
 			setUser(null);
 			setIsAuthenticated(false);
+			setMessage(null);
+			setError(null);
+			setFieldErrors({});
+			setProfileWindow(null);
+			setToVerifyEmail("");
 			setIsLoading(false);
-			console.log("Logged out successfully.");
+		}
+	};
+
+	//--- Verify Email Actions ---
+	const sendVerificationEmail = async (): Promise<boolean> => {
+		if (!toVerifyEmail) {
+			setError("No email provided for verification.");
+			return false;
+		}
+
+		setIsLoading(true);
+		setError(null);
+		setMessage(null);
+		try {
+			// Make a POST request to the Laravel endpoint to resend the email
+			const response = await apiClient.post(
+				"/email/verification-notification",
+				{
+					email: toVerifyEmail,
+				}
+			);
+			setMessage(response.data.message || "Verification link sent!"); // Should be something like "Verification link sent!"
+			return true;
+		} catch (error) {
+			setError("Failed to resend the verification link.");
+			return false;
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -176,7 +218,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		token: string,
 		password: string,
 		password_confirmation: string
-	) => {
+	): Promise<boolean> => {
 		setIsLoading(true);
 		setError(null);
 		setMessage(null);
@@ -192,19 +234,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			);
 			return true;
 		} catch (err: any) {
-			const apiErrors = err.response?.data?.errors;
-			if (apiErrors) {
-				let errorMessage = "";
-				for (const key in apiErrors) {
-					errorMessage += apiErrors[key].join(" ") + " ";
-				}
-				setError(errorMessage.trim());
-			} else {
-				setError(
-					err.response?.data?.message ||
-						"Failed to reset password. Please try again."
-				);
-			}
+			processErrors(err, "Failed to reset password");
 			return false;
 		} finally {
 			setIsLoading(false);
@@ -214,41 +244,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	const updateProfile = async (
 		username: string,
 		email: string
-	): Promise<Response | null> => {
+	): Promise<boolean> => {
 		//..
 		setIsLoading(true);
-		setError("");
-		setMessage("");
+		setProfileWindow("details");
+		setError(null);
+		setMessage(null);
+		setFieldErrors({});
 		try {
 			const response = await apiClient.put("/user/profile", {
 				username: username,
 				email: email,
 			});
-			setUser(response.data.user);
-			console.log("re", response);
-			// setMessage(response.data.message || "Profile data has been updated.");
-			return {
-				success: response.data.message || "Profile data has been updated.",
-				error: null,
-			};
-		} catch (err: any) {
-			const apiErrors = err.response?.data?.errors;
-			let tempErr: string = "";
-			if (apiErrors) {
-				let errorMessage = "";
-				for (const key in apiErrors) {
-					errorMessage += apiErrors[key].join(" ") + " ";
-				}
-				// setError(errorMessage.trim());
-				tempErr = errorMessage.trim();
-			} else {
-				// setError(
-				// 	err.response?.data?.message || "Failed to update profile."
-				// );
-				tempErr =
-					err.response?.data?.message || "Failed to update profile.";
+			const isEmailNew = response.data.is_email_new;
+			if (isEmailNew) {
+				localStorage.removeItem("token");
+				setUser(null);
+				setIsAuthenticated(false);
+				setToVerifyEmail(email);
+				setMessage(
+					response.data.message ||
+						"Email has been updated. Please verify your new email."
+				);
+				return true;
 			}
-			return { success: null, error: tempErr };
+			setUser(response.data.user);
+			setMessage(response.data.message || "Profile data has been updated.");
+			return true;
+		} catch (err: any) {
+			processErrors(err, "Failed to update profile");
+			return false;
 		} finally {
 			setIsLoading(false);
 		}
@@ -258,71 +283,44 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		current_password: string,
 		password: string,
 		password_confirmation: string
-	): Promise<Response | null> => {
+	): Promise<boolean> => {
 		setIsLoading(true);
-		setError("");
-		setMessage("");
+		setError(null);
+		setMessage(null);
+		setFieldErrors({});
+		setProfileWindow("password");
 		try {
 			const response = await apiClient.put("/user/password", {
 				current_password,
 				password,
 				password_confirmation,
-			}); // Or PATCH
-			// setMessage(response.data.message || "Password updated successfully!");
-			return {
-				success: response.data.message || "Password updated successfully!",
-				error: null,
-			};
+			});
+			setMessage(response.data.message || "Password updated successfully!");
+			return true;
 		} catch (err: any) {
-			let myError: string = "";
-			const apiErrors = err.response?.data?.errors;
-			if (apiErrors) {
-				let errorMessage = "";
-				for (const key in apiErrors) {
-					errorMessage += apiErrors[key].join(" ") + " ";
-				}
-				// setError(errorMessage.trim());
-				myError = errorMessage.trim();
-			} else {
-				// setError(
-				// 	err.response?.data?.message || "Failed to update password."
-				// );
-				myError =
-					err.response?.data?.message || "Failed to update password.";
-			}
-			return {
-				success: null,
-				error: myError,
-			};
+			processErrors(err, "Failed to update password");
+			return false;
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
-	const deleteAccount = async () => {
+	const deleteAccount = async (): Promise<boolean> => {
 		setIsLoading(true); // Indicate loading for this action
-		clearMessages();
+		setProfileWindow("delete");
+		setError(null);
+		setMessage(null);
+		setFieldErrors({});
 		try {
 			await apiClient.delete("/user");
-			localStorage.removeItem("token"); // Clear token from storage
+			// localStorage.removeItem("token"); // Clear token from storage
+			// setToken(null);
 			setUser(null);
-			setToken(null);
 			setIsAuthenticated(false);
 			return true; // Indicate success
 		} catch (err: any) {
-			const apiErrors = err.response?.data?.errors;
-			if (apiErrors) {
-				let errorMessage = "";
-				for (const key in apiErrors) {
-					errorMessage += apiErrors[key].join(" ") + " ";
-				}
-				setError(errorMessage.trim());
-			} else {
-				setError(
-					err.response?.data?.message || "Failed to update password."
-				);
-			}
-			return false;
+			processErrors(err, "Failed to delete account");
+			return false; // Indicate failure
 		} finally {
 			setIsLoading(false);
 		}
@@ -332,6 +330,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setError(null);
 		setMessage(null);
 		setFieldErrors({});
+		setProfileWindow(null);
 	};
 
 	// Check if user has a specific role
@@ -356,8 +355,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				error,
 				fieldErrors,
 				message,
-				token,
+				// token,
 				isAuthenticated,
+				profileWindow,
+				toVerifyEmail,
+				verifyEmail,
+				sendVerificationEmail,
 				login,
 				register,
 				logout,

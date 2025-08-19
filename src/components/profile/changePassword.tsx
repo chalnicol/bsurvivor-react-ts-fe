@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
-import { type Response } from "../../data/userData";
 
 const ChangePassword = () => {
-	const { updatePassword, isLoading } = useAuth();
+	const { updatePassword, error, message, profileWindow, isLoading } =
+		useAuth();
 
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [password, setPassword] = useState("");
 	const [passwordConfirmation, setPasswordConfirmation] = useState("");
-
-	const [response, setResponse] = useState<Response | null>(null);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -20,12 +18,9 @@ const ChangePassword = () => {
 			passwordConfirmation
 		);
 		if (newResponse) {
-			if (newResponse.success) {
-				setCurrentPassword("");
-				setPassword("");
-				setPasswordConfirmation("");
-			}
-			setResponse(newResponse);
+			setCurrentPassword("");
+			setPassword("");
+			setPasswordConfirmation("");
 		}
 	};
 
@@ -87,11 +82,11 @@ const ChangePassword = () => {
 						SAVE
 					</button>
 				</form>
-				{response?.error && (
-					<p className="my-3 text-sm text-red-500">{response.error}</p>
+				{profileWindow === "password" && error && (
+					<p className="my-3 text-sm text-red-500">{error}</p>
 				)}
-				{response?.success && (
-					<p className="my-3 text-sm text-green-700">{response.success}</p>
+				{profileWindow === "password" && message && (
+					<p className="my-3 text-sm text-green-700">{message}</p>
 				)}
 			</div>
 		</div>

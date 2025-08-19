@@ -59,6 +59,7 @@ const ListTeams = () => {
 		setIsLoading(true);
 		try {
 			await apiClient.delete(`/admin/teams/${toDelete.id}`);
+			setTeams((prev) => prev.filter((team) => team.id !== toDelete.id));
 			setToDelete(null);
 			setSuccess("Team deleted successfully!");
 			if (meta) {

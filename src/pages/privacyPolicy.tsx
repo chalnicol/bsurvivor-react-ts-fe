@@ -6,17 +6,19 @@ const PrivacyPolicyPage = () => {
 		<ContentBase className="p-4">
 			<div className="border border-gray-400 bg-gray-100 px-3 md:px-8 pt-2 pb-6 mt-4 mb-7 rounded-lg shadow">
 				<h1 className="text-3xl font-bold mt-4 mb-3">Privacy Policy</h1>
-				<p className="mb-2">
-					Your privacy is important to us. This Privacy Policy describes
-					how BasketballSurvivor ("we," "us," or "our") collects, uses, and
-					discloses your information when you visit and use our website and
-					services.
-				</p>
-				<p className="mb-6">
-					By using our Service, you agree to the collection and use of
-					information in accordance with this policy.
-				</p>
+
 				<div className="bg-gray-800 text-white rounded px-8 py-6 ">
+					<p className="mb-2">
+						Your privacy is important to us. This Privacy Policy describes
+						how BasketballSurvivor ("we," "us," or "our") collects, uses,
+						and discloses your information when you visit and use our
+						website and services.
+					</p>
+					<p className="mb-6">
+						By using our Service, you agree to the collection and use of
+						information in accordance with this policy.
+					</p>
+
 					<h2 className="text-2xl font-semibold mb-4">
 						1. Information We Collect
 					</h2>

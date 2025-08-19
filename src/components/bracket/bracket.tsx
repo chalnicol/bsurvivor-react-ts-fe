@@ -3,6 +3,7 @@ import { useAuth } from "../../context/auth/AuthProvider";
 import Conference from "./conference";
 import Finals from "./finals";
 import StatusMessage from "../statusMessage";
+import { Link } from "react-router-dom";
 
 const Bracket = () => {
 	const { isAuthenticated } = useAuth();
@@ -13,7 +14,8 @@ const Bracket = () => {
 		success,
 		isLoading,
 		mode,
-		isActive,
+		// isActive,
+		submitSuccess,
 		hasProgressed,
 		resetMessage,
 		refreshBracket,
@@ -42,6 +44,21 @@ const Bracket = () => {
 					type="success"
 					onClose={resetMessage}
 				/>
+			)}
+			{submitSuccess && (
+				<StatusMessage
+					message={submitSuccess}
+					type="success"
+					fixed={true}
+					onClose={resetMessage}
+				>
+					<Link
+						to="/entries"
+						className="text-white bg-green-900 hover:bg-gray-700 px-3 py-0.5 rounded text-xs"
+					>
+						View My Entries Page
+					</Link>
+				</StatusMessage>
 			)}
 
 			<div className="w-full rounded relative text-black select-none">
@@ -81,7 +98,7 @@ const Bracket = () => {
 					</div>
 				)}
 			</div>
-			{mode == "submit" && isActive && (
+			{mode == "submit" && !hasProgressed && (
 				<>
 					<hr className="my-2 border-gray-400" />
 					<div className="flex items-center space-x-2 mt-3">

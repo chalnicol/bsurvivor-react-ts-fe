@@ -1,44 +1,65 @@
 import type { BracketChallengeInfo } from "../../data/adminData";
 import { useAdmin } from "../../context/admin/AdminProvider";
+import { Link } from "react-router-dom";
+import StatusPills from "../statusPills";
 
 interface topEntryListProps {
 	bracketChallenge: BracketChallengeInfo;
 }
 
 const TopEntryList = ({ bracketChallenge }: topEntryListProps) => {
-	const { isLoading, fetchTopEntries } = useAdmin();
+	const { isLoading } = useAdmin();
 
 	return (
-		<div className="flex-1">
-			<div className="px-2 py-1 bg-red-600 text-white flex items-center">
-				<p className="font-semibold flex-1">{bracketChallenge.name}</p>
-				<button
-					className="text-xs border rounded px-2 py-0.5 cursor-pointer hover:bg-red-500 text-white"
-					onClick={() => fetchTopEntries(bracketChallenge.id)}
+		<div className="overflow-x-auto">
+			<div className="min-w-3xl">
+				<div
+					className={`px-2 py-1 text-lg font-bold text-white ${
+						bracketChallenge.league == "NBA"
+							? "bg-red-700"
+							: "bg-blue-700"
+					}`}
 				>
-					REFRESH LIST
-				</button>
-			</div>
-			<div>
+					<h1>{bracketChallenge.name}</h1>
+				</div>
 				{bracketChallenge.entries.length > 0 ? (
-					bracketChallenge.entries.map((entry) => (
-						<div
-							key={entry.id}
-							className="border-b border-gray-300 py-1 px-3 flex items-center even:bg-gray-300 odd:bg-gray-200"
-						>
-							<div className="w-full flex items-center justify-between">
-								<p>{entry.user.username}</p>
-								<p>
-									<span className="text-sm">SCORE</span>:
-									{entry.correct_predictions_count}1
+					<>
+						<div className="grid grid-cols-4 bg-gray-800 text-white font-bold text-sm">
+							<p className="px-2 py-0.5">Username</p>
+							<p className="px-2 py-0.5">Correct Predictions</p>
+							<p className="px-2 py-0.5">Status</p>
+							<p className="px-2 py-0.5">View</p>
+						</div>
+
+						{bracketChallenge.entries.map((entry) => (
+							<div
+								className="grid grid-cols-4 odd:bg-gray-200 even:bg-gray-50"
+								key={entry.id}
+							>
+								<p className="px-2 py-0.5 font-semibold text-gray-600">
+									{entry.user.username}
+								</p>
+								<p className="px-2 py-0.5 font-semibold text-gray-600">
+									{entry.correct_predictions_count}
+								</p>
+								<p className="px-2 py-0.5">
+									<StatusPills status={entry.status} />
+								</p>
+								<p className="px-2 py-0.5">
+									<Link
+										to={`/bracket-challenge-entries/${entry.slug}`}
+										className="bg-teal-700 hover:bg-teal-600 text-white px-2 text-xs rounded font-bold"
+									>
+										VIEW
+									</Link>
 								</p>
 							</div>
-						</div>
-					))
+						))}
+					</>
 				) : isLoading ? (
-					<p>Loading..</p>
+					<p>Loading...</p>
 				) : (
-					<p className="px-2 py-1 bg-gray-200">No top entries found.</p>
+					<p>No entries found.</p>
 				)}
 			</div>
 		</div>

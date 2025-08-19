@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiClient } from "../utils/api";
 import Loader from "../components/loader";
@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Detail from "../components/detail";
 import { displayLocalDate } from "../utils/dateTime";
 import EndOfPage from "../components/endOfPage";
+import StatusPills from "../components/statusPills";
 
 const BracketChallengeEntryPage = () => {
 	const { slug } = useParams<{ slug: string }>();
@@ -41,23 +42,6 @@ const BracketChallengeEntryPage = () => {
 		fetchBracketChallengeEntry();
 	}, [slug]);
 
-	const bgClass = useCallback((status: string): string => {
-		switch (status) {
-			case "success":
-				return "bg-green-600";
-			case "eliminated":
-				return "bg-red-600";
-			case "active":
-				return "bg-blue-600";
-			default:
-				return "bg-gray-500";
-		}
-	}, []);
-
-	// if (bracketChallengeEntry) {
-	// 	console.log(bracketChallengeEntry.entry_data);
-	// }
-
 	return (
 		<ContentBase className="px-4 py-7">
 			<div className="p-3 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
@@ -87,14 +71,12 @@ const BracketChallengeEntryPage = () => {
 								<Detail label="Date Submitted">
 									{displayLocalDate(bracketChallengeEntry.created_at)}
 								</Detail>
+								<Detail label="Correct Predictions">
+									{bracketChallengeEntry.correct_predictions_count}
+								</Detail>
+
 								<Detail label="Status">
-									<span
-										className={`text-xs font-bold select-none rounded px-2 text-white ${bgClass(
-											bracketChallengeEntry.status
-										)}`}
-									>
-										{bracketChallengeEntry.status.toLocaleUpperCase()}
-									</span>
+									<StatusPills status={bracketChallengeEntry.status} />
 								</Detail>
 							</div>
 							<hr className="my-4 border-gray-400" />

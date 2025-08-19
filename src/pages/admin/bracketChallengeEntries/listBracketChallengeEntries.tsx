@@ -5,7 +5,7 @@ import {
 	type MetaInfo,
 	type PaginatedResponse,
 } from "../../../data/adminData";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import apiClient from "../../../utils/axiosConfig";
 import Loader from "../../../components/loader";
 import Pagination from "../../../components/pagination";
@@ -17,6 +17,7 @@ import StatusMessage from "../../../components/statusMessage";
 import ContentBase from "../../../components/contentBase";
 import { Link } from "react-router-dom";
 import { displayLocalDate } from "../../../utils/dateTime";
+import StatusPills from "../../../components/statusPills";
 
 const ListBracketChallengeEntries = () => {
 	const [bracketChallengeEntries, setBracketChallengeEntries] = useState<
@@ -67,6 +68,10 @@ const ListBracketChallengeEntries = () => {
 			await apiClient.delete(
 				`/admin/bracket-challenge-entries/${toDelete.id}`
 			);
+			setBracketChallengeEntries((prev) =>
+				prev.filter((entry) => entry.id !== toDelete.id)
+			);
+			setToDelete(null);
 			setSuccess("Bracket Challenge Entry deleted successfully");
 			if (meta) {
 				const newTotal = bracketChallengeEntries.length - 1;
@@ -122,19 +127,6 @@ const ListBracketChallengeEntries = () => {
 		// Alternatively, just always reset to page 1 when the debounced search term changes
 		// setCurrentPage(1);
 	}, [debouncedSearchTerm]);
-
-	const bgClass = useCallback((status: string): string => {
-		switch (status) {
-			case "won":
-				return "bg-green-600";
-			case "eliminated":
-				return "bg-red-600";
-			case "active":
-				return "bg-blue-600";
-			default:
-				return "";
-		}
-	}, []);
 
 	return (
 		<ContentBase className="py-7 px-4">
@@ -211,13 +203,7 @@ const ListBracketChallengeEntries = () => {
 											{entry.user.username}
 										</td>
 										<td className="px-2 py-1">
-											<span
-												className={`text-xs font-bold select-none rounded text-white px-2 ${bgClass(
-													entry.status
-												)}`}
-											>
-												{entry.status.toLocaleUpperCase()}
-											</span>
+											<StatusPills status={entry.status} />
 										</td>
 										<td className="px-2 py-1 flex items-center space-x-1">
 											<Link
