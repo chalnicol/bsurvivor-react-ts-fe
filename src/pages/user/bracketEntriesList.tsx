@@ -17,6 +17,7 @@ import { displayLocalDate } from "../../utils/dateTime";
 import EndOfPage from "../../components/endOfPage";
 import FailPrompt from "../../components/failPrompt";
 import { useAuth } from "../../context/auth/AuthProvider";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const BracketEntriesList = () => {
 	const { isAuthenticated } = useAuth();
@@ -96,8 +97,12 @@ const BracketEntriesList = () => {
 		<ContentBase className="py-7 px-4">
 			<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 				<h1 className="text-xl font-bold px-1">
-					My Bracket Challenge Entries
+					<FontAwesomeIcon icon="caret-right" /> My Bracket Challenge
+					Entries
 				</h1>
+				<p className="font-medium text-sm my-1">
+					View all your submitted bracket challenge entries here.
+				</p>
 
 				<input
 					type="search"

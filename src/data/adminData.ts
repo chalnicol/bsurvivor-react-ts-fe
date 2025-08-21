@@ -133,6 +133,8 @@ export interface BracketChallengeEntryInfo {
 	predictions: BracketChallengeEntryPredictionsInfo[];
 	created_at: string;
 	updated_at: string;
+	rank?: number;
+	is_current_user_entry?: boolean;
 }
 
 //...
@@ -210,6 +212,44 @@ export type SlotModeType =
 	| "void";
 
 export type ProfileWindow = "details" | "password" | "delete" | null;
+
+export interface NotificationDataInfo {
+	sender_id: number;
+	sender_name: string;
+	message: string;
+}
+
+export interface UserMiniInfo {
+	id: number;
+	username: string;
+}
+
+export interface SearchedUserInfo extends UserMiniInfo {
+	is_friend: boolean;
+	is_blocked: boolean;
+	has_pending_sent: boolean;
+	has_pending_received: boolean;
+}
+
+export interface FriendsInfo {
+	active_friends: UserMiniInfo[];
+	pending_friends: UserMiniInfo[];
+	to_accept_friends: UserMiniInfo[];
+	blocked_friends: UserMiniInfo[];
+}
+
+export interface NotificationInfo {
+	id: string;
+	type: string;
+	data: {
+		sender_id: number;
+		sender_name: string;
+		message: string;
+	};
+	read_at: string | null;
+	created_at: string;
+	is_read: boolean;
+}
 
 // export interface GeneralApiErrorResponse {
 // 	message: string;

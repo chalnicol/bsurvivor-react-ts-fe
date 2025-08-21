@@ -21,8 +21,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
 	// Function to fetch user data if a token exists (on app load/refresh)
 
-	useEffect(() => {
-		const fetchUser = async () => {
+	const fetchUser = async () => {
+		if (!user) {
 			try {
 				const response = await apiClient.get("/user"); // Protected route to get user details
 				setUser(response.data.data);
@@ -34,10 +34,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			} finally {
 				setAuthLoading(false);
 			}
-		};
-		console.log("asdf asdf");
+		} else {
+			setAuthLoading(false);
+		}
+	};
+
+	useEffect(() => {
 		fetchUser();
-	}, []);
+	}, [user]);
 
 	const processErrors = (error: any, errorMessage?: string) => {
 		if (error.type === "validation") {

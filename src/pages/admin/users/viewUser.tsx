@@ -126,7 +126,7 @@ const ViewUser = () => {
 	}, [user]);
 
 	return (
-		<ContentBase className="py-7">
+		<ContentBase className="px-4 py-7">
 			<div className="p-3 lg:p-5 border bg-gray-100 rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 				<BreadCrumbs />
 				<div className="md:flex items-center space-y-2 md:space-y-0">

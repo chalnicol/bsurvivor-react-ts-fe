@@ -6,6 +6,11 @@ import { useOutsideClick } from "../hooks/useOutsideClick";
 // import Dropdown from "./dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+interface LinksInfo {
+	name: string;
+	label: string;
+	route: string;
+}
 const Navbar = () => {
 	const [showDropdown, setShowDropdown] = useState<boolean>(false);
 	const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -23,6 +28,12 @@ const Navbar = () => {
 		// 2. Callback function: close the dropdown when an outside click occurs
 		setShowDropdown(false);
 	});
+
+	const userLinks: LinksInfo[] = [
+		{ name: "profile", label: "Profile", route: "/profile" },
+		{ name: "entries", label: "Entries", route: "/entries" },
+		{ name: "friends", label: "Friends", route: "/friends" },
+	];
 
 	const handleLogout = async () => {
 		setShowDropdown(false);
@@ -77,11 +88,6 @@ const Navbar = () => {
 			onComplete: () => setShowMenuDropDown(false),
 		});
 	};
-
-	// const handleDropdownItemsClick = (route: string) => {
-	// 	setShowDropdown(false);
-	// 	navigate(route);
-	// };
 
 	useEffect(() => {
 		if (showMenu) {
@@ -140,56 +146,68 @@ const Navbar = () => {
 					<div className="flex-1 space-x-3">
 						<Link to="/">Home</Link>
 						<Link to="/about">About</Link>
-					</div>
-					<div className="flex items-center space-x-3">
-						{isAuthenticated && user ? (
-							<div className="relative" ref={dropdownRef}>
-								<button
-									className="block cursor-pointer"
-									onClick={() => setShowDropdown((prev) => !prev)}
-								>
-									<div className="flex items-center">
-										<FontAwesomeIcon icon="user" size="lg" />
-										<span className="ms-2 me-1">{user.username}</span>
-										<FontAwesomeIcon icon="caret-down" size="xs" />
-									</div>
-								</button>
-								{showDropdown && (
-									<div className="absolute font-medium border border-gray-300 bg-white rounded-lg min-w-40 text-gray-700 shadow-lg right-0 mt-2 overflow-hidden">
-										<Link
-											to="/profile"
-											className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
-											onClick={() => setShowDropdown(false)}
-										>
-											My Profile
-										</Link>
-										<Link
-											to="/entries"
-											className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
-											onClick={() => setShowDropdown(false)}
-										>
-											My Entries
-										</Link>
 
-										{hasRole("admin") && (
-											<Link
-												to="/admin"
-												className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
-												onClick={() => setShowDropdown(false)}
-											>
-												Admin Dashboard
-											</Link>
-										)}
-
-										<button
-											className="w-full text-right px-3 py-2 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
-											onClick={handleLogout}
-										>
-											Logout
-										</button>
-									</div>
+						{isAuthenticated && user && (
+							<>
+								{hasRole("admin") && (
+									<Link
+										to="/admin"
+										className=""
+										onClick={() => setShowDropdown(false)}
+									>
+										Admin Page
+									</Link>
 								)}
-							</div>
+							</>
+						)}
+					</div>
+					<div className="flex items-center space-x-4">
+						{isAuthenticated && user ? (
+							<>
+								<div className="relative">
+									<Link
+										to="/notifications"
+										className="hover:text-gray-200"
+									>
+										<FontAwesomeIcon icon="bell" size="lg" />
+										<div className="bg-red-500 rounded-full w-2 h-2 absolute top-0.5 -right-0.5"></div>
+									</Link>
+								</div>
+								<div className="relative" ref={dropdownRef}>
+									<button
+										className="block cursor-pointer "
+										onClick={() => setShowDropdown((prev) => !prev)}
+									>
+										<div className="bg-gray-700 border rounded overflow-hidden px-2 space-x-1.5">
+											<span className="font-semibold">
+												{user.username}
+											</span>
+											<FontAwesomeIcon icon="caret-down" />
+										</div>
+									</button>
+									{showDropdown && (
+										<div className="absolute font-medium border border-gray-300 bg-white rounded-lg min-w-40 text-gray-700 shadow-lg right-0 mt-2 overflow-hidden">
+											{userLinks.map((link) => (
+												<Link
+													key={link.name}
+													to={link.route}
+													className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
+													onClick={() => setShowDropdown(false)}
+												>
+													{link.label}
+												</Link>
+											))}
+
+											<button
+												className="w-full text-right px-3 py-2 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
+												onClick={handleLogout}
+											>
+												Logout
+											</button>
+										</div>
+									)}
+								</div>
+							</>
 						) : (
 							<>
 								<Link to="/register">Register</Link>
@@ -199,12 +217,23 @@ const Navbar = () => {
 					</div>
 				</div>
 
-				<button
-					className="md:hidden cursor-pointer text-white border rounded font-bold px-2"
-					onClick={handleMenuOptionsClick}
-				>
-					<FontAwesomeIcon icon={showMenu ? "xmark" : "bars"} />
-				</button>
+				<div className="md:hidden flex space-x-4 items-center">
+					{isAuthenticated && user && (
+						<div className="relative text-white">
+							<Link to="/notifications" className="hover:text-gray-200">
+								<FontAwesomeIcon icon="bell" size="lg" />
+								<div className="bg-red-500 rounded-full w-2 h-2 absolute top-0.5 -right-0.5"></div>
+							</Link>
+						</div>
+					)}
+
+					<button
+						className="cursor-pointer text-white border rounded font-bold px-2"
+						onClick={handleMenuOptionsClick}
+					>
+						<FontAwesomeIcon icon={showMenu ? "xmark" : "bars"} />
+					</button>
+				</div>
 
 				{showMenu && (
 					<div className="fixed w-full h-[calc(100dvh-57px)] bottom-0 end-0">
@@ -231,6 +260,15 @@ const Navbar = () => {
 
 							{isAuthenticated ? (
 								<>
+									{hasRole("admin") && (
+										<button
+											className="border-b p-2 w-full text-left"
+											onClick={() => handleMenuClick("/admin")}
+										>
+											Admin Page
+										</button>
+									)}
+
 									<button
 										className="border-b p-2 w-full text-left flex items-center gap-x-2"
 										onClick={handleDropdownMenuClick}
@@ -257,27 +295,17 @@ const Navbar = () => {
 											ref={dropdownMenuRef}
 											className="overflow-hidden bg-gray-500"
 										>
-											<button
-												className="border-b p-2 w-full text-left"
-												onClick={() => handleMenuClick("/profile")}
-											>
-												My Profile
-											</button>
-											<button
-												className="border-b p-2 w-full text-left"
-												onClick={() => handleMenuClick("/entries")}
-											>
-												My Entries
-											</button>
-
-											{hasRole("admin") && (
+											{userLinks.map((link) => (
 												<button
+													key={link.name}
 													className="border-b p-2 w-full text-left"
-													onClick={() => handleMenuClick("/admin")}
+													onClick={() =>
+														handleMenuClick(link.route)
+													}
 												>
-													Admin Dashboard
+													{link.label}
 												</button>
-											)}
+											))}
 
 											<button
 												className="border-b p-2 w-full text-left"

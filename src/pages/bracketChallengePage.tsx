@@ -14,11 +14,13 @@ import Detail from "../components/detail";
 import { Link } from "react-router-dom";
 import LoadAuth from "../components/auth/loadAuth";
 import EndOfPage from "../components/endOfPage";
+import Leaderboard from "../components/bracket/leaderboard";
 
 interface BracketResponse {
 	message: string;
 	bracketChallenge: BracketChallengeInfo;
-	bracketEntrySlug: string;
+	bracketEntrySlug: string | null;
+	showLeaderboard: boolean;
 }
 const BracketChallengePage = () => {
 	const { isAuthenticated, authLoading } = useAuth();
@@ -29,7 +31,8 @@ const BracketChallengePage = () => {
 		useState<BracketChallengeInfo | null>(null);
 
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const [entrySlug, setEntrySlug] = useState<string>("");
+	const [entrySlug, setEntrySlug] = useState<string | null>(null);
+	const [showLeaderboard, setShowLeaderboard] = useState<boolean>(true);
 
 	useEffect(() => {
 		//fetch bracket challenge..
@@ -41,6 +44,7 @@ const BracketChallengePage = () => {
 				);
 				setBracketChallenge(response.data.bracketChallenge);
 				setEntrySlug(response.data.bracketEntrySlug);
+				setShowLeaderboard(response.data.showLeaderboard);
 			} catch (error) {
 				console.error(error);
 			} finally {
@@ -84,7 +88,7 @@ const BracketChallengePage = () => {
 							<hr className="my-3 border-gray-400" />
 
 							{isAuthenticated ? (
-								entrySlug !== "" && (
+								entrySlug && (
 									<div className="py-1 px-4 py-2 rounded mb-3 bg-rose-600 font-semibold sm:flex items-center justify-between space-y-2 sm:space-y-0">
 										<div className="text-white">
 											You have an entry for this bracket challenge.
@@ -124,15 +128,25 @@ const BracketChallengePage = () => {
 								</div>
 							)}
 
-							{/* preview */}
+							{/* bracket */}
 							<div>
 								<BracketProvider
 									bracketChallenge={bracketChallenge}
-									bracketMode={entrySlug !== "" ? "preview" : "submit"}
+									bracketMode={entrySlug ? "preview" : "submit"}
 								>
 									<Bracket />
 								</BracketProvider>
 							</div>
+							{/* entry list */}
+
+							{showLeaderboard && (
+								<>
+									<hr className="my-3 border-gray-400" />
+									<Leaderboard
+										bracketChallengeId={bracketChallenge.id}
+									/>
+								</>
+							)}
 						</div>
 					</>
 				) : (

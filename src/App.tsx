@@ -64,7 +64,10 @@ import {
 	faStar,
 	faAsterisk,
 	faRotateRight,
+	faBell,
 } from "@fortawesome/free-solid-svg-icons";
+import FriendsList from "./pages/user/friends";
+import NotificationsList from "./pages/user/notifications";
 
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 
@@ -87,7 +90,8 @@ library.add(
 	faCaretRight,
 	faStar,
 	faAsterisk,
-	faRotateRight
+	faRotateRight,
+	faBell
 );
 
 function App() {
@@ -139,6 +143,7 @@ function App() {
 								path="/forgot-password"
 								element={<ForgotPassword />}
 							/>
+
 							<Route
 								path="/reset-password"
 								element={<ResetPassword />}
@@ -150,6 +155,11 @@ function App() {
 						<Route element={<ProtectedRoute />}>
 							<Route path="/profile" element={<ProfilePage />} />
 							<Route path="/entries" element={<BracketEntriesList />} />
+							<Route path="/friends" element={<FriendsList />} />
+							<Route
+								path="/notifications"
+								element={<NotificationsList />}
+							/>
 
 							<Route element={<ProtectedRoute requiredRoles="admin" />}>
 								<Route path="/admin" element={<AdminDashboard />} />
