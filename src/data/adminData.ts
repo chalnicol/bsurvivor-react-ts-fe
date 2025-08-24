@@ -245,6 +245,7 @@ export interface NotificationInfo {
 		sender_id: number;
 		sender_name: string;
 		message: string;
+		url: string;
 	};
 	read_at: string | null;
 	created_at: string;

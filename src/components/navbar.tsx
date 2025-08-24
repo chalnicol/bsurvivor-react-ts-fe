@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 // import Dropdown from "./dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import NotificationLink from "./NotificationLink";
 
 interface LinksInfo {
 	name: string;
@@ -16,7 +17,15 @@ const Navbar = () => {
 	const [showMenu, setShowMenu] = useState<boolean>(false);
 	const [showMenuDropDown, setShowMenuDropDown] = useState<boolean>(false);
 
-	const { user, isAuthenticated, hasRole, logout } = useAuth();
+	const {
+		user,
+		isAuthenticated,
+		hasRole,
+		logout,
+		fetchUnreadCount,
+		updateUnreadCount,
+		unreadCount,
+	} = useAuth();
 
 	const navigate = useNavigate();
 
@@ -135,6 +144,21 @@ const Navbar = () => {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (!user) return;
+
+		fetchUnreadCount();
+
+		window.Echo.private(`users.${user.id}`).notification(
+			(unreadCount: number) => {
+				updateUnreadCount(unreadCount);
+			}
+		);
+		return () => {
+			window.Echo.leaveChannel(`users.${user.id}`);
+		};
+	}, [user]);
+
 	return (
 		<nav className="bg-gray-800 border-b border-gray-600 h-14 sticky top-0 z-20">
 			<div className="max-w-7xl mx-auto flex justify-between items-center gap-x-6 h-full px-4">
@@ -146,33 +170,12 @@ const Navbar = () => {
 					<div className="flex-1 space-x-3">
 						<Link to="/">Home</Link>
 						<Link to="/about">About</Link>
-
-						{isAuthenticated && user && (
-							<>
-								{hasRole("admin") && (
-									<Link
-										to="/admin"
-										className=""
-										onClick={() => setShowDropdown(false)}
-									>
-										Admin Page
-									</Link>
-								)}
-							</>
-						)}
 					</div>
-					<div className="flex items-center space-x-4">
+					<div className="flex items-center space-x-5">
 						{isAuthenticated && user ? (
 							<>
-								<div className="relative">
-									<Link
-										to="/notifications"
-										className="hover:text-gray-200"
-									>
-										<FontAwesomeIcon icon="bell" size="lg" />
-										<div className="bg-red-500 rounded-full w-2 h-2 absolute top-0.5 -right-0.5"></div>
-									</Link>
-								</div>
+								<NotificationLink unreadCount={unreadCount} />
+
 								<div className="relative" ref={dropdownRef}>
 									<button
 										className="block cursor-pointer "
@@ -197,6 +200,15 @@ const Navbar = () => {
 													{link.label}
 												</Link>
 											))}
+											{hasRole("admin") && (
+												<Link
+													to="/admin"
+													className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
+													onClick={() => setShowDropdown(false)}
+												>
+													Admin Page
+												</Link>
+											)}
 
 											<button
 												className="w-full text-right px-3 py-2 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
@@ -219,12 +231,10 @@ const Navbar = () => {
 
 				<div className="md:hidden flex space-x-4 items-center">
 					{isAuthenticated && user && (
-						<div className="relative text-white">
-							<Link to="/notifications" className="hover:text-gray-200">
-								<FontAwesomeIcon icon="bell" size="lg" />
-								<div className="bg-red-500 rounded-full w-2 h-2 absolute top-0.5 -right-0.5"></div>
-							</Link>
-						</div>
+						<NotificationLink
+							unreadCount={unreadCount}
+							className="text-white"
+						/>
 					)}
 
 					<button
@@ -260,15 +270,6 @@ const Navbar = () => {
 
 							{isAuthenticated ? (
 								<>
-									{hasRole("admin") && (
-										<button
-											className="border-b p-2 w-full text-left"
-											onClick={() => handleMenuClick("/admin")}
-										>
-											Admin Page
-										</button>
-									)}
-
 									<button
 										className="border-b p-2 w-full text-left flex items-center gap-x-2"
 										onClick={handleDropdownMenuClick}
@@ -293,7 +294,7 @@ const Navbar = () => {
 									{showMenuDropDown && (
 										<div
 											ref={dropdownMenuRef}
-											className="overflow-hidden bg-gray-500"
+											className="overflow-hidden bg-gray-600"
 										>
 											{userLinks.map((link) => (
 												<button
@@ -306,6 +307,15 @@ const Navbar = () => {
 													{link.label}
 												</button>
 											))}
+
+											{hasRole("admin") && (
+												<button
+													className="border-b p-2 w-full text-left"
+													onClick={() => handleMenuClick("/admin")}
+												>
+													Admin Page
+												</button>
+											)}
 
 											<button
 												className="border-b p-2 w-full text-left"

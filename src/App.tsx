@@ -65,6 +65,8 @@ import {
 	faAsterisk,
 	faRotateRight,
 	faBell,
+	faTrash,
+	faCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import FriendsList from "./pages/user/friends";
 import NotificationsList from "./pages/user/notifications";
@@ -91,7 +93,9 @@ library.add(
 	faStar,
 	faAsterisk,
 	faRotateRight,
-	faBell
+	faBell,
+	faTrash,
+	faCircle
 );
 
 function App() {

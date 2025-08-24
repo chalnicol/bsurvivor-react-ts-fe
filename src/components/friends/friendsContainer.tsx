@@ -3,32 +3,32 @@ import type { UserMiniInfo } from "../../data/adminData";
 
 interface FriendsContainerProps {
 	label: string;
-	btnLabel: string;
-	btnAction: "remove" | "add" | "cancel" | "accept";
+	buttons: string[];
 	friends: UserMiniInfo[];
 	isLoading: boolean;
 	onClick: (action: string, user_id: number) => void;
 }
 const FriendsContainer = ({
 	label,
-	btnLabel,
-	btnAction,
+	buttons,
 	friends,
 	isLoading,
 	onClick,
 }: FriendsContainerProps) => {
-	const btnClass = (): string => {
-		switch (btnAction) {
+	const btnClass = (btn: string): string => {
+		switch (btn) {
 			case "remove":
-				return "bg-red-500 hover:bg-red-500";
+				return "bg-red-500 hover:bg-red-400";
 			case "add":
-				return "bg-blue-500 hover:bg-blue-500";
+				return "bg-blue-500 hover:bg-blue-400";
 			case "cancel":
-				return "bg-amber-500 hover:bg-amber-500";
+				return "bg-amber-500 hover:bg-amber-400";
 			case "accept":
-				return "bg-green-500 hover:bg-green-500";
+				return "bg-green-500 hover:bg-green-400";
+			case "reject":
+				return "bg-red-500 hover:bg-red-400";
 			default:
-				return "bg-gray-500 hover:bg-gray-500";
+				return "bg-gray-500 hover:bg-gray-400";
 		}
 	};
 
@@ -48,18 +48,25 @@ const FriendsContainer = ({
 								<p>
 									<FontAwesomeIcon icon="user" /> {friend.username}
 								</p>
-								<button
-									className={`cursor-pointer  text-white text-xs px-2 py-0.5 rounded font-bold ${btnClass()}`}
-									onClick={() => onClick(btnAction, friend.id)}
-								>
-									{btnLabel}
-								</button>
+								<div className="space-x-1">
+									{buttons.map((btn) => (
+										<button
+											key={btn}
+											className={`cursor-pointer  text-white text-xs px-2 py-0.5 rounded font-bold ${btnClass(
+												btn
+											)}`}
+											onClick={() => onClick(btn, friend.id)}
+										>
+											{btn.toUpperCase()}
+										</button>
+									))}
+								</div>
 							</li>
 						))}
 					</ul>
 				) : (
 					<p className="p-2 bg-gray-500 text-white">
-						{isLoading ? `Fetching ${label} ` : `No ${label} to display`}
+						{isLoading ? `Fetching ${label} ` : `No ${label} found.`}
 					</p>
 				)}
 			</div>

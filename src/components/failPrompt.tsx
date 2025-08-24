@@ -5,7 +5,7 @@ interface FailPromptProps {
 }
 const FailPrompt = ({ message }: FailPromptProps) => {
 	return (
-		<div className="bg-gray-300 rounded h-34 flex flex-col justify-center items-center space-y-3">
+		<div className="bg-gray-700 text-white rounded h-34 flex flex-col justify-center items-center space-y-3">
 			<div className="font-medium">{message}</div>
 			<Link
 				to="/"

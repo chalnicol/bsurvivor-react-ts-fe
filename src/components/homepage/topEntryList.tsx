@@ -15,18 +15,20 @@ const TopEntryList = ({ bracketChallenge }: topEntryListProps) => {
 		<div className="overflow-hidden border border-gray-500 rounded">
 			<div className="min-w-[350px]">
 				<div
-					className={`px-3 py-1 text-lg font-bold text-white flex items-center justify-between shadow ${
+					className={`px-3 py-2 text-white flex items-center shadow ${
 						bracketChallenge.league == "NBA"
 							? "bg-red-700"
 							: "bg-blue-700"
 					}`}
 				>
-					<h1>{bracketChallenge.name}</h1>
+					<p className="text-xs py-0.5 text-white bg-black/30 px-2">
+						Bracket Challenge{" "}
+					</p>
 					<Link
 						to={`/bracket-challenges/${bracketChallenge.slug}`}
-						className="border rounded text-white text-sm px-3 hover:bg-white/20"
+						className="text-white text-sm px-3 hover:bg-white/20 font-semibold"
 					>
-						VIEW
+						{bracketChallenge.name}
 					</Link>
 				</div>
 				<div className="px-3 py-2 bg-gray-800 ">
@@ -56,10 +58,14 @@ const TopEntryList = ({ bracketChallenge }: topEntryListProps) => {
 								</Link>
 							))}
 						</>
-					) : isLoading ? (
-						<p>Loading...</p>
 					) : (
-						<p>No entries found.</p>
+						<>
+							<p className="text-white px-2 py-1">
+								{isLoading
+									? "Loading..."
+									: "No entries submittted for this challenge."}
+							</p>
+						</>
 					)}
 				</div>
 			</div>

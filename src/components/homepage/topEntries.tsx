@@ -20,7 +20,7 @@ const TopEntries = () => {
 	return (
 		<div className="mb-12">
 			<h2 className="text-lg font-bold">
-				<FontAwesomeIcon icon="caret-right" /> Ongoing Bracket Challenges
+				<FontAwesomeIcon icon="caret-right" /> Top Challenge Entries
 			</h2>
 			{/* <p className="text-sm my-1">
 				This is the list of ongoing bracket challenges.

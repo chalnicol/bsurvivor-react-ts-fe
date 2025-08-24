@@ -60,7 +60,6 @@ const ListTeams = () => {
 		try {
 			await apiClient.delete(`/admin/teams/${toDelete.id}`);
 			setTeams((prev) => prev.filter((team) => team.id !== toDelete.id));
-			setToDelete(null);
 			setSuccess("Team deleted successfully!");
 			if (meta) {
 				const newTotal = teams.length - 1;
@@ -73,6 +72,9 @@ const ListTeams = () => {
 		} catch (error) {
 			console.error("Error deleting Bracket Challenge:", error);
 			setError("Error deleting Bracket Challenge.");
+		} finally {
+			setIsLoading(false);
+			setToDelete(null);
 		}
 	};
 

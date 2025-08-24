@@ -71,7 +71,6 @@ const ListBracketChallengeEntries = () => {
 			setBracketChallengeEntries((prev) =>
 				prev.filter((entry) => entry.id !== toDelete.id)
 			);
-			setToDelete(null);
 			setSuccess("Bracket Challenge Entry deleted successfully");
 			if (meta) {
 				const newTotal = bracketChallengeEntries.length - 1;

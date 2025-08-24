@@ -67,7 +67,6 @@ const ListBracketChallenges = () => {
 				prev.filter((c) => c.id !== toDelete.id)
 			);
 			setSuccess("Bracket Challenge deleted successfully");
-			setToDelete(null);
 			if (meta) {
 				const newTotal = bracketChallenges.length - 1;
 				if (newTotal === 0 && meta.current_page > 1) {
@@ -79,6 +78,9 @@ const ListBracketChallenges = () => {
 		} catch (error) {
 			console.error("Error deleting Bracket Challenge:", error);
 			setError("Error deleting Bracket Challenge");
+		} finally {
+			setToDelete(null);
+			setIsLoading(false);
 		}
 	};
 

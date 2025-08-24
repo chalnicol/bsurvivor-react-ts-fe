@@ -210,7 +210,7 @@ const FriendsList = () => {
 					</span>
 				</p>
 				<button
-					className="text-xs bg-sky-500 hover:bg-sky-400 cursor-pointer text-white px-2 py-1 rounded font-semibold mt-2"
+					className="text-xs bg-sky-500 hover:bg-sky-400 cursor-pointer text-white px-2 py-1 rounded font-semibold mt-2 mb-2"
 					onClick={fetchFriends}
 				>
 					REFRESH LIST
@@ -231,42 +231,39 @@ const FriendsList = () => {
 					/>
 				)}
 
-				<div className="w-full lg:flex space-y-4 lg:space-y-0 mt-4 gap-x-6">
-					<div className="space-y-4 flex-2">
+				<div className="w-full lg:flex space-y-4 lg:space-y-0 mt-2 gap-x-4">
+					<div className="space-y-4 flex-1 xl:flex-2">
 						{/* active friends */}
 
 						<FriendsContainer
 							label="Friend Request Sent"
-							btnLabel="CANCEL"
-							btnAction="cancel"
+							buttons={["cancel"]}
 							onClick={friendQuery}
 							isLoading={isLoading}
 							friends={friends?.pending_friends || []}
 						/>
 						<FriendsContainer
 							label="Friend Request Received"
-							btnLabel="ACCEPT"
-							btnAction="accept"
+							buttons={["accept", "reject"]}
 							onClick={friendQuery}
 							isLoading={isLoading}
 							friends={friends?.to_accept_friends || []}
 						/>
 						<FriendsContainer
 							label="Active Friends"
-							btnLabel="REMOVE"
-							btnAction="remove"
+							buttons={["remove"]}
 							onClick={friendQuery}
 							isLoading={isLoading}
 							friends={friends?.active_friends || []}
 						/>
-						<FriendsContainer
+						{/* <FriendsContainer
 							label="Blocked Friends"
 							btnLabel="ADD FRIEND"
 							btnAction="add"
 							onClick={friendQuery}
 							isLoading={isLoading}
 							friends={[]}
-						/>
+						/> */}
 					</div>
 					{/* add friends */}
 					<div className="flex-1">
@@ -282,7 +279,7 @@ const FriendsList = () => {
 									className="px-2 py-1 font-medium border-gray-300 text-white border-b w-full focus:outline-none"
 									placeholder="Search users here..."
 								/>
-								<div className="border mt-3 border-gray-400/70 bg-gray-500/50 h-33 overflow-y-auto">
+								<div className="border  mt-3 border-gray-400/70 bg-gray-800 h-17 overflow-y-auto">
 									{modifiedSearchedUsers.length > 0 ? (
 										<>
 											{modifiedSearchedUsers.map((user) => (
@@ -299,7 +296,7 @@ const FriendsList = () => {
 											))}
 										</>
 									) : (
-										<p className="px-3 py-2 h-full text-white bg-gray-500">
+										<p className="px-3 py-2 h-full text-white ">
 											{isLoading
 												? "Loading..."
 												: "No users to display."}

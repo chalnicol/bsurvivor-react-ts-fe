@@ -18,6 +18,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [profileWindow, setProfileWindow] = useState<ProfileWindow>(null);
 	const [toVerifyEmail, setToVerifyEmail] = useState<string | null>(null);
+	const [unreadCount, setUnreadCount] = useState<number>(0);
 
 	// Function to fetch user data if a token exists (on app load/refresh)
 
@@ -40,8 +41,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	};
 
 	useEffect(() => {
-		fetchUser();
-	}, [user]);
+		const getTokenAndFetchUser = async () => {
+			await getCsrfToken();
+			fetchUser();
+		};
+		getTokenAndFetchUser();
+	}, []);
+
+	const fetchUnreadCount = async () => {
+		try {
+			const response = await apiClient.get("/get-unread-count");
+			setUnreadCount(response.data.count);
+		} catch (error) {
+			console.error("Failed to fetch unread notification count:", error);
+		}
+	};
+
+	const updateUnreadCount = (value: "increment" | "decrement" | number) => {
+		setUnreadCount((prevCount) => {
+			if (typeof value === "number") {
+				return value;
+			} else if (typeof value === "string") {
+				if (value === "increment") {
+					return prevCount + 1;
+				} else if (value === "decrement") {
+					return prevCount - 1;
+				}
+			}
+			return prevCount;
+		});
+	};
 
 	const processErrors = (error: any, errorMessage?: string) => {
 		if (error.type === "validation") {
@@ -66,7 +95,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setMessage(null);
 		setFieldErrors({});
 		try {
-			await getCsrfToken();
+			// await getCsrfToken();
 			const response = await apiClient.post("/login", { email, password });
 			setUser(response.data.user);
 			setIsAuthenticated(true);
@@ -116,7 +145,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	): Promise<boolean> => {
 		setIsLoading(true);
 		try {
-			await getCsrfToken();
+			// await getCsrfToken();
 			const response = await apiClient.post("/email/verify", {
 				email,
 				token,
@@ -352,6 +381,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setUser(updatedUser);
 	};
 
+	// const fetchNotifications = async (page: number): Promise<boolean> => {
+	// 	setIsLoading(true);
+	// 	try {
+	// 		const response = await apiClient.get(
+	// 			`/get-notifications?page=${page}`
+	// 		);
+	// 		setNotifications(response.data.data);
+	// 		return true;
+	// 	} catch (error: any) {
+	// 		console.error(error);
+	// 		return false;
+	// 	} finally {
+	// 		setIsLoading(false);
+	// 	}
+	// };
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -363,6 +408,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				isAuthenticated,
 				profileWindow,
 				toVerifyEmail,
+				unreadCount,
+				fetchUnreadCount,
+				updateUnreadCount,
 				verifyEmail,
 				sendVerificationEmail,
 				login,

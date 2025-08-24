@@ -30,8 +30,8 @@ const BracketChallengeActiveList = () => {
 					<button
 						className={`font-bold text-xs px-2 py-0.5 block rounded text-white ${
 							isLoading
-								? "bg-amber-500 opacity-70"
-								: "bg-amber-600 hover:bg-amber-500 cursor-pointer"
+								? "bg-amber-300 opacity-70"
+								: "bg-amber-500 hover:bg-amber-400 cursor-pointer"
 						}`}
 						onClick={() => fetchBracketChallenges("active")}
 						disabled={isLoading}

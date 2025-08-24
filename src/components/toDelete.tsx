@@ -72,8 +72,11 @@ const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
 			className="px-3 py-2 rounded border border-gray-300 shadow mt-2 text-sm bg-amber-200 md:flex items-center justify-between space-y-2 md:space-y-0"
 		>
 			<p className="">
-				Are you sure you want to delete "{name}
-				"?
+				{name !== "" ? (
+					<>Are you sure you want to delete "{name}"?</>
+				) : (
+					"Are you sure you want to delete?"
+				)}
 			</p>
 			<div className="flex-none space-x-1 font-bold">
 				<button
