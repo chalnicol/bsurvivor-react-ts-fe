@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import ContentBase from "../contentBase";
-import ErrorDisplay from "../errorDisplay";
 import LoadAuth from "./loadAuth";
 
 const Login = () => {
@@ -14,8 +13,8 @@ const Login = () => {
 		isAuthenticated,
 		isLoading,
 		error,
-		fieldErrors,
 		login,
+		sendVerificationEmail,
 		clearMessages,
 	} = useAuth();
 	const navigate = useNavigate();
@@ -27,6 +26,13 @@ const Login = () => {
 		e.preventDefault();
 		const success = await login(email, password);
 		if (success) navigate(from, { replace: true });
+	};
+
+	const handleVerifyEmail = async () => {
+		const response = await sendVerificationEmail();
+		if (response) {
+			navigate("/email-verification-notice");
+		}
 	};
 
 	useEffect(() => {
@@ -64,11 +70,9 @@ const Login = () => {
 							value={email}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							onChange={(e) => setEmail(e.target.value)}
+							disabled={isLoading}
 							required
 						/>
-						{fieldErrors?.email && (
-							<ErrorDisplay errors={fieldErrors.email} />
-						)}
 					</div>
 					<div className="mb-6">
 						<label
@@ -83,6 +87,7 @@ const Login = () => {
 							value={password}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 							onChange={(e) => setPassword(e.target.value)}
+							disabled={isLoading}
 							required
 						/>
 					</div>
@@ -98,7 +103,22 @@ const Login = () => {
 						LOGIN
 					</button>
 				</form>
-				{error && <p className="my-3 text-red-500">{error}</p>}
+				{error && (
+					<div>
+						<p className="my-3 text-red-500">
+							{error}
+							{error === "Please verify your email to log in." && (
+								<button
+									type="button"
+									className="text-sm	text-gray-700 bg-red-700 hover:bg-red-600 cursor-pointer text-white font-bold px-2 ms-2 rounded"
+									onClick={handleVerifyEmail}
+								>
+									VERIFY EMAIL
+								</button>
+							)}
+						</p>
+					</div>
+				)}
 
 				<div className="mt-3">
 					{isLoading ? (

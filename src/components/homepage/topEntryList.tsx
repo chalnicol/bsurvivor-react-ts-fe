@@ -1,5 +1,5 @@
 import type { BracketChallengeInfo } from "../../data/adminData";
-import { useAdmin } from "../../context/admin/AdminProvider";
+// import { useAdmin } from "../../context/admin/AdminProvider";
 import { Link } from "react-router-dom";
 import StatusPills from "../statusPills";
 import Detail from "../detail";
@@ -9,7 +9,7 @@ interface topEntryListProps {
 }
 
 const TopEntryList = ({ bracketChallenge }: topEntryListProps) => {
-	const { isLoading } = useAdmin();
+	// const { isLoading } = useAdmin();
 
 	return (
 		<div className="overflow-hidden border border-gray-500 rounded">
@@ -61,9 +61,7 @@ const TopEntryList = ({ bracketChallenge }: topEntryListProps) => {
 					) : (
 						<>
 							<p className="text-white px-2 py-1">
-								{isLoading
-									? "Loading..."
-									: "No entries submittted for this challenge."}
+								No entries submittted for this challenge.
 							</p>
 						</>
 					)}

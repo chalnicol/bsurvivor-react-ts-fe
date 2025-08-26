@@ -49,7 +49,7 @@ const FriendsList = () => {
 
 	const fetchFriends = async () => {
 		setIsLoading(true);
-		setFriends(null);
+		// setFriends(null);
 		try {
 			const response = await apiClient.get("/get-friends");
 			setFriends(response.data.friends);
@@ -210,7 +210,7 @@ const FriendsList = () => {
 					</span>
 				</p>
 				<button
-					className="text-xs bg-sky-500 hover:bg-sky-400 cursor-pointer text-white px-2 py-1 rounded font-semibold mt-2 mb-2"
+					className="text-xs bg-sky-500 hover:bg-sky-400 cursor-pointer text-white px-2 py-0.5 rounded font-semibold mt-2 mb-2"
 					onClick={fetchFriends}
 				>
 					REFRESH LIST

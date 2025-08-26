@@ -13,7 +13,7 @@ const ProtectedRoute = ({
 	requiredRoles,
 	requiredPermissions,
 }: ProtectedRouteProps) => {
-	const { authLoading, isAuthenticated, toVerifyEmail, hasRole, can } =
+	const { authLoading, isAuthenticated, isToVerifyEmail, hasRole, can } =
 		useAuth();
 	const location = useLocation();
 
@@ -22,7 +22,7 @@ const ProtectedRoute = ({
 		return <LoadAuth />;
 	}
 
-	if (toVerifyEmail) {
+	if (isToVerifyEmail) {
 		return <Navigate to="/email-verification-notice" replace />;
 	}
 

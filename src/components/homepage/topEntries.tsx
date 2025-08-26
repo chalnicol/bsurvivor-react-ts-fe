@@ -5,29 +5,41 @@ import { useEffect } from "react";
 
 const TopEntries = () => {
 	const {
+		isLoading,
 		fetchBracketChallenges,
 		ongoingChallenges,
 		isOngoingLoading,
-		isOngoingChallengesPopulated,
+		ongoingChallengesFetched,
 	} = useAdmin();
 
 	useEffect(() => {
-		if (!isOngoingChallengesPopulated) {
+		if (!ongoingChallengesFetched) {
 			fetchBracketChallenges("ongoing");
 		}
-	}, [isOngoingChallengesPopulated]);
+	}, [ongoingChallengesFetched]);
 
 	return (
 		<div className="mb-12">
-			<h2 className="text-lg font-bold">
+			<h3 className="font-bold text-xl">
 				<FontAwesomeIcon icon="caret-right" /> Top Challenge Entries
-			</h2>
-			{/* <p className="text-sm my-1">
+			</h3>
+
+			<p className="text-sm">
 				This is the list of ongoing bracket challenges.
-			</p> */}
-			<hr className="my-2 border-gray-400" />
+			</p>
+			<button
+				className={`font-bold text-xs px-2 py-0.5 block rounded text-white mt-3 ${
+					isLoading
+						? "bg-amber-400 opacity-80"
+						: "bg-amber-500 hover:bg-amber-400 cursor-pointer"
+				}`}
+				onClick={() => fetchBracketChallenges("ongoing")}
+				disabled={isLoading}
+			>
+				REFRESH LIST
+			</button>
 			{ongoingChallenges.length > 0 ? (
-				<div className="space-y-6 mb-4">
+				<div className="space-y-6 mb-4 mt-2">
 					{ongoingChallenges.map((bracketChallenge) => (
 						<TopEntryList
 							key={bracketChallenge.id}
@@ -36,10 +48,10 @@ const TopEntries = () => {
 					))}
 				</div>
 			) : (
-				<div className="py-2 px-3 bg-gray-200">
+				<div className="py-2 px-3 bg-gray-200 mt-2">
 					{isOngoingLoading
-						? "Fetching ongoing bracket challenges..."
-						: "No ongoing bracket challenges to display."}
+						? "Fetching top entries..."
+						: "No top entries to display."}
 				</div>
 			)}
 		</div>

@@ -16,8 +16,8 @@ interface AdminContextType {
 	error: string | null;
 	isRolesPopulated: boolean;
 	areTeamsAndLeaguesPopulated: boolean;
-	isActiveChallengesPopulated: boolean;
-	isOngoingChallengesPopulated: boolean;
+	activeChallengesFetched: boolean;
+	ongoingChallengesFetched: boolean;
 	activeChallenges: BracketChallengeInfo[];
 	ongoingChallenges: BracketChallengeInfo[];
 	fetchRoles: () => Promise<void>;

@@ -1,4 +1,10 @@
-import React, { useContext, useState, useEffect, type ReactNode } from "react";
+import React, {
+	useContext,
+	useState,
+	useEffect,
+	type ReactNode,
+	use,
+} from "react";
 import { AuthContext, type User } from "./AuthContext";
 import { apiClient, getCsrfToken } from "../../utils/api"; // Import your configured axios instance
 import { type ProfileWindow } from "../../data/adminData";
@@ -17,8 +23,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [profileWindow, setProfileWindow] = useState<ProfileWindow>(null);
-	const [toVerifyEmail, setToVerifyEmail] = useState<string | null>(null);
 	const [unreadCount, setUnreadCount] = useState<number>(0);
+	const [isToVerifyEmail, setIsToVerifyEmail] = useState<boolean>(false);
 
 	// Function to fetch user data if a token exists (on app load/refresh)
 
@@ -41,11 +47,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	};
 
 	useEffect(() => {
-		const getTokenAndFetchUser = async () => {
-			await getCsrfToken();
-			fetchUser();
-		};
-		getTokenAndFetchUser();
+		// const fetchCsrfTokenAnduser = async () => {
+		// 	try {
+		// 		await getCsrfToken();
+		// 		fetchUser();
+		// 	} catch (error) {
+		// 		console.log(error);
+		// 	}
+		// };
+		// fetchCsrfTokenAnduser();
+		fetchUser();
 	}, []);
 
 	const fetchUnreadCount = async () => {
@@ -94,8 +105,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setError(null);
 		setMessage(null);
 		setFieldErrors({});
+
 		try {
-			// await getCsrfToken();
+			await getCsrfToken();
 			const response = await apiClient.post("/login", { email, password });
 			setUser(response.data.user);
 			setIsAuthenticated(true);
@@ -126,7 +138,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				password,
 				password_confirmation,
 			});
-			setToVerifyEmail(email);
 			setMessage(response.data.message || "Registration successful!");
 			setError(null);
 			setFieldErrors({});
@@ -145,15 +156,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	): Promise<boolean> => {
 		setIsLoading(true);
 		try {
-			// await getCsrfToken();
+			await getCsrfToken();
 			const response = await apiClient.post("/email/verify", {
 				email,
 				token,
 			});
+			console.log(response.data.message);
 			setUser(response.data.user);
 			setMessage(response.data.message || "Email verification successful!");
-			setToVerifyEmail("");
 			setIsAuthenticated(true);
+			setIsToVerifyEmail(false);
 			return true;
 		} catch (error: any) {
 			console.log(error);
@@ -179,28 +191,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			setError(null);
 			setFieldErrors({});
 			setProfileWindow(null);
-			setToVerifyEmail("");
 			setIsLoading(false);
 		}
 	};
 
 	//--- Verify Email Actions ---
 	const sendVerificationEmail = async (): Promise<boolean> => {
-		if (!toVerifyEmail) {
-			setError("No email provided for verification.");
-			return false;
-		}
-
 		setIsLoading(true);
 		setError(null);
 		setMessage(null);
 		try {
 			// Make a POST request to the Laravel endpoint to resend the email
 			const response = await apiClient.post(
-				"/email/verification-notification",
-				{
-					email: toVerifyEmail,
-				}
+				"/email/verification-notification"
 			);
 			setMessage(response.data.message || "Verification link sent!"); // Should be something like "Verification link sent!"
 			return true;
@@ -292,9 +295,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			const isEmailNew = response.data.is_email_new;
 			if (isEmailNew) {
 				localStorage.removeItem("token");
+				setIsToVerifyEmail(true);
 				setUser(null);
 				setIsAuthenticated(false);
-				setToVerifyEmail(email);
 				setMessage(
 					response.data.message ||
 						"Email has been updated. Please verify your new email."
@@ -407,8 +410,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				// token,
 				isAuthenticated,
 				profileWindow,
-				toVerifyEmail,
 				unreadCount,
+				isToVerifyEmail,
 				fetchUnreadCount,
 				updateUnreadCount,
 				verifyEmail,

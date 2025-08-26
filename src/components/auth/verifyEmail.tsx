@@ -4,8 +4,14 @@ import { useAuth } from "../../context/auth/AuthProvider";
 import ContentBase from "../contentBase";
 
 const VerifyEmail = () => {
-	const { message, error, isAuthenticated, verifyEmail, clearMessages } =
-		useAuth();
+	const {
+		message,
+		error,
+		isAuthenticated,
+		authLoading,
+		verifyEmail,
+		clearMessages,
+	} = useAuth();
 
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -24,19 +30,21 @@ const VerifyEmail = () => {
 		const params = new URLSearchParams(location.search);
 		const email = params.get("email");
 		const token = params.get("token");
-
-		if (!email || !token) {
-			setIsInvalid(true);
-			return;
-		}
-		const verify = async () => {
-			const success = await verifyEmail(email, token);
-			if (success) {
-				navigate(from, { replace: true });
+		if (!authLoading) {
+			if (!email || !token) {
+				setIsInvalid(true);
+				return;
 			}
-		};
-		verify();
-	}, [location, navigate]);
+			const verify = async () => {
+				const success = await verifyEmail(email, token);
+				if (success) {
+					// navigate(from, { replace: true });
+					console.log("successful email verification.. redirecting");
+				}
+			};
+			verify();
+		}
+	}, [location, navigate, authLoading]);
 
 	useEffect(() => {
 		if (isAuthenticated) {

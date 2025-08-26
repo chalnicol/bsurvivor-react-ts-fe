@@ -43,8 +43,13 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 	const areTeamsAndLeaguesPopulated =
 		nbaTeams.length > 0 && pbaTeams.length > 0 && leagues.length > 0;
 
-	const isActiveChallengesPopulated = activeChallenges.length > 0;
-	const isOngoingChallengesPopulated = ongoingChallenges.length > 0;
+	// const isActiveChallengesPopulated = activeChallenges.length > 0;
+	// const isOngoingChallengesPopulated = ongoingChallenges.length > 0;
+
+	const [activeChallengesFetched, setActiveChallengesFetched] =
+		useState(false);
+	const [ongoingChallengesFetched, setOngoingChallengesFetched] =
+		useState(false);
 
 	const fetchRoles = useCallback(async () => {
 		if (isRolesPopulated) return;
@@ -95,12 +100,16 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 				setOngoingChallenges([]);
 			}
 			try {
-				const response = await apiClient.get(`/bracket-challenges/${type}`);
+				const response = await apiClient.get(
+					`/get-bracket-challenges/${type}`
+				);
 				if (type == "active") {
 					setActiveChallenges(response.data.challenges);
+					setActiveChallengesFetched(true);
 				}
 				if (type == "ongoing") {
 					setOngoingChallenges(response.data.challenges);
+					setOngoingChallengesFetched(true);
 				}
 			} catch (error) {
 				console.error(error);
@@ -140,8 +149,8 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 				areTeamsAndLeaguesPopulated,
 				activeChallenges,
 				ongoingChallenges,
-				isActiveChallengesPopulated,
-				isOngoingChallengesPopulated,
+				activeChallengesFetched,
+				ongoingChallengesFetched,
 				fetchRoles,
 				fetchTeamsAndLeagues,
 				fetchBracketChallenges,

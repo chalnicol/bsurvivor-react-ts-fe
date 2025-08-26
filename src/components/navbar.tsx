@@ -146,14 +146,11 @@ const Navbar = () => {
 
 	useEffect(() => {
 		if (!user) return;
-
 		fetchUnreadCount();
-
-		window.Echo.private(`users.${user.id}`).notification(
-			(unreadCount: number) => {
-				updateUnreadCount(unreadCount);
-			}
-		);
+		window.Echo.private(`users.${user.id}`).notification((data: any) => {
+			console.log("unreadCount", data.unread_count);
+			updateUnreadCount(data.unread_count);
+		});
 		return () => {
 			window.Echo.leaveChannel(`users.${user.id}`);
 		};
@@ -169,7 +166,7 @@ const Navbar = () => {
 				<div className="hidden md:flex items-center text-white font-medium flex-1">
 					<div className="flex-1 space-x-3">
 						<Link to="/">Home</Link>
-						<Link to="/about">About</Link>
+						<Link to="/about">About Us</Link>
 					</div>
 					<div className="flex items-center space-x-5">
 						{isAuthenticated && user ? (
@@ -265,7 +262,7 @@ const Navbar = () => {
 								className="border-b p-2 w-full text-left"
 								onClick={() => handleMenuClick("/about")}
 							>
-								About
+								About Us
 							</button>
 
 							{isAuthenticated ? (

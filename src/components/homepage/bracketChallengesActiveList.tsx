@@ -9,41 +9,39 @@ const BracketChallengeActiveList = () => {
 	const {
 		activeChallenges,
 		isLoading,
-		isActiveChallengesPopulated,
+		activeChallengesFetched,
 		fetchBracketChallenges,
 	} = useAdmin();
 
 	useEffect(() => {
-		if (!isActiveChallengesPopulated) {
+		if (!activeChallengesFetched) {
 			fetchBracketChallenges("active");
 		}
-	}, [isActiveChallengesPopulated]);
+	}, [activeChallengesFetched]);
 
 	return (
 		<>
 			<div className="w-full">
-				<div className="sm:flex items-center gap-x-3 space-y-2">
-					<h3 className="font-bold text-xl mb-1">
-						<FontAwesomeIcon icon="caret-right" /> Active Bracket
-						Challenges
-					</h3>
-					<button
-						className={`font-bold text-xs px-2 py-0.5 block rounded text-white ${
-							isLoading
-								? "bg-amber-300 opacity-70"
-								: "bg-amber-500 hover:bg-amber-400 cursor-pointer"
-						}`}
-						onClick={() => fetchBracketChallenges("active")}
-						disabled={isLoading}
-					>
-						REFRESH LIST
-					</button>
-				</div>
-				{/* <p className="text-sm my-1">
+				<h3 className="font-bold text-xl">
+					<FontAwesomeIcon icon="caret-right" /> Active Bracket Challenges
+				</h3>
+				<p className="text-sm">
 					Take a look and submit your bracket challenge entry
-				</p> */}
-				<hr className="my-2 border-gray-400 text-gray-500" />
-				<div className="overflow-x-hidden">
+				</p>
+				<button
+					className={`font-bold text-xs px-2 py-0.5 block rounded text-white mt-3 ${
+						isLoading
+							? "bg-amber-400 opacity-80"
+							: "bg-amber-500 hover:bg-amber-400 cursor-pointer"
+					}`}
+					onClick={() => fetchBracketChallenges("active")}
+					disabled={isLoading}
+				>
+					REFRESH LIST
+				</button>
+
+				{/* <hr className="my-2 border-gray-400 text-gray-500" /> */}
+				<div className="overflow-x-hidden mt-2">
 					<div className="min-w-xl">
 						{activeChallenges.length > 0 ? (
 							<>
@@ -57,7 +55,15 @@ const BracketChallengeActiveList = () => {
 												{bracketChallenge.name}
 											</Detail>
 											<Detail label="League">
-												{bracketChallenge.league}
+												<span
+													className={`font-semibold px-1 ${
+														bracketChallenge.league == "NBA"
+															? "text-red-500"
+															: "text-blue-500"
+													}`}
+												>
+													{bracketChallenge.league}
+												</span>
 											</Detail>
 											<Detail label="Start Date">
 												{displayLocalDate(

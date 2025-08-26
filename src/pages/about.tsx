@@ -1,12 +1,23 @@
 import ContentBase from "../components/contentBase";
 import EndOfPage from "../components/endOfPage";
+import img from "../assets/about.jpg";
 
 const About = () => {
 	return (
 		<ContentBase className="p-4">
 			<div className="border border-gray-400 bg-gray-100 px-4 md:px-6 pt-5 pb-6 mt-3 mb-6 rounded-lg shadow">
-				<h1 className="text-3xl font-bold mb-3">About Page</h1>
-
+				{/* <h1 className="text-3xl font-bold mb-3">About Us Page</h1> */}
+				<div className="h-30 overflow-hidden rounded-lg flex items-center justify-center relative">
+					<img
+						src={img}
+						alt="about"
+						className="object-cover w-full mb-4"
+					/>
+					<div className="w-full h-full absolute bg-gray-900 opacity-50"></div>
+					<div className="absolute z-10 text-white text-3xl font-bold">
+						ABOUT US
+					</div>
+				</div>
 				<div className="bg-gray-800 text-white rounded px-6 py-6 pb-12 mt-4">
 					<p className="font-medium mb-5">
 						Welcome to the ultimate hub for basketball fanatics and

@@ -51,10 +51,10 @@ export interface AuthContextType {
 	sendVerificationEmail: () => Promise<boolean>;
 	verifyEmail: (email: string, token: string) => Promise<boolean>;
 	profileWindow: ProfileWindow;
-	toVerifyEmail: string | null;
 	fetchUnreadCount: () => Promise<void>;
 	updateUnreadCount: (method: "increment" | "decrement" | number) => void;
 	unreadCount: number;
+	isToVerifyEmail: boolean;
 }
 
 export const AuthContext = React.createContext<AuthContextType | undefined>(

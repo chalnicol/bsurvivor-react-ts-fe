@@ -69,7 +69,7 @@ import {
 	faCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import FriendsList from "./pages/user/friends";
-import NotificationsList from "./pages/user/notifications";
+import NotificationsList from "./pages/user/notificationsList";
 
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 

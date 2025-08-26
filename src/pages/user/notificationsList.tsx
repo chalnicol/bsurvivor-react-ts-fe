@@ -6,14 +6,17 @@ import apiClient from "../../utils/axiosConfig";
 import Pagination from "../../components/pagination";
 import EndOfPage from "../../components/endOfPage";
 import Loader from "../../components/loader";
-import { displayLocalDate } from "../../utils/dateTime";
 import StatusMessage from "../../components/statusMessage";
 import ToDelete from "../../components/toDelete";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
+import Notification from "../../components/notifications";
 
 const NotificationsList = () => {
-	const { user, updateUnreadCount } = useAuth();
+	const {
+		// user,
+		fetchUnreadCount,
+		updateUnreadCount,
+	} = useAuth();
 
 	const [notifications, setNotifications] = useState<NotificationInfo[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -23,8 +26,7 @@ const NotificationsList = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [toDelete, setToDelete] = useState<NotificationInfo | null>(null);
-	const [hasNewNotifications, setHasNewNotifications] =
-		useState<boolean>(false);
+	const [isActiveButton, setIsActiveButton] = useState<boolean>(false);
 	const [toView, setToView] = useState<string | null>(null);
 
 	const fetchNotifications = async (page: number) => {
@@ -36,7 +38,7 @@ const NotificationsList = () => {
 			setNotifications(response.data.data);
 			setMeta(response.data.meta);
 			setCurrentPage(page);
-			setHasNewNotifications(false);
+			setIsActiveButton(false);
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -128,45 +130,43 @@ const NotificationsList = () => {
 	};
 
 	const handleRefreshClick = () => {
-		fetchNotifications(1);
-		setCurrentPage(1);
+		// setToView(null);
+		fetchUnreadCount();
+		if (currentPage > 1) {
+			setCurrentPage(1);
+		} else {
+			fetchNotifications(1);
+			// setCurrentPage(1);
+		}
 	};
 
 	useEffect(() => {
 		fetchNotifications(currentPage);
+		fetchUnreadCount();
 	}, [currentPage]);
 
 	useEffect(() => {
-		if (!user) return;
-
-		window.Echo.private(`users.${user.id}`).notification(() => {
-			setHasNewNotifications(true);
-		});
-		return () => {
-			window.Echo.leaveChannel(`users.${user.id}`);
-		};
-	}, [user]);
-
-	const renderLink = (type: string, url: string): React.ReactNode => {
-		if (type == "FriendRequestSent") {
-			return (
-				<Link
-					to={url}
-					className="text-white bg-amber-500 hover:bg-amber-400 text-xs px-2 mx-2 rounded font-bold"
-				>
-					FRIENDS
-				</Link>
-			);
+		let timer: number;
+		if (!isActiveButton) {
+			timer = setTimeout(() => {
+				setIsActiveButton(true);
+			}, 5000);
 		}
-		return (
-			<Link
-				to={url}
-				className="text-white bg-sky-500 hover:bg-sky-400 text-xs px-2 mx-2 rounded font-bold"
-			>
-				PAGE
-			</Link>
-		);
-	};
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [isActiveButton]);
+
+	// useEffect(() => {
+	// 	if (!user) return;
+
+	// 	window.Echo.private(`users.${user.id}`).notification(() => {
+	// 		setHasNewNotifications(true);
+	// 	});
+	// 	return () => {
+	// 		window.Echo.leaveChannel(`users.${user.id}`);
+	// 	};
+	// }, [user]);
 
 	return (
 		<ContentBase className="py-7 px-4">
@@ -179,16 +179,16 @@ const NotificationsList = () => {
 				</p>
 
 				<div className="mt-3 mb-4">
-					{hasNewNotifications ? (
+					{isActiveButton ? (
 						<button
-							className={`text-xs text-white px-3 py-1 rounded font-semibold bg-sky-500 hover:bg-sky-400 cursor-pointer`}
+							className={`text-xs text-white px-3 py-0.5 rounded font-semibold bg-sky-500 hover:bg-sky-400 cursor-pointer`}
 							onClick={handleRefreshClick}
 						>
-							GET NEW NOTIFICATIONS
+							REFRESH LIST
 						</button>
 					) : (
-						<span className="text-xs text-white px-3 py-1 rounded font-semibold bg-sky-400 opacity-80 select-none">
-							GET NEW NOTIFICATIONS
+						<span className="text-xs text-white px-3 py-1 rounded font-semibold bg-sky-300 opacity-80 select-none">
+							REFRESH LIST
 						</span>
 					)}
 				</div>
@@ -220,62 +220,14 @@ const NotificationsList = () => {
 					<div className="bg-gray-700 text-white overflow-hidden rounded min-w-[350px]">
 						{notifications.length > 0 ? (
 							<>
-								{notifications.map((notif) => (
-									<div
-										key={notif.id}
-										className={`px-3 py-2 border-b border-gray-400 last:border-b-0 select-none flex items-center gap-x-2 cursor-pointer ${
-											notif.id === toView && "bg-gray-800"
-										}`}
-									>
-										{!notif.is_read && (
-											<FontAwesomeIcon icon="circle" size="2xs" />
-										)}
-										<div
-											className="flex-1 space-y-0.5"
-											onClick={() =>
-												handleNotificationClick(
-													notif.id,
-													notif.is_read
-												)
-											}
-										>
-											<p
-												className={`${
-													notif.is_read
-														? "text-gray-200"
-														: "text-white font-semibold"
-												}`}
-											>
-												{notif.data.message}
-											</p>
-											{toView && toView === notif.id && (
-												<p className="text-sm  max-w-md my-2 py-2 border-t border-gray-400">
-													View
-													{renderLink(notif.type, notif.data.url)}
-												</p>
-											)}
-											<div className="sm:flex items-center gap-x-3 space-y-1 sm:space-y-0">
-												<p className="text-xs text-orange-400">
-													Date:{" "}
-													<span className="text-gray-400">
-														{displayLocalDate(notif.created_at)}
-													</span>
-												</p>
-												<p className="text-xs text-orange-400">
-													ID:{" "}
-													<span className="text-gray-400">
-														{notif.id}
-													</span>
-												</p>
-											</div>
-										</div>
-										<button
-											className="hover:text-gray-700 cursor-pointer ms-auto w-7 h-7 rounded-full border bg-gray-300 text-gray-600"
-											onClick={() => handleDeleteNotification(notif)}
-										>
-											<FontAwesomeIcon icon="trash" size="sm" />
-										</button>
-									</div>
+								{notifications.map((notification) => (
+									<Notification
+										key={notification.id}
+										notification={notification}
+										toView={toView}
+										onClick={handleNotificationClick}
+										onDelete={handleDeleteNotification}
+									/>
 								))}
 							</>
 						) : (

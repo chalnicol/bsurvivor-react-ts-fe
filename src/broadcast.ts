@@ -3,6 +3,8 @@
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 
+import apiClient from "./utils/axiosConfig";
+
 window.Pusher = Pusher;
 
 window.Echo = new Echo({
@@ -10,5 +12,32 @@ window.Echo = new Echo({
 	key: import.meta.env.VITE_PUSHER_APP_KEY,
 	cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
 	forceTLS: true,
-	// authEndpoint: `${import.meta.env.VITE_API_URL}/broadcasting/auth`,
+	authEndpoint: `${import.meta.env.VITE_API_URL}/broadcasting/auth`,
+	// auth: {
+	// 	headers: {
+	// 		"X-CSRF-TOKEN": document
+	// 			.querySelector('meta[name="csrf-token"]')
+	// 			.getAttribute("content"),
+	// 	},
+	// },
+	withCredentials: true, // Crucial for sending HttpOnly cookies
+	authorizer: (channel) => {
+		return {
+			authorize: (socketId, callback) => {
+				// Use your apiClient instance here instead of the global 'axios'
+				apiClient
+					.post(`/broadcasting/auth`, {
+						socket_id: socketId,
+						channel_name: channel.name,
+					})
+					.then((response) => {
+						// callback(false, response.data);
+						callback(null, response.data);
+					})
+					.catch((error) => {
+						callback(error, null);
+					});
+			},
+		};
+	},
 });
