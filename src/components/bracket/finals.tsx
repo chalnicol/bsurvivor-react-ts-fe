@@ -36,7 +36,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 			setTeamA(finalMatchup.teams.find((t) => t.slot == 1) || null);
 			setTeamB(finalMatchup.teams.find((t) => t.slot == 2) || null);
 
-			const team_id = hasPredictions
+			const team_id = finalMatchup.predicted_winner_team_id
 				? finalMatchup.predicted_winner_team_id
 				: finalMatchup.winner_team_id;
 
@@ -97,6 +97,12 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 			if (
 				!finalMatchup.winner_team_id &&
 				finalMatchup.predicted_winner_team_id == team.id
+			)
+				return "selected";
+
+			if (
+				!finalMatchup.predicted_winner_team_id &&
+				finalMatchup.winner_team_id == team.id
 			)
 				return "selected";
 		} else {

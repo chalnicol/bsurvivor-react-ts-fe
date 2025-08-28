@@ -22,6 +22,7 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 	const [team2, setTeam2] = useState<AnyPlayoffsTeamInfo | null>(null);
 	const [showClearButton, setShowClearButton] = useState<boolean>(false);
 	const [isClickable, setIsClickable] = useState<boolean>(false);
+
 	useEffect(() => {
 		if (!matchup) return;
 		setTeam1(matchup.teams.find((t) => t.slot == 1) || null);
@@ -93,6 +94,12 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 					if (
 						!matchup.winner_team_id &&
 						matchup.predicted_winner_team_id == team.id
+					)
+						return "selected";
+
+					if (
+						!matchup.predicted_winner_team_id &&
+						matchup.winner_team_id == team.id
 					)
 						return "selected";
 				} else {

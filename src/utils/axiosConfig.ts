@@ -1,8 +1,11 @@
 import axios from "axios";
 
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+
 // Create an Axios instance with a base URL
 const apiClient = axios.create({
-	baseURL: import.meta.env.VITE_API_URL, // Your Laravel API base URL
+	baseURL: "/api",
 	withCredentials: true, // This is crucial for sending cookies
 	headers: {
 		Accept: "application/json",
@@ -15,22 +18,22 @@ const apiClient = axios.create({
 // The request interceptor for adding the token is no longer needed.
 
 // Optional: Add a response interceptor for global error handling (e.g., 401 Unauthorized)
-apiClient.interceptors.request.use(
-	function (config) {
-		const csrfToken = document.cookie
-			.split("; ")
-			.find((row) => row.startsWith("XSRF-TOKEN"));
-		if (csrfToken) {
-			config.headers["X-XSRF-TOKEN"] = decodeURIComponent(
-				csrfToken.split("=")[1]
-			);
-		}
-		return config;
-	},
-	function (error) {
-		return Promise.reject(error);
-	}
-);
+// apiClient.interceptors.request.use(
+// 	function (config) {
+// 		const csrfToken = document.cookie
+// 			.split("; ")
+// 			.find((row) => row.startsWith("XSRF-TOKEN"));
+// 		if (csrfToken) {
+// 			config.headers["X-XSRF-TOKEN"] = decodeURIComponent(
+// 				csrfToken.split("=")[1]
+// 			);
+// 		}
+// 		return config;
+// 	},
+// 	function (error) {
+// 		return Promise.reject(error);
+// 	}
+// );
 
 apiClient.interceptors.response.use(
 	(response) => response,
@@ -59,6 +62,7 @@ apiClient.interceptors.response.use(
 				throw {
 					type: "server",
 					message:
+						data.message ||
 						"A general server error occurred. Please try again later.",
 				};
 			} else {

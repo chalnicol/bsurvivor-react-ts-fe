@@ -22,22 +22,36 @@ const Notification = ({
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	const renderLink = (type: string, url: string): React.ReactNode => {
-		if (type == "FriendRequestSent") {
-			return (
-				<Link
-					to={url}
-					className="text-white bg-amber-500 hover:bg-amber-400 text-xs px-2 mx-2 rounded font-bold"
-				>
-					FRIENDS
-				</Link>
-			);
+		// if (type == "FriendRequestSentNotification") {
+		// 	return (
+		// 		<Link
+		// 			to={url}
+		// 			className="text-white bg-amber-500 hover:bg-amber-400 text-xs px-2 mx-2 rounded font-bold"
+		// 		>
+		// 			FRIENDS
+		// 		</Link>
+		// 	);
+		// }
+		let bgClass = "";
+		let label = "";
+
+		if (type == "FriendRequestReceivedNotification") {
+			bgClass = "bg-amber-500 hover:bg-amber-400";
+			label = "FRIENDS";
+		} else if (type == "WelcomeUserNotification") {
+			bgClass = "bg-emerald-500 hover:bg-emerald-400";
+			label = "PROFILE";
+		} else {
+			bgClass = "bg-gray-500 hover:bg-gray-400";
+			label = "PAGE";
 		}
+
 		return (
 			<Link
 				to={url}
-				className="text-white bg-sky-500 hover:bg-sky-400 text-xs px-2 mx-2 rounded font-bold"
+				className={`text-white text-xs px-2 py-0.5 mx-2 rounded font-bold ${bgClass}`}
 			>
-				PAGE
+				{label}
 			</Link>
 		);
 	};

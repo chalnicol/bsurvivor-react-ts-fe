@@ -12,14 +12,6 @@ window.Echo = new Echo({
 	key: import.meta.env.VITE_PUSHER_APP_KEY,
 	cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
 	forceTLS: true,
-	authEndpoint: `${import.meta.env.VITE_API_URL}/broadcasting/auth`,
-	// auth: {
-	// 	headers: {
-	// 		"X-CSRF-TOKEN": document
-	// 			.querySelector('meta[name="csrf-token"]')
-	// 			.getAttribute("content"),
-	// 	},
-	// },
 	withCredentials: true, // Crucial for sending HttpOnly cookies
 	authorizer: (channel) => {
 		return {

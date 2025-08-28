@@ -82,6 +82,7 @@ export interface BracketChallengeMatchupsDataInfo {
 		seed?: number;
 	}[];
 }
+
 export interface BracketChallengeEntryPredictionsInfo
 	extends BracketChallengeMatchupsDataInfo {
 	predicted_winner_team_id: number;
@@ -115,6 +116,7 @@ export interface BracketChallengeInfo {
 	is_public: boolean;
 	bracket_data: AnyTeamData;
 	rounds: PlayoffsRoundInfo[];
+	comments: CommentInfo[];
 	created_at: string;
 	updated_at: string;
 	entries: BracketChallengeEntryInfo[];
@@ -250,6 +252,19 @@ export interface NotificationInfo {
 	read_at: string | null;
 	created_at: string;
 	is_read: boolean;
+}
+
+export interface CommentInfo {
+	id: number;
+	type: string;
+	body: string;
+	user_id: number;
+	parent_id: number;
+	user: UserMiniInfo;
+	created_at: string;
+	updated_at: string;
+	replies: CommentInfo[];
+	parent: CommentInfo;
 }
 
 // export interface GeneralApiErrorResponse {

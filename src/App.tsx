@@ -10,8 +10,6 @@ import Unauthorized from "./pages/unauthorized";
 import PageNotFound from "./components/pageNotFound";
 import AdminDashboard from "./pages/admin/adminDashboard";
 import About from "./pages/about";
-import NBAPage from "./pages/leagues/nba";
-import PBAPage from "./pages/leagues/pba";
 import ProfilePage from "./pages/user/profile";
 import ListBracketChallenges from "./pages/admin/bracketChallengers/listBracketChallenges";
 import CreateBracketChallenge from "./pages/admin/bracketChallengers/createBracketChallenge";
@@ -70,6 +68,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import FriendsList from "./pages/user/friends";
 import NotificationsList from "./pages/user/notificationsList";
+import BracketChallengesList from "./pages/bracketChallengesList";
 
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 
@@ -109,8 +108,14 @@ function App() {
 						{/* Define your routes inside Routes */}
 						<Route path="/" element={<HomePage />} />
 						<Route path="/about" element={<About />} />
-						<Route path="/nba" element={<NBAPage />} />
-						<Route path="/pba" element={<PBAPage />} />
+						{/* <Route path="/nba" element={<NBAPage />} /> */}
+						{/* <Route path="/pba" element={<PBAPage />} /> */}
+
+						<Route
+							path="/bracket-challenges"
+							element={<BracketChallengesList />}
+						/>
+
 						<Route
 							path="/bracket-challenges/:slug"
 							element={<BracketChallengePage />}

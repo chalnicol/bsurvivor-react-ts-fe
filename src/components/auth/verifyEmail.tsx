@@ -5,7 +5,7 @@ import ContentBase from "../contentBase";
 
 const VerifyEmail = () => {
 	const {
-		message,
+		// message,
 		error,
 		isAuthenticated,
 		authLoading,
@@ -72,9 +72,6 @@ const VerifyEmail = () => {
 				<p className="text-sm mt-2 mb-6">
 					Almost done! Just a moment while we confirm your details..
 				</p>
-				{message && (
-					<p className="text-green-600 text-sm my-3">{message}</p>
-				)}
 				{error && <p className="text-red-500 text-sm my-3">{error}</p>}
 			</div>
 		</ContentBase>

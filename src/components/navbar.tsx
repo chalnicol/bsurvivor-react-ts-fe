@@ -6,6 +6,7 @@ import { useOutsideClick } from "../hooks/useOutsideClick";
 // import Dropdown from "./dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import NotificationLink from "./NotificationLink";
+import img from "../assets/bsurvivor.png";
 
 interface LinksInfo {
 	name: string;
@@ -160,12 +161,14 @@ const Navbar = () => {
 		<nav className="bg-gray-800 border-b border-gray-600 h-14 sticky top-0 z-20">
 			<div className="max-w-7xl mx-auto flex justify-between items-center gap-x-6 h-full px-4">
 				<Link to="/" className="text-lg text-white font-bold">
-					<FontAwesomeIcon icon="basketball" /> BBSurvivor
+					{/* <FontAwesomeIcon icon="basketball" /> BBSurvivor */}
+					<img src={img} alt="brand" className="h-10 object-contain" />
 				</Link>
 
 				<div className="hidden md:flex items-center text-white font-medium flex-1">
-					<div className="flex-1 space-x-3">
+					<div className="flex-1 space-x-4">
 						<Link to="/">Home</Link>
+						<Link to="/bracket-challenges">Bracket Challenges</Link>
 						<Link to="/about">About Us</Link>
 					</div>
 					<div className="flex items-center space-x-5">
@@ -257,6 +260,12 @@ const Navbar = () => {
 								onClick={() => handleMenuClick("/")}
 							>
 								Home
+							</button>
+							<button
+								className="border-b p-2 w-full text-left"
+								onClick={() => handleMenuClick("/bracket-challenges")}
+							>
+								Bracket Challenges
 							</button>
 							<button
 								className="border-b p-2 w-full text-left"

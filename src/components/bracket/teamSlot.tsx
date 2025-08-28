@@ -91,6 +91,7 @@ const TeamSlot = ({
 
 	const getBgClass = getSlotBgClass(slotMode);
 
+	// console.log("sm", slotMode, team?.abbr);
 	return (
 		<div
 			ref={containerRef}

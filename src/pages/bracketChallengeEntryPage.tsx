@@ -11,6 +11,8 @@ import Detail from "../components/detail";
 import { displayLocalDate } from "../utils/dateTime";
 import EndOfPage from "../components/endOfPage";
 import StatusPills from "../components/statusPills";
+import fbImage from "../assets/socials/fb.png";
+import xImage from "../assets/socials/x.png";
 
 const BracketChallengeEntryPage = () => {
 	const { slug } = useParams<{ slug: string }>();
@@ -42,6 +44,25 @@ const BracketChallengeEntryPage = () => {
 		fetchBracketChallengeEntry();
 	}, [slug]);
 
+	const handleShareToX = () => {
+		const text = encodeURIComponent(
+			"Check out my bracket predictions! #BracketChallenge"
+		);
+		const url = encodeURIComponent(window.location.href);
+		window.open(
+			`https://x.com/intent/tweet?text=${text}&url=${url}`,
+			"_blank"
+		);
+	};
+
+	const handleShareToFacebook = () => {
+		const url = encodeURIComponent(window.location.href);
+		window.open(
+			`https://www.facebook.com/sharer/sharer.php?u=${url}`,
+			"_blank"
+		);
+	};
+
 	return (
 		<ContentBase className="px-4 py-7">
 			<div className="p-3 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
@@ -54,6 +75,7 @@ const BracketChallengeEntryPage = () => {
 						<p className="text-sm font-medium my-1">
 							View your bracket challenge entry below.
 						</p>
+
 						<div className="bg-gray-800 text-white p-4 rounded border text-sm border border-gray-300 mt-4">
 							<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-2">
 								<Detail label="Entry Name">
@@ -92,6 +114,22 @@ const BracketChallengeEntryPage = () => {
 									<Bracket />
 								</BracketProvider>
 							</div>
+						</div>
+
+						<div className="flex items-center justify-end space-x-1 mt-3">
+							<span className="font-bold">SHARE</span>
+							<img
+								src={fbImage}
+								alt="fb"
+								className="h-8 object-contain shadow-lg border border-gray-400 rounded p-1 cursor-pointer hover:bg-gray-200"
+								onClick={handleShareToFacebook}
+							/>
+							<img
+								src={xImage}
+								alt="x"
+								className="h-8 object-contain shadow-lg border border-gray-400 rounded p-1 cursor-pointer hover:bg-gray-200"
+								onClick={handleShareToX}
+							/>
 						</div>
 					</>
 				) : (

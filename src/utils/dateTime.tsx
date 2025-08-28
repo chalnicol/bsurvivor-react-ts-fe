@@ -47,3 +47,25 @@ export const checkIsActive = (
 	// AND on or before the end date.
 	return now >= startDate && now <= endDate;
 };
+
+const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+export const getRelativeTime = (dateString: string) => {
+	const date = new Date(dateString);
+	const now = new Date();
+	const seconds = Math.round((date.getTime() - now.getTime()) / 1000);
+	const minutes = Math.round(seconds / 60);
+	const hours = Math.round(minutes / 60);
+	const days = Math.round(hours / 24);
+	const weeks = Math.round(days / 7);
+	const months = Math.round(days / 30.436875); // Average days in a month
+	const years = Math.round(days / 365.25);
+
+	if (Math.abs(seconds) < 60) return rtf.format(seconds, "second");
+	if (Math.abs(minutes) < 60) return rtf.format(minutes, "minute");
+	if (Math.abs(hours) < 24) return rtf.format(hours, "hour");
+	if (Math.abs(days) < 7) return rtf.format(days, "day");
+	if (Math.abs(weeks) < 4) return rtf.format(weeks, "week"); // Limit weeks for compactness
+	if (Math.abs(months) < 12) return rtf.format(months, "month");
+	return rtf.format(years, "year");
+};

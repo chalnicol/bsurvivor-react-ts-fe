@@ -4,6 +4,7 @@ import Conference from "./conference";
 import Finals from "./finals";
 import StatusMessage from "../statusMessage";
 import { Link } from "react-router-dom";
+import { useRef } from "react";
 
 const Bracket = () => {
 	const { isAuthenticated } = useAuth();
@@ -17,12 +18,17 @@ const Bracket = () => {
 		// isActive,
 		submitSuccess,
 		hasProgressed,
+		hasPredictions,
+		previewState,
+		toggleBracket,
 		resetMessage,
 		refreshBracket,
 		updateBracket,
 		submitPicks,
 		resetBracket,
 	} = useBracket();
+
+	const bracketRef = useRef(null);
 
 	const handleSubmit = () => {
 		if (!isAuthenticated) return;
@@ -62,7 +68,7 @@ const Bracket = () => {
 			)}
 
 			<div className="w-full rounded relative text-black select-none">
-				<div className="overflow-x-auto">
+				<div ref={bracketRef} className="overflow-x-auto">
 					{league == "NBA" && (
 						<div className="flex gap-x-6 items-center min-w-4xl mb-3">
 							<Conference
@@ -167,6 +173,25 @@ const Bracket = () => {
 							disabled={isLoading}
 						>
 							UPDATE BRACKET
+						</button>
+					</div>
+				</>
+			)}
+			{mode == "preview" && hasPredictions && (
+				<>
+					<hr className="my-2 border-gray-400" />
+					<div className="flex items-center">
+						<button
+							className={`cursor-pointer w-full sm:w-64 px-3 py-2 rounded text-white font-bold ${
+								previewState == "entry"
+									? "bg-sky-600 hover:bg-sky-500"
+									: "bg-green-600 hover:bg-green-500"
+							}`}
+							onClick={toggleBracket}
+						>
+							{previewState === "entry"
+								? "VIEW BRACKET CHALLENGE"
+								: "VIEW BRACKET CHALLENGE ENTRY"}
 						</button>
 					</div>
 				</>

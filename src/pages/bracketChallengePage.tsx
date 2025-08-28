@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import LoadAuth from "../components/auth/loadAuth";
 import EndOfPage from "../components/endOfPage";
 import Leaderboard from "../components/bracket/leaderboard";
+import CommentsSection from "../components/commentsSection";
 
 interface BracketResponse {
 	message: string;
@@ -60,6 +61,8 @@ const BracketChallengePage = () => {
 		return <LoadAuth />;
 	}
 
+	//test comments
+
 	return (
 		<ContentBase className="px-4 py-7">
 			<div className="p-3 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
@@ -90,12 +93,12 @@ const BracketChallengePage = () => {
 							{isAuthenticated ? (
 								entrySlug && (
 									<div className="py-1 px-4 py-2 rounded mb-3 bg-rose-600 font-semibold sm:flex items-center justify-between space-y-2 sm:space-y-0">
-										<div className="text-white">
+										<p className="text-white">
 											You have an entry for this bracket challenge.
-										</div>
+										</p>
 										<Link
 											to={`/bracket-challenge-entries/${entrySlug}`}
-											className="bg-gray-800 font-semibold text-white px-2 py-1 rounded text-xs hover:bg-gray-700 block text-center w-26 mb-1 sm:mb-0"
+											className="bg-red-900 hover:bg-red-800 font-semibold text-white px-2 py-1 rounded text-xs block text-center w-26 mb-1 sm:mb-0"
 										>
 											VIEW ENTRY
 										</Link>
@@ -148,6 +151,13 @@ const BracketChallengePage = () => {
 								</>
 							)}
 						</div>
+
+						{/* comment */}
+						<CommentsSection
+							comments={bracketChallenge.comments}
+							challengeId={bracketChallenge.id}
+							className="mt-4"
+						/>
 					</>
 				) : (
 					<div className="py-2 px-3 bg-gray-300 mt-4">

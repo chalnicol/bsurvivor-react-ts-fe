@@ -30,7 +30,7 @@ const Loader = ({ prompt }: LoaderProps) => {
 					// src={"logo_bbsurvivor.png"}
 					src={img}
 					alt="logo"
-					className="h-8 mx-auto"
+					className="h-10 mx-auto"
 				/>
 				<div className="flex justify-center text-white font-semibold">
 					<p>{prompt || "LOADING"}</p>

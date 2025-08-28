@@ -26,7 +26,8 @@ const BracketChallengeActiveList = () => {
 					<FontAwesomeIcon icon="caret-right" /> Active Bracket Challenges
 				</h3>
 				<p className="text-sm">
-					Take a look and submit your bracket challenge entry
+					Take a look of the active bracket challenges and submit your
+					bracket challenge entry.
 				</p>
 				<button
 					className={`font-bold text-xs px-2 py-0.5 block rounded text-white mt-3 ${

@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import { BracketContext } from "./BracketContext";
 import type {
 	AnyPlayoffsTeamInfo,
@@ -35,84 +41,21 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 	const [success, setSuccess] = useState<string | null>(null);
 	const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
-
+	// const [hasProgressed, setHasProgressed] = useState<boolean>(false);
 	const [mode, setMode] = useState<"update" | "submit" | "preview">(
 		bracketMode
 	);
-	const [hasProgressed, setHasProgressed] = useState<boolean>(false);
+	const [previewState, setPreviewState] = useState<"entry" | "challenge">(
+		"entry"
+	);
 
 	const league = bracketChallenge.league;
 
 	const hasPredictions = !!predictions;
 
-	// const isActive = checkIsActive(
-	// 	bracketChallenge.start_date,
-	// 	bracketChallenge.end_date
-	// );
-
 	useEffect(() => {
 		if (predictions) {
-			const allTeams = bracketChallenge.rounds.flatMap((round) =>
-				round.matchups.flatMap((matchup) => matchup.teams)
-			);
-			const newRounds: PlayoffsRoundInfo[] = bracketChallenge.rounds.map(
-				(round) => {
-					const newMatchups: PlayoffsMatchupInfo[] = round.matchups.map(
-						(matchup) => {
-							const prediction = predictions.find(
-								(p) => p.matchup_id === matchup.id
-							);
-
-							if (prediction) {
-								//get teams based from the predictions teams and update winner_team_id
-								const newTeams: AnyPlayoffsTeamInfo[] = [];
-
-								if (round.order_index !== 1) {
-									//get team slot 1
-									const team1 = allTeams.find(
-										(t) => t.id === prediction.teams[0].id
-									);
-									const team2 = allTeams.find(
-										(t) => t.id === prediction.teams[1].id
-									);
-									if (team1) {
-										newTeams.push({ ...team1, slot: 1 });
-									}
-									if (team2) {
-										newTeams.push({ ...team2, slot: 2 });
-									}
-								}
-
-								const actualMatchup = matchup.teams
-									.flatMap((t) => t.id)
-									.sort()
-									.toString();
-								const predictedMatchup = prediction.teams
-									.flatMap((t) => t.id)
-									.sort()
-									.toString();
-
-								// console.log(actualMatchup, predictedMatchup);
-
-								return {
-									...matchup,
-									// winner_team_id: prediction.predicted_winner_team_id,
-									teams:
-										newTeams.length > 0 ? newTeams : matchup.teams,
-									predicted_winner_team_id:
-										prediction.predicted_winner_team_id,
-									isCorrect: actualMatchup === predictedMatchup,
-								};
-							}
-							return matchup;
-						}
-					);
-					return {
-						...round,
-						matchups: newMatchups,
-					};
-				}
-			);
+			const newRounds = getPredictionRounds();
 			setRounds(newRounds);
 		} else {
 			setRounds(bracketChallenge.rounds);
@@ -120,15 +63,90 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 		setCurrentRounds(bracketChallenge.rounds);
 	}, [bracketChallenge.rounds, predictions]);
 
-	useEffect(() => {
-		if (!currentRounds) return;
+	// useEffect(() => {
+	// 	if (!currentRounds) return;
+	// 	const matchups = currentRounds.flatMap((round) => {
+	// 		return round.matchups.filter(
+	// 			(matchup) => matchup.winner_team_id !== null
+	// 		);
+	// 	});
+	// 	setHasProgressed(matchups.length > 0);
+	// }, [currentRounds]);
+
+	const hasProgressed = useMemo(() => {
+		if (!currentRounds) return false;
 		const matchups = currentRounds.flatMap((round) => {
 			return round.matchups.filter(
 				(matchup) => matchup.winner_team_id !== null
 			);
 		});
-		setHasProgressed(matchups.length > 0);
+		return matchups.length > 0;
 	}, [currentRounds]);
+
+	const getPredictionRounds = (): PlayoffsRoundInfo[] => {
+		if (!predictions) return [];
+		const allTeams = bracketChallenge.rounds.flatMap((round) =>
+			round.matchups.flatMap((matchup) => matchup.teams)
+		);
+		const newRounds: PlayoffsRoundInfo[] = bracketChallenge.rounds.map(
+			(round) => {
+				const newMatchups: PlayoffsMatchupInfo[] = round.matchups.map(
+					(matchup) => {
+						const prediction = predictions.find(
+							(p) => p.matchup_id === matchup.id
+						);
+
+						if (prediction) {
+							//get teams based from the predictions teams and update winner_team_id
+							const newTeams: AnyPlayoffsTeamInfo[] = [];
+
+							if (round.order_index !== 1) {
+								//get team slot 1
+								const team1 = allTeams.find(
+									(t) => t.id === prediction.teams[0].id
+								);
+								const team2 = allTeams.find(
+									(t) => t.id === prediction.teams[1].id
+								);
+								if (team1) {
+									newTeams.push({ ...team1, slot: 1 });
+								}
+								if (team2) {
+									newTeams.push({ ...team2, slot: 2 });
+								}
+							}
+
+							const actualMatchup = matchup.teams
+								.flatMap((t) => t.id)
+								.sort()
+								.toString();
+							const predictedMatchup = prediction.teams
+								.flatMap((t) => t.id)
+								.sort()
+								.toString();
+
+							// console.log(actualMatchup, predictedMatchup);
+
+							return {
+								...matchup,
+								// winner_team_id: prediction.predicted_winner_team_id,
+								teams: newTeams.length > 0 ? newTeams : matchup.teams,
+								predicted_winner_team_id:
+									prediction.predicted_winner_team_id,
+								isCorrect: actualMatchup === predictedMatchup,
+							};
+						}
+						return matchup;
+					}
+				);
+				return {
+					...round,
+					matchups: newMatchups,
+				};
+			}
+		);
+		return newRounds;
+	};
 
 	const submitData = async (data: BracketChallengeEntryData) => {
 		try {
@@ -473,6 +491,19 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 		});
 	}, [bracketChallenge.league]);
 
+	const toggleBracket = useCallback(() => {
+		if (!predictions || !rounds) return;
+		setRounds(() => {
+			if (previewState == "entry") {
+				return currentRounds;
+			} else {
+				const newRounds = getPredictionRounds();
+				return newRounds;
+			}
+		});
+		setPreviewState((prev) => (prev == "entry" ? "challenge" : "entry"));
+	}, [predictions, rounds]);
+
 	return (
 		<BracketContext.Provider
 			value={{
@@ -482,10 +513,11 @@ export const BracketProvider: React.FC<BracketProviderProps> = ({
 				isLoading,
 				mode,
 				league,
-				// isActive,
 				submitSuccess,
 				hasProgressed,
 				hasPredictions,
+				previewState,
+				toggleBracket,
 				refreshBracket,
 				resetMessage,
 				updatePick,

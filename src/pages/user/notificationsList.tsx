@@ -12,11 +12,7 @@ import { useAuth } from "../../context/auth/AuthProvider";
 import Notification from "../../components/notifications";
 
 const NotificationsList = () => {
-	const {
-		// user,
-		fetchUnreadCount,
-		updateUnreadCount,
-	} = useAuth();
+	const { user, fetchUnreadCount, updateUnreadCount } = useAuth();
 
 	const [notifications, setNotifications] = useState<NotificationInfo[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -26,7 +22,8 @@ const NotificationsList = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [toDelete, setToDelete] = useState<NotificationInfo | null>(null);
-	const [isActiveButton, setIsActiveButton] = useState<boolean>(false);
+	const [hasNewNotifications, setHasNewNotifications] =
+		useState<boolean>(false);
 	const [toView, setToView] = useState<string | null>(null);
 
 	const fetchNotifications = async (page: number) => {
@@ -38,7 +35,7 @@ const NotificationsList = () => {
 			setNotifications(response.data.data);
 			setMeta(response.data.meta);
 			setCurrentPage(page);
-			setIsActiveButton(false);
+			setHasNewNotifications(false);
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -146,27 +143,15 @@ const NotificationsList = () => {
 	}, [currentPage]);
 
 	useEffect(() => {
-		let timer: number;
-		if (!isActiveButton) {
-			timer = setTimeout(() => {
-				setIsActiveButton(true);
-			}, 5000);
-		}
+		if (!user) return;
+
+		window.Echo.private(`users.${user.id}`).notification(() => {
+			setHasNewNotifications(true);
+		});
 		return () => {
-			clearTimeout(timer);
+			window.Echo.leaveChannel(`users.${user.id}`);
 		};
-	}, [isActiveButton]);
-
-	// useEffect(() => {
-	// 	if (!user) return;
-
-	// 	window.Echo.private(`users.${user.id}`).notification(() => {
-	// 		setHasNewNotifications(true);
-	// 	});
-	// 	return () => {
-	// 		window.Echo.leaveChannel(`users.${user.id}`);
-	// 	};
-	// }, [user]);
+	}, [user]);
 
 	return (
 		<ContentBase className="py-7 px-4">
@@ -179,16 +164,17 @@ const NotificationsList = () => {
 				</p>
 
 				<div className="mt-3 mb-4">
-					{isActiveButton ? (
+					{hasNewNotifications ? (
 						<button
-							className={`text-xs text-white px-3 py-0.5 rounded font-semibold bg-sky-500 hover:bg-sky-400 cursor-pointer`}
+							className={`text-xs text-white px-3 py-0.5 rounded font-semibold bg-sky-500 hover:bg-sky-400 cursor-pointer relative`}
 							onClick={handleRefreshClick}
 						>
-							REFRESH LIST
+							GET NEW NOTIFICATIONS
+							<p className="absolute w-2.5 h-2.5 rounded-full bg-red-500 -top-1 -right-1"></p>
 						</button>
 					) : (
-						<span className="text-xs text-white px-3 py-1 rounded font-semibold bg-sky-300 opacity-80 select-none">
-							REFRESH LIST
+						<span className="text-xs text-white px-3 py-1 rounded font-semibold bg-sky-400 opacity-70 select-none">
+							GET NEW NOTIFICATIONS
 						</span>
 					)}
 				</div>

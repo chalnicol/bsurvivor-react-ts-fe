@@ -33,6 +33,8 @@ interface BracketContextType {
 	) => void;
 	clearFinalsMatchup: () => void;
 	refreshBracket: () => void;
+	toggleBracket: () => void;
+	previewState: "entry" | "challenge";
 }
 
 export const BracketContext = createContext<BracketContextType | undefined>(

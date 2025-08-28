@@ -21,7 +21,7 @@ const EmailVerificationNotice = () => {
 					onClick={sendVerificationEmail}
 					disabled={isLoading}
 				>
-					Click here to resend the verification link.
+					CLICK HERE TO RESEND VERIFICATION LINK
 				</button>
 
 				{message && <p className="my-3 text-green-500">{message}</p>}

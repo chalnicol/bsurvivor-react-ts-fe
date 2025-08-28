@@ -269,7 +269,7 @@ const FriendsList = () => {
 					<div className="flex-1">
 						<div className="border border-gray-400 rounded overflow-hidden">
 							<h2 className="bg-gray-800 text-white px-3 py-2 font-semibold">
-								Add Friends
+								Search Friends
 							</h2>
 							<div className="p-3 bg-gray-500">
 								<input
