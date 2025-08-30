@@ -43,11 +43,10 @@ const TopEntryList = ({ bracketChallenge }: topEntryListProps) => {
 									to={`/bracket-challenge-entries/${entry.slug}`}
 									key={entry.id}
 								>
-									<div className="sm:grid md:grid-cols-2 lg:grid-cols-3 px-3 py-2 space-y-1 border border-gray-500 bg-gray-700 hover:bg-gray-500 text-sm text-white rounded mb-2 shadow">
+									<div className="sm:grid md:grid-cols-2 lg:grid-cols-3 px-3 py-2 space-y-1 border border-gray-500 bg-gray-700 hover:border-gray-400 text-sm text-white rounded mb-2 shadow">
 										<Detail label="User">
 											{entry.user.username}
 										</Detail>
-
 										<Detail label="Correct Predictions">
 											{entry.correct_predictions_count}
 										</Detail>

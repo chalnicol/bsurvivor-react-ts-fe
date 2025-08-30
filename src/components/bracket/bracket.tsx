@@ -180,20 +180,22 @@ const Bracket = () => {
 			{mode == "preview" && hasPredictions && (
 				<>
 					<hr className="my-2 border-gray-400" />
-					<div className="flex items-center">
-						<button
-							className={`cursor-pointer w-full sm:w-64 px-3 py-2 rounded text-white font-bold ${
-								previewState == "entry"
-									? "bg-sky-600 hover:bg-sky-500"
-									: "bg-green-600 hover:bg-green-500"
-							}`}
-							onClick={toggleBracket}
-						>
-							{previewState === "entry"
-								? "VIEW BRACKET CHALLENGE"
-								: "VIEW BRACKET CHALLENGE ENTRY"}
-						</button>
-					</div>
+					{hasPredictions && (
+						<div className="flex items-center">
+							<button
+								className={`cursor-pointer w-full sm:w-64 px-3 py-2 rounded text-white font-bold ${
+									previewState == "entry"
+										? "bg-sky-600 hover:bg-sky-500"
+										: "bg-green-600 hover:bg-green-500"
+								}`}
+								onClick={toggleBracket}
+							>
+								{previewState === "entry"
+									? "VIEW BRACKET CHALLENGE"
+									: "VIEW BRACKET CHALLENGE ENTRY"}
+							</button>
+						</div>
+					)}
 				</>
 			)}
 		</>

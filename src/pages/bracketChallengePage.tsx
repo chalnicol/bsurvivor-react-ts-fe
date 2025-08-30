@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { type BracketChallengeInfo } from "../data/adminData";
 import { apiClient } from "../utils/api";
@@ -16,13 +16,9 @@ import LoadAuth from "../components/auth/loadAuth";
 import EndOfPage from "../components/endOfPage";
 import Leaderboard from "../components/bracket/leaderboard";
 import CommentsSection from "../components/commentsSection";
+import { CommentsProvider } from "../context/comment/CommentsProvider";
+import gsap from "gsap";
 
-interface BracketResponse {
-	message: string;
-	bracketChallenge: BracketChallengeInfo;
-	bracketEntrySlug: string | null;
-	showLeaderboard: boolean;
-}
 const BracketChallengePage = () => {
 	const { isAuthenticated, authLoading } = useAuth();
 	const location = useLocation();
@@ -33,19 +29,22 @@ const BracketChallengePage = () => {
 
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [entrySlug, setEntrySlug] = useState<string | null>(null);
-	const [showLeaderboard, setShowLeaderboard] = useState<boolean>(true);
+	const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+	const [isPast, setIsPast] = useState<boolean>(false);
+	const [totalCommentsCount, setTotalCommentsCount] = useState<number>(0);
+
+	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		//fetch bracket challenge..
 		const fetchBracketChallenge = async () => {
 			setIsLoading(true);
 			try {
-				const response = await apiClient.get<BracketResponse>(
-					`/bracket-challenges/${slug}`
-				);
+				const response = await apiClient.get(`/bracket-challenges/${slug}`);
 				setBracketChallenge(response.data.bracketChallenge);
 				setEntrySlug(response.data.bracketEntrySlug);
-				setShowLeaderboard(response.data.showLeaderboard);
+				setIsPast(response.data.isPast);
+				setTotalCommentsCount(response.data.totalCommentsCount);
 			} catch (error) {
 				console.error(error);
 			} finally {
@@ -57,11 +56,32 @@ const BracketChallengePage = () => {
 		}
 	}, [slug]);
 
+	useEffect(() => {
+		if (!containerRef.current) return;
+		gsap.to(containerRef.current, {
+			xPercent: showLeaderboard ? -100 : 0,
+			duration: 0.3,
+			ease: "power4.out",
+		});
+
+		return () => {
+			if (containerRef.current) {
+				gsap.killTweensOf(containerRef.current);
+			}
+		};
+	}, [showLeaderboard]);
+
 	if (authLoading) {
 		return <LoadAuth />;
 	}
 
 	//test comments
+	const bracketMode = () => {
+		if (entrySlug || isPast) {
+			return "preview";
+		}
+		return "submit";
+	};
 
 	return (
 		<ContentBase className="px-4 py-7">
@@ -132,32 +152,53 @@ const BracketChallengePage = () => {
 							)}
 
 							{/* bracket */}
-							<div>
-								<BracketProvider
-									bracketChallenge={bracketChallenge}
-									bracketMode={entrySlug ? "preview" : "submit"}
-								>
-									<Bracket />
-								</BracketProvider>
-							</div>
-							{/* entry list */}
 
-							{showLeaderboard && (
+							<div className="w-full overflow-hidden">
+								<div ref={containerRef} className="flex">
+									<div className="flex-none w-full">
+										<BracketProvider
+											bracketChallenge={bracketChallenge}
+											bracketMode={bracketMode()}
+										>
+											<Bracket />
+										</BracketProvider>
+									</div>
+									{isPast && (
+										<div className="flex-none w-full py-3">
+											<Leaderboard
+												bracketChallengeId={bracketChallenge.id}
+											/>
+										</div>
+									)}
+								</div>
+							</div>
+
+							{isPast && (
 								<>
 									<hr className="my-3 border-gray-400" />
-									<Leaderboard
-										bracketChallengeId={bracketChallenge.id}
-									/>
+									<button
+										className="text-white px-3 py-2 bg-orange-600 cursor-pointer w-full sm:w-auto rounded font-semibold hover:bg-orange-500"
+										onClick={() =>
+											setShowLeaderboard((prev) => !prev)
+										}
+									>
+										{`${
+											showLeaderboard ? "HIDE" : "SHOW"
+										} LEADERBOARD`}
+									</button>
 								</>
 							)}
 						</div>
 
 						{/* comment */}
-						<CommentsSection
-							comments={bracketChallenge.comments}
-							challengeId={bracketChallenge.id}
-							className="mt-4"
-						/>
+						<CommentsProvider
+							resource="challenges"
+							resourceId={bracketChallenge.id}
+							totalCount={totalCommentsCount}
+							// comments={bracketChallenge.comments}
+						>
+							<CommentsSection className="mt-4" />
+						</CommentsProvider>
 					</>
 				) : (
 					<div className="py-2 px-3 bg-gray-300 mt-4">

@@ -14,7 +14,6 @@ const Login = () => {
 		isLoading,
 		error,
 		login,
-		sendVerificationEmail,
 		clearMessages,
 	} = useAuth();
 	const navigate = useNavigate();
@@ -26,13 +25,6 @@ const Login = () => {
 		e.preventDefault();
 		const success = await login(email, password);
 		if (success) navigate(from, { replace: true });
-	};
-
-	const handleVerifyEmail = async () => {
-		const response = await sendVerificationEmail();
-		if (response) {
-			navigate("/email-verification-notice");
-		}
 	};
 
 	useEffect(() => {
@@ -105,18 +97,7 @@ const Login = () => {
 				</form>
 				{error && (
 					<div>
-						<p className="my-3 text-red-500">
-							{error}
-							{error === "Please verify your email to log in." && (
-								<button
-									type="button"
-									className="text-sm	text-gray-700 bg-red-700 hover:bg-red-600 cursor-pointer text-white font-bold px-2 ms-2 rounded"
-									onClick={handleVerifyEmail}
-								>
-									VERIFY EMAIL
-								</button>
-							)}
-						</p>
+						<p className="my-3 text-red-500">{error}</p>
 					</div>
 				)}
 

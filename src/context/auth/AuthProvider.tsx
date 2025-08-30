@@ -1,10 +1,4 @@
-import React, {
-	useContext,
-	useState,
-	useEffect,
-	type ReactNode,
-	use,
-} from "react";
+import React, { useContext, useState, useEffect, type ReactNode } from "react";
 import { AuthContext, type User } from "./AuthContext";
 import { apiClient, getCsrfToken } from "../../utils/api"; // Import your configured axios instance
 import { type ProfileWindow } from "../../data/adminData";
@@ -47,15 +41,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	};
 
 	useEffect(() => {
-		// const fetchCsrfTokenAnduser = async () => {
-		// 	try {
-		// 		await getCsrfToken();
-		// 		fetchUser();
-		// 	} catch (error) {
-		// 		console.log(error);
-		// 	}
-		// };
-		// fetchCsrfTokenAnduser();
 		fetchUser();
 	}, []);
 
@@ -156,15 +141,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	): Promise<boolean> => {
 		setIsLoading(true);
 		try {
-			await getCsrfToken();
 			const response = await apiClient.post("/email/verify", {
 				email,
 				token,
 			});
 			console.log(response.data.message);
-			setUser(response.data.user);
 			setMessage(response.data.message || "Email verification successful!");
-			setIsAuthenticated(true);
 			setIsToVerifyEmail(false);
 			return true;
 		} catch (error: any) {

@@ -259,12 +259,15 @@ export interface CommentInfo {
 	type: string;
 	body: string;
 	user_id: number;
-	parent_id: number;
+	parent_id: number | null;
 	user: UserMiniInfo;
 	created_at: string;
 	updated_at: string;
 	replies: CommentInfo[];
 	parent: CommentInfo;
+	replies_count: number;
+	last_page?: number;
+	current_page?: number;
 }
 
 // export interface GeneralApiErrorResponse {

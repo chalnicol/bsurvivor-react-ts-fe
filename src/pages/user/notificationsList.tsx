@@ -173,7 +173,7 @@ const NotificationsList = () => {
 							<p className="absolute w-2.5 h-2.5 rounded-full bg-red-500 -top-1 -right-1"></p>
 						</button>
 					) : (
-						<span className="text-xs text-white px-3 py-1 rounded font-semibold bg-sky-400 opacity-70 select-none">
+						<span className="text-xs text-white px-3 py-0.5 rounded font-semibold bg-sky-400 opacity-70 select-none">
 							GET NEW NOTIFICATIONS
 						</span>
 					)}

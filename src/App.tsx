@@ -65,6 +65,11 @@ import {
 	faBell,
 	faTrash,
 	faCircle,
+	faEllipsisVertical,
+	faThumbsUp,
+	faThumbsDown,
+	faArrowAltCircleDown,
+	faQuoteLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import FriendsList from "./pages/user/friends";
 import NotificationsList from "./pages/user/notificationsList";
@@ -94,7 +99,12 @@ library.add(
 	faRotateRight,
 	faBell,
 	faTrash,
-	faCircle
+	faCircle,
+	faEllipsisVertical,
+	faThumbsUp,
+	faThumbsDown,
+	faArrowAltCircleDown,
+	faQuoteLeft
 );
 
 function App() {

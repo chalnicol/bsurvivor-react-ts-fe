@@ -1,24 +1,15 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
 import ContentBase from "../contentBase";
 
 const VerifyEmail = () => {
-	const {
-		// message,
-		error,
-		isAuthenticated,
-		authLoading,
-		verifyEmail,
-		clearMessages,
-	} = useAuth();
+	const { message, error, authLoading, verifyEmail, clearMessages } =
+		useAuth();
 
-	const location = useLocation();
 	const navigate = useNavigate();
 
 	const [isInvalid, setIsInvalid] = useState(false);
-
-	const from = location.state?.from?.pathname || "/"; // Default to /dashboard
 
 	useEffect(() => {
 		return () => {
@@ -38,19 +29,19 @@ const VerifyEmail = () => {
 			const verify = async () => {
 				const success = await verifyEmail(email, token);
 				if (success) {
-					// navigate(from, { replace: true });
 					console.log("successful email verification.. redirecting");
+					setTimeout(() => navigate("/login"), 2000);
 				}
 			};
 			verify();
 		}
 	}, [location, navigate, authLoading]);
 
-	useEffect(() => {
-		if (isAuthenticated) {
-			navigate(from, { replace: true });
-		}
-	}, [isAuthenticated, navigate, from]);
+	// useEffect(() => {
+	// 	if (isAuthenticated) {
+	// 		navigate(from, { replace: true });
+	// 	}
+	// }, [isAuthenticated, navigate, from]);
 
 	if (isInvalid) {
 		return (
@@ -73,6 +64,9 @@ const VerifyEmail = () => {
 					Almost done! Just a moment while we confirm your details..
 				</p>
 				{error && <p className="text-red-500 text-sm my-3">{error}</p>}
+				{message && (
+					<p className="text-green-500 text-sm my-3">{message}</p>
+				)}
 			</div>
 		</ContentBase>
 	);
