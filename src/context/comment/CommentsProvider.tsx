@@ -1,11 +1,4 @@
-import {
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-	type ReactNode,
-} from "react";
+import { useCallback, useContext, useState, type ReactNode } from "react";
 
 import { CommentsContext } from "./CommentsContext";
 import type { CommentInfo, PaginatedResponse } from "../../data/adminData";
@@ -31,8 +24,6 @@ export const CommentsProvider = ({
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [totalCommentsCount, setTotalCommentsCount] =
 		useState<number>(totalCount);
-
-	const isInitialMount = useRef<boolean>(false);
 
 	const fetchComments = useCallback(
 		async (page: number) => {
@@ -61,7 +52,7 @@ export const CommentsProvider = ({
 					// Combine the old and new comments
 					return [...prevComments, ...newUniqueComments];
 				});
-				setTotalCommentsCount(meta.total);
+				// setTotalCommentsCount(meta.total);
 				setCurrentPage(meta.current_page);
 				setLastPage(meta.last_page);
 			} catch (error: any) {
@@ -205,6 +196,7 @@ export const CommentsProvider = ({
 						})
 					);
 				}
+				setTotalCommentsCount((prev) => prev - 1);
 			} catch (error: any) {
 				console.log(error);
 			} finally {
@@ -310,12 +302,70 @@ export const CommentsProvider = ({
 		[]
 	);
 
-	useEffect(() => {
-		if (!isInitialMount.current) {
-			fetchComments(1);
-			isInitialMount.current = true;
-		}
-	}, [isInitialMount.current]);
+	const commentVote = useCallback(
+		async (
+			commentId: number,
+			parentId: number | null,
+			voteType: "like" | "dislike"
+		) => {
+			const is_like = voteType === "like";
+			try {
+				const response = await apiClient.post(
+					`/comments/${commentId}/votes`,
+					{ is_like }
+				);
+				const votes = response.data.votes;
+
+				if (!parentId) {
+					setComments((prev) => {
+						return prev.map((comment) => {
+							if (comment.id === commentId) {
+								let newVote =
+									comment.user_vote != voteType ? voteType : null;
+
+								return {
+									...comment,
+									user_vote: newVote,
+									votes: votes,
+								};
+							}
+							return comment;
+						});
+					});
+				} else {
+					setComments((prev) =>
+						prev.map((comment) => {
+							if (comment.id === parentId) {
+								const replies = comment.replies || [];
+
+								return {
+									...comment,
+									replies: replies.map((reply) => {
+										if (reply.id === commentId) {
+											let newVote =
+												reply.user_vote != voteType
+													? voteType
+													: null;
+											return {
+												...reply,
+												user_vote: newVote,
+												votes: votes,
+											};
+										}
+										return reply;
+									}),
+								};
+							}
+							return comment;
+						})
+					);
+				}
+			} catch (error) {
+				console.error("Error submitting vote:", error);
+			}
+		},
+		[]
+	);
 
 	return (
 		<CommentsContext.Provider
@@ -325,6 +375,8 @@ export const CommentsProvider = ({
 				totalCommentsCount,
 				currentPage,
 				lastPage,
+				commentVote,
+				fetchComments,
 				fetchReplies,
 				loadMoreReplies,
 				loadMoreComments,

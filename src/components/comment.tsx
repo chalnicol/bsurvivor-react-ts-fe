@@ -1,24 +1,26 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { CommentInfo } from "../data/adminData";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/auth/AuthProvider";
 import { getRelativeTime } from "../utils/dateTime";
 import gsap from "gsap";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import { useComments } from "../context/comment/CommentsProvider";
+import { formatNumberShorthand } from "../utils/numbers";
 
 interface CommentProps {
 	comment: CommentInfo;
 	className?: string;
 }
 const Comment = ({ comment, className }: CommentProps) => {
-	const { user } = useAuth();
+	const { isAuthenticated, user } = useAuth();
 	const {
 		updateComment,
 		deleteComment,
 		addReply,
 		fetchReplies,
 		loadMoreReplies,
+		commentVote,
 		isLoading,
 	} = useComments();
 
@@ -28,6 +30,7 @@ const Comment = ({ comment, className }: CommentProps) => {
 
 	const [body, setBody] = useState<string>(comment.body);
 	const [reply, setReply] = useState<string>("");
+
 	const [displayTime, setDisplayTime] = useState<string>("");
 	const [showOptions, setShowOptions] = useState<boolean>(false);
 	const [showReplies, setShowReplies] = useState<boolean>(false);
@@ -157,15 +160,22 @@ const Comment = ({ comment, className }: CommentProps) => {
 		setShowReplies(false);
 	};
 
+	const getCount = useCallback((count: number): string => {
+		if (count && count > 0) {
+			return formatNumberShorthand(count);
+		}
+		return "";
+	}, []);
+
 	return (
-		<div className={`w-fullborder-t border-gray-300 ${className}`}>
+		<div className={`w-full border-t border-gray-300 ${className}`}>
 			<div className="flex">
 				{/* header */}
 				<div className="flex-1">
 					{/* username + date display */}
 					<div className="flex items-center font-semibold text-gray-500 gap-x-2 select-none">
 						<p
-							className={`flex-none px-2 py-0.5 w-33 text-sm bg-zinc-800 ${
+							className={`flex-none px-2 py-0.5 w-33 text-sm bg-gray-700 ${
 								isOwned ? "text-yellow-500" : "text-white"
 							}`}
 						>
@@ -183,6 +193,7 @@ const Comment = ({ comment, className }: CommentProps) => {
 								value={body}
 								className="w-full border-b border-gray-400 focus:outline-none py-1 block"
 								onChange={(e) => setBody(e.target.value)}
+								required
 							/>
 							<div className="space-x-1 mt-1">
 								<button
@@ -269,30 +280,45 @@ const Comment = ({ comment, className }: CommentProps) => {
 				</div>
 			</div>
 			{/* reactions */}
-			<div className="flex items-center gap-x-1">
+			<div className="flex items-center select-none">
 				<button
-					className={`flex items-center gap-x-1 text-sm font-semibold rounded border w-16 px-1 ${
-						user && user.id !== comment.user_id
-							? "hover:text-gray-500 cursor-pointer shadow border-neutral-400"
-							: "border-neutral-300 bg-zinc-50"
+					className={`rounded flex items-center justify-center px-2 py-0.5 ${
+						isAuthenticated &&
+						"cursor-pointer hover:text-emerald-500 hover:scale-120 transition-scale ease-in duration-100"
+					} ${
+						comment.user_vote &&
+						comment.user_vote == "like" &&
+						"text-emerald-600"
 					}`}
-					disabled={!user || user.id === comment.user_id}
+					onClick={() =>
+						commentVote(comment.id, comment.parent_id, "like")
+					}
+					disabled={!isAuthenticated}
 				>
-					<FontAwesomeIcon icon="thumbs-up" className="px-1 py-0.5" />
-					<span className="text-sm">1M</span>
+					<FontAwesomeIcon icon="thumbs-up" />
 				</button>
-				{/* <span>100</span> */}
+				<p className="text-sm w-8 font-bold">
+					{getCount(comment.votes?.likes || 0)}
+				</p>
 				<button
-					className={`flex items-center gap-x-1 text-sm font-semibold rounded border  w-16 px-1 ${
-						user && user.id !== comment.user_id
-							? "hover:text-gray-500 cursor-pointer shadow border-neutral-400"
-							: "border-neutral-300 bg-zinc-50"
+					className={`rounded flex items-center justify-center px-2 py-0.5 ${
+						isAuthenticated &&
+						"cursor-pointer hover:text-rose-500 hover:scale-120 transition-scale ease-in duration-100"
+					} ${
+						comment.user_vote &&
+						comment.user_vote == "dislike" &&
+						"text-rose-600"
 					}`}
-					disabled={!user || user.id === comment.user_id}
+					onClick={() =>
+						commentVote(comment.id, comment.parent_id, "dislike")
+					}
+					disabled={!isAuthenticated}
 				>
-					<FontAwesomeIcon icon="thumbs-down" className="px-1 py-0.5" />
-					<span className="text-sm">1K</span>
+					<FontAwesomeIcon icon="thumbs-down" />
 				</button>
+				<p className="text-sm w-8 font-bold">
+					{getCount(comment.votes?.dislikes || 0)}
+				</p>
 			</div>
 			{/* replies */}
 			<div>
@@ -306,6 +332,7 @@ const Comment = ({ comment, className }: CommentProps) => {
 								placeholder="Add a reply..."
 								value={reply}
 								onChange={(e) => setReply(e.target.value)}
+								required
 							/>
 							<div className="space-x-1 mt-1.5">
 								<button

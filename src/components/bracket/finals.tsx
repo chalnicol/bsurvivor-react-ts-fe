@@ -120,7 +120,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 						<div className="font-bold text-lg text-center">
 							{league} FINALS
 						</div>
-						{showClearButton && (
+						{/* {showClearButton && (
 							<button
 								className="cursor-pointer hover:text-gray-400 bg-gray-500 leading-0 px-1"
 								onClick={clearFinalsMatchup}
@@ -128,7 +128,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 							>
 								<FontAwesomeIcon icon="xmark" />
 							</button>
-						)}
+						)} */}
 					</div>
 
 					<div className="space-y-2 w-full">
@@ -144,6 +144,25 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 							isClickable={isClickable}
 							placeholderText="R2M2 WINNER"
 						/>
+					</div>
+					<div
+						className={`select-none text-[10px] mt-1.5 text-white font-semibold flex items-center`}
+					>
+						<p className="flex-1">
+							<span className="bg-gray-600 px-1">Match ID</span>
+							<span className="bg-orange-800 px-1 text-white">
+								{league == "NBA" ? "F_R4M1" : "R3M1"}
+							</span>
+						</p>
+						{showClearButton && (
+							<button
+								className="text-xs text-white cursor-pointer hover:text-gray-400 bg-gray-500 leading-0 px-1"
+								onClick={clearFinalsMatchup}
+								title="CLEAR TEAMS"
+							>
+								<FontAwesomeIcon icon="xmark" />
+							</button>
+						)}
 					</div>
 				</div>
 				{/* winning team */}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Comment from "./comment";
 import { useAuth } from "../context/auth/AuthProvider";
 import { useComments } from "../context/comment/CommentsProvider";
@@ -16,11 +16,14 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 		totalCommentsCount,
 		currentPage,
 		lastPage,
+		fetchComments,
 		loadMoreComments,
 		addComment,
 	} = useComments();
 
 	const [body, setBody] = useState<string>("");
+
+	const isInitialMount = useRef<boolean>(false);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -31,35 +34,46 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 	const commentsCount: string =
 		totalCommentsCount > 0 ? `(${totalCommentsCount})` : "";
 
+	useEffect(() => {
+		if (isAuthenticated && !isInitialMount.current) {
+			fetchComments(1);
+			isInitialMount.current = true;
+		}
+	}, [isAuthenticated, isInitialMount.current]);
+
 	return (
 		<div className={`${className}`}>
 			<h2 className="font-bold text-lg">Comments {commentsCount}</h2>
 			{/* <p className="text-gray-500 mt-0.5">
 				Please make your comments friendly and constructive.
 			</p> */}
-			{isAuthenticated && (
+			{isAuthenticated ? (
 				<form id="comment-form" onSubmit={handleSubmit} className="mt-2">
-					<div className="md:flex items-start gap-x-2 mt-1 space-y-1 md:space-y-0">
+					<div className="md:flex gap-x-2 mt-1 space-y-1 md:space-y-0">
 						<input
 							type="text"
 							value={body}
 							placeholder="Add a comment"
-							className="flex-1 rounded border border-gray-500 placeholder:text-gray-500 w-full h-10 px-3 py-1 text-base focus:outline-none focus:ring-gray-500 focus:border-gray-500"
+							className="flex-1 rounded border border-gray-500 placeholder:text-gray-500 w-full h-10 px-3 py-1 text-sm md:text-base focus:outline-none focus:ring-gray-500 focus:border-gray-500"
 							onChange={(e) => setBody(e.target.value)}
 							required
 						/>
 						<button
-							className={`text-white rounded  w-full md:w-auto font-bold px-4 py-2 ${
+							className={`text-white rounded text-sm md:text-base w-full md:w-auto font-bold px-4 py-2 ${
 								isLoading
 									? "bg-gray-500 opacity-50"
 									: "bg-gray-600 hover:bg-gray-500 cursor-pointer"
 							}`}
 							disabled={isLoading}
 						>
-							<FontAwesomeIcon icon="plus" /> ADD
+							SUBMIT
 						</button>
 					</div>
 				</form>
+			) : (
+				<p className="text-sm text-gray-500">
+					You have to be logged in to view and add comments.
+				</p>
 			)}
 			<div className="mt-4 md:mt-3">
 				{comments.length > 0 ? (

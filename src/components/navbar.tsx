@@ -169,7 +169,7 @@ const Navbar = () => {
 					<div className="flex-1 space-x-4">
 						<Link to="/">Home</Link>
 						<Link to="/bracket-challenges">Bracket Challenges</Link>
-						<Link to="/about">About Us</Link>
+						<Link to="/about">About</Link>
 					</div>
 					<div className="flex items-center space-x-5">
 						{isAuthenticated && user ? (
@@ -271,7 +271,7 @@ const Navbar = () => {
 								className="border-b p-2 w-full text-left"
 								onClick={() => handleMenuClick("/about")}
 							>
-								About Us
+								About
 							</button>
 
 							{isAuthenticated ? (

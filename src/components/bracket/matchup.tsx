@@ -150,10 +150,13 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 					/>
 				</div>
 				<div
-					className={`select-none text-[10px] mt-1 px-0.5 text-white font-semibold flex items-center ${flexClass} ${textAlignment}`}
+					className={`select-none text-[10px] mt-1.5 text-white font-semibold flex items-center ${flexClass} ${textAlignment}`}
 				>
 					<p className="flex-1">
-						Match : <span className="text-red-400">{matchup.name}</span>
+						<span className="bg-gray-600 px-1">Match ID</span>
+						<span className="bg-orange-800 px-1 text-white">
+							{matchup.name}
+						</span>
 					</p>
 					{showClearButton && (
 						<button

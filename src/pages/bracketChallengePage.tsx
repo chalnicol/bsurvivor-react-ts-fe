@@ -60,7 +60,7 @@ const BracketChallengePage = () => {
 		if (!containerRef.current) return;
 		gsap.to(containerRef.current, {
 			xPercent: showLeaderboard ? -100 : 0,
-			duration: 0.3,
+			duration: 0.5,
 			ease: "power4.out",
 		});
 
@@ -110,21 +110,21 @@ const BracketChallengePage = () => {
 							</div>
 							<hr className="my-3 border-gray-400" />
 
-							{isAuthenticated ? (
-								entrySlug && (
-									<div className="py-1 px-4 py-2 rounded mb-3 bg-rose-600 font-semibold sm:flex items-center justify-between space-y-2 sm:space-y-0">
-										<p className="text-white">
-											You have an entry for this bracket challenge.
-										</p>
-										<Link
-											to={`/bracket-challenge-entries/${entrySlug}`}
-											className="bg-red-900 hover:bg-red-800 font-semibold text-white px-2 py-1 rounded text-xs block text-center w-26 mb-1 sm:mb-0"
-										>
-											VIEW ENTRY
-										</Link>
-									</div>
-								)
-							) : (
+							{isAuthenticated && entrySlug && (
+								<div className="py-1 px-4 py-2 rounded mb-3 bg-rose-600 font-semibold sm:flex items-center justify-between space-y-2 sm:space-y-0">
+									<p className="text-white">
+										You have an entry for this bracket challenge.
+									</p>
+									<Link
+										to={`/bracket-challenge-entries/${entrySlug}`}
+										className="bg-red-900 hover:bg-red-800 font-semibold text-white px-2 py-1 rounded text-xs block text-center w-26 mb-1 sm:mb-0"
+									>
+										VIEW ENTRY
+									</Link>
+								</div>
+							)}
+
+							{!isAuthenticated && !isPast && (
 								<div className="py-2 px-4 bg-teal-400 font-semibold rounded mb-3 md:flex items-center justify-between">
 									<span className="text-gray-600">
 										To join this bracket challenge, you must be
@@ -152,7 +152,6 @@ const BracketChallengePage = () => {
 							)}
 
 							{/* bracket */}
-
 							<div className="w-full overflow-hidden">
 								<div ref={containerRef} className="flex">
 									<div className="flex-none w-full">
@@ -191,6 +190,7 @@ const BracketChallengePage = () => {
 						</div>
 
 						{/* comment */}
+
 						<CommentsProvider
 							resource="challenges"
 							resourceId={bracketChallenge.id}

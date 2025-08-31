@@ -10,13 +10,13 @@ const Footer = () => {
 						<div className="space-x-3">
 							<Link
 								to="/terms-of-service"
-								className="text-red-400 underline"
+								className="text-teal-400 underline"
 							>
 								Terms of Service
 							</Link>
 							<Link
 								to="/privacy-policy"
-								className="text-red-400 underline"
+								className="text-teal-400 underline"
 							>
 								Privacy Policy
 							</Link>

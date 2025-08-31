@@ -227,10 +227,7 @@ export interface UserMiniInfo {
 }
 
 export interface SearchedUserInfo extends UserMiniInfo {
-	is_friend: boolean;
-	is_blocked: boolean;
-	has_pending_sent: boolean;
-	has_pending_received: boolean;
+	status: "friends" | "request_sent" | "request_received" | "not_friends";
 }
 
 export interface FriendsInfo {
@@ -268,6 +265,13 @@ export interface CommentInfo {
 	replies_count: number;
 	last_page?: number;
 	current_page?: number;
+	votes: VotesInfo;
+	user_vote: "like" | "dislike" | null;
+}
+
+export interface VotesInfo {
+	likes: number;
+	dislikes: number;
 }
 
 // export interface GeneralApiErrorResponse {

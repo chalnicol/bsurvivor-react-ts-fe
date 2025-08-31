@@ -140,6 +140,7 @@ const ListUsers = () => {
 									<td className="px-2 py-1">Name</td>
 									<td className="px-2 py-1">Email</td>
 									<td className="px-2 py-1">Roles</td>
+									<td className="px-2 py-1">Email Verified</td>
 									<td className="px-2 py-1">Account Status</td>
 									<td className="px-2 py-1">Actions</td>
 								</tr>
@@ -155,6 +156,17 @@ const ListUsers = () => {
 										<td className="px-2 py-1 space-x-1">
 											<RolesPills roles={user.roles} />
 										</td>
+										<td>
+											{user.email_verified_at ? (
+												<span className="text-xs font-bold text-green-600">
+													YES
+												</span>
+											) : (
+												<span className="text-xs font-bold text-rose-600">
+													NO
+												</span>
+											)}
+										</td>
 										<td className="px-2 py-1 ">
 											<span
 												className={`text-xs border font-bold rounded bg-white px-2 shadow ${
@@ -166,6 +178,7 @@ const ListUsers = () => {
 												{user.is_blocked ? "blocked" : "active"}
 											</span>
 										</td>
+
 										<td className="px-2 py-1 flex items-center space-x-1">
 											<Link
 												to={`/admin/users/${user.id}`}

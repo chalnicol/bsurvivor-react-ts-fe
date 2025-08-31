@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import apiClient from "../../utils/axiosConfig";
 import type { BracketChallengeEntryInfo } from "../../data/adminData";
 import StatusPills from "../statusPills";
+import { useAuth } from "../../context/auth/AuthProvider";
 
 type LeaderboardType = "global" | "friends";
 
@@ -9,6 +10,7 @@ interface LeaderboardProps {
 	bracketChallengeId: number;
 }
 const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
+	const { isAuthenticated } = useAuth();
 	const [type, setType] = useState<LeaderboardType>("global");
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [leaderboard, setLeaderboard] = useState<BracketChallengeEntryInfo[]>(
@@ -34,12 +36,25 @@ const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
 	}, [bracketChallengeId, type]);
 
 	const handleButtonClick = (buttonType: LeaderboardType) => {
+		if (!isAuthenticated && buttonType === "friends") return;
 		setType(buttonType);
 	};
+
+	const getFriendsButtonClass = (): string => {
+		if (type == "friends") {
+			return "bg-gray-500";
+		} else {
+			if (isAuthenticated) {
+				return "hover:bg-gray-700 cursor-pointer";
+			}
+		}
+		return "cursor-not-allowed";
+	};
+
 	return (
 		<div className="max-w-2xl mx-auto mb-6">
 			<h2 className="font-bold text-sm text-center text-xl">LEADERBOARD</h2>
-			<div className="border rounded overflow-hidden flex mt-4">
+			<div className="border rounded-full overflow-hidden flex mt-4">
 				<button
 					className={`flex-1 border-r border-gray-400 px-2 py-1 font-bold ${
 						type === "global"
@@ -51,12 +66,9 @@ const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
 					GLOBAL
 				</button>
 				<button
-					className={`flex-1 border-r border-gray-400 px-2 py-1 font-bold ${
-						type === "friends"
-							? "bg-gray-500"
-							: "hover:bg-gray-700 cursor-pointer"
-					}`}
+					className={`flex-1 border-r border-gray-400 px-2 py-1 font-bold ${getFriendsButtonClass()}`}
 					onClick={() => handleButtonClick("friends")}
+					disabled={!isAuthenticated}
 				>
 					FRIENDS
 				</button>

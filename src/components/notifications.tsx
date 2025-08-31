@@ -35,7 +35,7 @@ const Notification = ({
 		let bgClass = "";
 		let label = "";
 
-		if (type == "FriendRequestReceivedNotification") {
+		if (type == "FriendRequestSentNotification") {
 			bgClass = "bg-amber-500 hover:bg-amber-400";
 			label = "FRIENDS";
 		} else if (type == "WelcomeUserNotification") {

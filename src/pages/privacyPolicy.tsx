@@ -4,7 +4,7 @@ import EndOfPage from "../components/endOfPage";
 const PrivacyPolicyPage = () => {
 	return (
 		<ContentBase className="p-4">
-			<div className="border border-gray-400 bg-gray-100 px-3 md:px-8 pt-2 pb-6 mt-4 mb-7 rounded-lg shadow">
+			<div className="border border-gray-400 bg-gray-100 px-4 pb-4 mt-4 mb-7 rounded-lg shadow">
 				<h1 className="text-3xl font-bold mt-4 mb-3">Privacy Policy</h1>
 
 				<div className="bg-gray-800 text-white rounded px-8 py-6 ">
