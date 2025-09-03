@@ -1,19 +1,20 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { CommentInfo } from "../data/adminData";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/auth/AuthProvider";
 import { getRelativeTime } from "../utils/dateTime";
 import gsap from "gsap";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import { useComments } from "../context/comment/CommentsProvider";
-import { formatNumberShorthand } from "../utils/numbers";
+import ReactionVote from "./reactions";
+import CommentForm from "./commentForm";
 
 interface CommentProps {
 	comment: CommentInfo;
 	className?: string;
 }
 const Comment = ({ comment, className }: CommentProps) => {
-	const { isAuthenticated, user } = useAuth();
+	const { user } = useAuth();
 	const {
 		updateComment,
 		deleteComment,
@@ -21,6 +22,8 @@ const Comment = ({ comment, className }: CommentProps) => {
 		fetchReplies,
 		loadMoreReplies,
 		commentVote,
+		updateActiveId,
+		activeId,
 		isLoading,
 	} = useComments();
 
@@ -36,8 +39,6 @@ const Comment = ({ comment, className }: CommentProps) => {
 	const [showReplies, setShowReplies] = useState<boolean>(false);
 
 	const optionRef = useRef<HTMLDivElement>(null);
-	const updateInputRef = useRef<HTMLInputElement>(null);
-	const replyInputRef = useRef<HTMLInputElement>(null);
 
 	const popupRef = useOutsideClick<HTMLDivElement>(() => {
 		setShowOptions(false);
@@ -80,30 +81,24 @@ const Comment = ({ comment, className }: CommentProps) => {
 	}, [showOptions]);
 
 	useEffect(() => {
-		if (replyMode && replyInputRef.current) {
-			replyInputRef.current.focus();
+		if (activeId == null || (activeId && activeId !== comment.id)) {
+			setReplyMode(false);
+			setEditMode(false);
+			setDeleteMode(false);
 		}
-	}, [replyMode, replyInputRef.current]);
-
-	useEffect(() => {
-		if (editMode && updateInputRef.current) {
-			updateInputRef.current.focus();
-		}
-	}, [editMode, updateInputRef.current]);
+	}, [activeId]);
 
 	const handleCancel = () => {
 		setEditMode(false);
 		setBody(comment.body);
 	};
 
-	const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+	const handleUpdate = async () => {
 		await updateComment(comment.id, comment.parent_id, body);
 		setEditMode(false);
 	};
 
-	const handleSubmitReply = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+	const handleSubmitReply = async () => {
 		console.log("submitting reply");
 
 		if (!comment.replies || comment.replies.length === 0) {
@@ -131,6 +126,7 @@ const Comment = ({ comment, className }: CommentProps) => {
 			}
 			setShowReplies(true);
 		}
+		updateActiveId(comment.id);
 	};
 
 	const handleEditMode = () => {
@@ -140,6 +136,7 @@ const Comment = ({ comment, className }: CommentProps) => {
 		setReplyMode(false);
 		setShowOptions(false);
 		setShowReplies(false);
+		updateActiveId(comment.id);
 	};
 
 	const handleDeleteMode = () => {
@@ -149,6 +146,7 @@ const Comment = ({ comment, className }: CommentProps) => {
 		setBody(comment.body);
 		setShowOptions(false);
 		setShowReplies(false);
+		updateActiveId(comment.id);
 	};
 
 	const handleReplyMode = () => {
@@ -158,14 +156,13 @@ const Comment = ({ comment, className }: CommentProps) => {
 		setBody(comment.body);
 		setShowOptions(false);
 		setShowReplies(false);
+		updateActiveId(comment.id);
 	};
 
-	const getCount = useCallback((count: number): string => {
-		if (count && count > 0) {
-			return formatNumberShorthand(count);
-		}
-		return "";
-	}, []);
+	const handleCancelReply = () => {
+		setReplyMode(false);
+		setReply("");
+	};
 
 	return (
 		<div className={`w-full border-t border-gray-300 ${className}`}>
@@ -175,7 +172,7 @@ const Comment = ({ comment, className }: CommentProps) => {
 					{/* username + date display */}
 					<div className="flex items-center font-semibold text-gray-500 gap-x-2 select-none">
 						<p
-							className={`flex-none px-2 py-0.5 w-33 text-sm bg-gray-700 ${
+							className={`flex-none px-2 py-0.5 w-35 text-sm bg-gray-700 rounded-br ${
 								isOwned ? "text-yellow-500" : "text-white"
 							}`}
 						>
@@ -186,31 +183,18 @@ const Comment = ({ comment, className }: CommentProps) => {
 					</div>
 					{/* comment body */}
 					{editMode ? (
-						<form onSubmit={handleUpdate} className="mt-1 mb-4">
-							<input
-								ref={updateInputRef}
-								type="text"
-								value={body}
-								className="w-full border-b border-gray-400 focus:outline-none py-1 block"
-								onChange={(e) => setBody(e.target.value)}
-								required
-							/>
-							<div className="space-x-1 mt-1">
-								<button
-									type="button"
-									className="text-xs bg-red-600 hover:bg-red-500 cursor-pointer text-white px-3 py-0.5 rounded font-bold"
-									onClick={handleCancel}
-									disabled={isLoading}
-								>
-									CANCEL
-								</button>
-								<button className="text-xs bg-sky-600 hoveer:bg-sky-500 cursor-pointer text-white px-3 py-0.5 rounded font-bold">
-									UPDATE
-								</button>
-							</div>
-						</form>
+						<CommentForm
+							className="mt-2 mb-4 space-y-1"
+							textValue={body}
+							isLoading={isLoading}
+							btnSizes="sm"
+							btnSubmitLabel="UPDATE"
+							onSubmit={() => handleUpdate()}
+							onCancel={() => handleCancel()}
+							onChange={(e: string) => setBody(e)}
+						/>
 					) : (
-						<p className="py-0.5 my-0.5 md:py-1 md:my-1">
+						<p className="py-0.5 my-0.5 md:py-1">
 							<FontAwesomeIcon
 								icon="quote-left"
 								size="2xs"
@@ -221,134 +205,91 @@ const Comment = ({ comment, className }: CommentProps) => {
 							</span>
 						</p>
 					)}
+					{/* reactions */}
+					<ReactionVote
+						likeableId={comment.id}
+						likeableParentId={comment.parent_id}
+						likesCount={comment.votes?.likes || 0}
+						dislikesCount={comment.votes?.dislikes || 0}
+						userVote={comment.user_vote}
+						onVote={commentVote}
+					/>
+					{/* reply form */}
+					{replyMode && (
+						<CommentForm
+							className="my-3 space-y-1"
+							textValue={reply}
+							isLoading={isLoading}
+							btnSizes="sm"
+							placeholderText="input reply here"
+							onSubmit={() => handleSubmitReply()}
+							onCancel={() => handleCancelReply()}
+							onChange={(e: string) => setReply(e)}
+						/>
+					)}
 				</div>
 				{/* ellipsis vertical */}
-				<div className="w-12 px-2">
-					<div
-						ref={popupRef}
-						className="flex-none w-full h-auto aspect-square relative mt-1"
-					>
-						<button
-							className="text-center w-full h-full rounded-full hover:bg-gray-300 cursor-pointer flex items-center justify-center"
-							onClick={() => setShowOptions((prev) => !prev)}
-							disabled={isLoading}
+				{user && (
+					<div className="w-12 px-2">
+						<div
+							ref={popupRef}
+							className="flex-none w-full h-auto aspect-square relative mt-2"
 						>
-							<FontAwesomeIcon icon="ellipsis-vertical" size="lg" />
-						</button>
-						{showOptions && (
-							<div
-								ref={optionRef}
-								className="absolute overflow-hidden flex flex-col w-28 border border-gray-300 rounded top-0 right-full bg-white text-sm z-10 shadow-md"
+							<button
+								className="text-center w-full h-full rounded-full hover:bg-gray-300 cursor-pointer flex items-center justify-center"
+								onClick={() => setShowOptions((prev) => !prev)}
+								disabled={isLoading}
 							>
-								<p className="bg-gray-700 text-white text-right font-bold px-3 py-0.5">
-									Options
-								</p>
-
-								{isReplyAllowed && (
-									<button
-										className="py-1 text-right px-3 hover:bg-sky-50 cursor-pointer"
-										onClick={handleReplyMode}
-										disabled={isLoading}
-									>
-										Reply
-									</button>
-								)}
-
-								{isOwned && (
-									<>
-										<button
-											className="py-1 text-right px-3 hover:bg-sky-50 cursor-pointer"
-											onClick={handleEditMode}
-										>
-											Edit
-										</button>
-										<button
-											className="py-1 text-right px-3 hover:bg-sky-50 cursor-pointer"
-											onClick={handleDeleteMode}
-										>
-											Delete
-										</button>
-									</>
-								)}
-
-								{!isOwned && !isReplyAllowed && (
-									<p className="px-3 py-1 text-right">-none-</p>
-								)}
-							</div>
-						)}
-					</div>
-				</div>
-			</div>
-			{/* reactions */}
-			<div className="flex items-center select-none">
-				<button
-					className={`rounded flex items-center justify-center px-2 py-0.5 ${
-						isAuthenticated &&
-						"cursor-pointer hover:text-emerald-500 hover:scale-120 transition-scale ease-in duration-100"
-					} ${
-						comment.user_vote &&
-						comment.user_vote == "like" &&
-						"text-emerald-600"
-					}`}
-					onClick={() =>
-						commentVote(comment.id, comment.parent_id, "like")
-					}
-					disabled={!isAuthenticated}
-				>
-					<FontAwesomeIcon icon="thumbs-up" />
-				</button>
-				<p className="text-sm w-8 font-bold">
-					{getCount(comment.votes?.likes || 0)}
-				</p>
-				<button
-					className={`rounded flex items-center justify-center px-2 py-0.5 ${
-						isAuthenticated &&
-						"cursor-pointer hover:text-rose-500 hover:scale-120 transition-scale ease-in duration-100"
-					} ${
-						comment.user_vote &&
-						comment.user_vote == "dislike" &&
-						"text-rose-600"
-					}`}
-					onClick={() =>
-						commentVote(comment.id, comment.parent_id, "dislike")
-					}
-					disabled={!isAuthenticated}
-				>
-					<FontAwesomeIcon icon="thumbs-down" />
-				</button>
-				<p className="text-sm w-8 font-bold">
-					{getCount(comment.votes?.dislikes || 0)}
-				</p>
-			</div>
-			{/* replies */}
-			<div>
-				{replyMode && (
-					<div className="my-2">
-						<form onSubmit={handleSubmitReply} className="mt-1">
-							<input
-								ref={replyInputRef}
-								type="text"
-								className="border-b border-gray-400 w-full py-1 px-1 focus:outline-none"
-								placeholder="Add a reply..."
-								value={reply}
-								onChange={(e) => setReply(e.target.value)}
-								required
-							/>
-							<div className="space-x-1 mt-1.5">
-								<button
-									type="button"
-									className="text-xs bg-amber-600 hover:bg-amber-500 cursor-pointer text-white px-3 py-0.5 rounded font-bold"
-									onClick={() => setReplyMode(false)}
+								<FontAwesomeIcon icon="ellipsis-vertical" size="lg" />
+							</button>
+							{showOptions && (
+								<div
+									ref={optionRef}
+									className="absolute overflow-hidden flex flex-col w-28 border border-gray-300 rounded top-0 right-full bg-white text-sm z-10 shadow-md"
 								>
-									CANCEL
-								</button>
-								<button className="text-xs bg-sky-600 hoveer:bg-sky-500 cursor-pointer text-white px-3 py-0.5 rounded font-bold">
-									ADD REPLY
-								</button>
-							</div>
-						</form>
+									<p className="bg-gray-700 text-white text-right font-bold px-3 py-0.5">
+										Options
+									</p>
+
+									{isReplyAllowed && (
+										<button
+											className="py-1 text-right px-3 hover:bg-sky-50 cursor-pointer"
+											onClick={handleReplyMode}
+											disabled={isLoading}
+										>
+											Reply
+										</button>
+									)}
+
+									{isOwned && (
+										<>
+											<button
+												className="py-1 text-right px-3 hover:bg-sky-50 cursor-pointer"
+												onClick={handleEditMode}
+											>
+												Edit
+											</button>
+											<button
+												className="py-1 text-right px-3 hover:bg-sky-50 cursor-pointer"
+												onClick={handleDeleteMode}
+											>
+												Delete
+											</button>
+										</>
+									)}
+
+									{!isOwned && !isReplyAllowed && (
+										<p className="px-3 py-1 text-right">-none-</p>
+									)}
+								</div>
+							)}
+						</div>
 					</div>
 				)}
+			</div>
+
+			{/* replies */}
+			<div>
 				{comment.replies_count > 0 && (
 					<button
 						className="bg-gray-400/50 hover:bg-gray-300/50 cursor-pointer text-left text-xs px-2 py-0.5 rounded-full w-33 mt-2"

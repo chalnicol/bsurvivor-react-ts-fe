@@ -4,10 +4,11 @@ import EndOfPage from "../components/endOfPage";
 const TermsOfServicePage = () => {
 	return (
 		<ContentBase className="p-4">
-			<div className="border border-gray-400 bg-gray-100 px-4 pb-4 mt-4 mb-7 rounded-lg shadow">
-				<h1 className="text-3xl font-bold mt-4 mb-2">Terms of Service</h1>
-
-				<div className="bg-gray-800 text-white rounded px-8 py-6 mt-3">
+			<div className="border border-gray-400 bg-gray-100 p-4 mt-4 mb-7 rounded-lg shadow">
+				<div className="h-24 flex items-center justify-center bg-gray-900 text-white rounded-t">
+					<h1 className="text-4xl font-bold">Terms of Service</h1>
+				</div>
+				<div className="bg-gray-800 text-white rounded-b px-8 py-6">
 					<p className="mb-2">
 						Welcome to BasketballSurvivor! These Terms of Service
 						("Terms") govern your access to and use of our website,

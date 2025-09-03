@@ -1,7 +1,6 @@
 export const displayLocalDate = (dateString: string): string => {
-	const utcMidnightDateString = dateString + "T00:00:00.000Z";
-
-	const date = new Date(utcMidnightDateString);
+	// const utcMidnightDateString = dateString + "T00:00:00.000Z";
+	const date = new Date(dateString);
 
 	return date.toLocaleDateString("en-US", {
 		year: "numeric",
@@ -11,7 +10,6 @@ export const displayLocalDate = (dateString: string): string => {
 };
 
 // checkHasStarted: Determines if the current date is on or after the start date.
-// Assumes dateString is in "YYYY-MM-DD" format.
 export const checkHasStarted = (dateString: string): boolean => {
 	// Create a Date object for the start of the specified day (in UTC)
 	const startDate = new Date(dateString + "T00:00:00Z");
@@ -24,7 +22,6 @@ export const checkHasStarted = (dateString: string): boolean => {
 };
 
 // checkHasEnded: Determines if the current date is after the end date.
-// Assumes dateString is in "YYYY-MM-DD" format.
 export const checkHasEnded = (dateString: string): boolean => {
 	// Create a Date object for the day *after* the specified end date
 	const endDate = new Date(dateString + "T23:59:59Z");

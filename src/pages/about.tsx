@@ -61,23 +61,6 @@ const About = () => {
 						sheer joy of watching your dark horse pick defy the odds.
 					</p>
 
-					<h2 className="text-xl font-bold mb-2">Behind The Bracket</h2>
-					<p className="font-medium">
-						I'm Charlou Nicolas, the creator of this Basketball Survivor.
-						This platform is the result of my lifelong obsession with
-						basketball and a personal mission to build something truly
-						special for fellow fans.
-					</p>
-					<p className="font-medium mt-2">
-						I've been a die-hard basketball enthusiast for as long as I
-						can remember. From the agony of a busted bracket to the thrill
-						of an underdog victory, I understand the emotional
-						rollercoaster of the playoffs. With a professional background
-						in software development, I decided to combine my skills and
-						passion to create a better, more engaging experience for
-						everyone.
-					</p>
-
 					<h2 className="mt-6 text-xl font-bold mb-2">Our Mission</h2>
 					<p className="font-medium">
 						Our mission is to provide the most engaging and user-friendly
@@ -126,6 +109,25 @@ const About = () => {
 						community. It's where you can compete for bragging rights,
 						share your insights (or commiserate over unexpected upsets!),
 						and feel more connected to the game you love.
+					</p>
+
+					<h2 className="text-xl font-bold mt-6 mb-2">
+						Behind The Bracket
+					</h2>
+					<p className="font-medium">
+						I'm Charlou Nicolas, the creator of this Basketball Survivor.
+						This platform is the result of my lifelong obsession with
+						basketball and a personal mission to build something truly
+						special for fellow fans.
+					</p>
+					<p className="font-medium mt-2">
+						I've been a die-hard basketball enthusiast for as long as I
+						can remember. From the agony of a busted bracket to the thrill
+						of an underdog victory, I understand the emotional
+						rollercoaster of the playoffs. With a professional background
+						in software development, I decided to combine my skills and
+						passion to create a better, more engaging experience for
+						everyone.
 					</p>
 
 					<hr className="my-6 border-gray-400" />

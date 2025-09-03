@@ -24,6 +24,7 @@ export const CommentsProvider = ({
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [totalCommentsCount, setTotalCommentsCount] =
 		useState<number>(totalCount);
+	const [activeId, setActiveId] = useState<number | null>(null);
 
 	const fetchComments = useCallback(
 		async (page: number) => {
@@ -367,6 +368,10 @@ export const CommentsProvider = ({
 		[]
 	);
 
+	const updateActiveId = useCallback((id: number | null) => {
+		setActiveId(id);
+	}, []);
+
 	return (
 		<CommentsContext.Provider
 			value={{
@@ -375,6 +380,8 @@ export const CommentsProvider = ({
 				totalCommentsCount,
 				currentPage,
 				lastPage,
+				activeId,
+				updateActiveId,
 				commentVote,
 				fetchComments,
 				fetchReplies,

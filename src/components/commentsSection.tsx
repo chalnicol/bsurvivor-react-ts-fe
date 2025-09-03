@@ -3,6 +3,7 @@ import Comment from "./comment";
 import { useAuth } from "../context/auth/AuthProvider";
 import { useComments } from "../context/comment/CommentsProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import CommentForm from "./commentForm";
 
 interface CommentsSectionProps {
 	className?: string;
@@ -19,62 +20,78 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 		fetchComments,
 		loadMoreComments,
 		addComment,
+		activeId,
+		updateActiveId,
 	} = useComments();
 
 	const [body, setBody] = useState<string>("");
+	const [addCommentMode, setAddCommentMode] = useState<boolean>(false);
 
 	const isInitialMount = useRef<boolean>(false);
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		addComment(body);
+	const handleSubmit = async () => {
+		await addComment(body);
 		setBody("");
+		setAddCommentMode(false);
+	};
+
+	const handleCancel = () => {
+		setBody("");
+		setAddCommentMode(false);
+	};
+
+	const handleAddComment = () => {
+		updateActiveId(null);
+		setAddCommentMode(true);
 	};
 
 	const commentsCount: string =
 		totalCommentsCount > 0 ? `(${totalCommentsCount})` : "";
 
 	useEffect(() => {
-		if (isAuthenticated && !isInitialMount.current) {
+		if (!isInitialMount.current) {
 			fetchComments(1);
 			isInitialMount.current = true;
 		}
-	}, [isAuthenticated, isInitialMount.current]);
+	}, [isInitialMount.current]);
+
+	useEffect(() => {
+		if (activeId) {
+			setAddCommentMode(false);
+			setBody("");
+		}
+	}, [activeId]);
 
 	return (
 		<div className={`${className}`}>
-			<h2 className="font-bold text-lg">Comments {commentsCount}</h2>
-			{/* <p className="text-gray-500 mt-0.5">
-				Please make your comments friendly and constructive.
-			</p> */}
-			{isAuthenticated ? (
-				<form id="comment-form" onSubmit={handleSubmit} className="mt-2">
-					<div className="md:flex gap-x-2 mt-1 space-y-1 md:space-y-0">
-						<input
-							type="text"
-							value={body}
-							placeholder="Add a comment"
-							className="flex-1 rounded border border-gray-500 placeholder:text-gray-500 w-full h-10 px-3 py-1 text-sm md:text-base focus:outline-none focus:ring-gray-500 focus:border-gray-500"
-							onChange={(e) => setBody(e.target.value)}
-							required
-						/>
-						<button
-							className={`text-white rounded text-sm md:text-base w-full md:w-auto font-bold px-4 py-2 ${
-								isLoading
-									? "bg-gray-500 opacity-50"
-									: "bg-gray-600 hover:bg-gray-500 cursor-pointer"
-							}`}
-							disabled={isLoading}
-						>
-							SUBMIT
-						</button>
-					</div>
-				</form>
-			) : (
-				<p className="text-sm text-gray-500">
-					You have to be logged in to view and add comments.
-				</p>
+			<div className="flex gap-x-4 items-baseline">
+				<h2 className="font-bold text-lg">Comments {commentsCount}</h2>
+				{isAuthenticated && (
+					<button
+						className={`rounded text-xs font-bold text-white px-3 py-0.5 ${
+							addCommentMode
+								? "bg-gray-400"
+								: "bg-amber-600 hover:bg-amber-500 cursor-pointer"
+						}`}
+						onClick={handleAddComment}
+						disabled={addCommentMode}
+					>
+						ADD COMMENT
+					</button>
+				)}
+			</div>
+
+			{addCommentMode && (
+				<CommentForm
+					className="mt-2 mb-6 space-y-1.5"
+					textValue={body}
+					isLoading={isLoading}
+					onSubmit={() => handleSubmit()}
+					onCancel={() => handleCancel()}
+					onChange={(e: string) => setBody(e)}
+				/>
 			)}
+
 			<div className="mt-4 md:mt-3">
 				{comments.length > 0 ? (
 					<>
@@ -102,7 +119,7 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 										<span>MORE COMMENTS</span>
 									</button>
 								) : (
-									<span className="text-gray-400 text-sm font-bold rounded mx-auto px-4 py-1">
+									<span className="text-gray-400 text-sm font-bold rounded mx-auto px-4 select-none">
 										END OF COMMENTS
 									</span>
 								)}
@@ -110,7 +127,7 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 						)}
 					</>
 				) : (
-					<p className="text-gray-500 border border-gray-400 rounded p-2 bg-gray-300">
+					<p className="border-t border-gray-300 py-2">
 						No comments to display.
 					</p>
 				)}

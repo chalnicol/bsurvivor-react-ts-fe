@@ -120,6 +120,7 @@ export interface BracketChallengeInfo {
 	created_at: string;
 	updated_at: string;
 	entries: BracketChallengeEntryInfo[];
+	entries_count?: number;
 }
 
 export interface BracketChallengeEntryInfo {

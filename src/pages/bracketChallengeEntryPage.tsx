@@ -11,8 +11,11 @@ import Detail from "../components/detail";
 import { displayLocalDate } from "../utils/dateTime";
 import EndOfPage from "../components/endOfPage";
 import StatusPills from "../components/statusPills";
-import fbImage from "../assets/socials/fb.png";
-import xImage from "../assets/socials/x.png";
+
+import { Link } from "react-router-dom";
+import { CommentsProvider } from "../context/comment/CommentsProvider";
+import CommentsSection from "../components/commentsSection";
+import ShareToSocials from "../components/shareToSocials";
 
 const BracketChallengeEntryPage = () => {
 	const { slug } = useParams<{ slug: string }>();
@@ -20,6 +23,7 @@ const BracketChallengeEntryPage = () => {
 	const [bracketChallengeEntry, setBracketChallengeEnry] =
 		useState<BracketChallengeEntryInfo | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [totalCommentsCount, setTotalCommentsCount] = useState<number>(0);
 
 	const fetchBracketChallengeEntry = async () => {
 		try {
@@ -27,7 +31,10 @@ const BracketChallengeEntryPage = () => {
 			const response = await apiClient.get(
 				`/bracket-challenge-entries/${slug}`
 			);
-			setBracketChallengeEnry(response.data.data);
+			const { message, entry, totalCommentsCount } = response.data;
+			console.log(message);
+			setBracketChallengeEnry(entry);
+			setTotalCommentsCount(totalCommentsCount);
 			// console.log(response.data.user);
 		} catch (error) {
 			console.error("Error fetching bracket challenge:", error);
@@ -43,25 +50,6 @@ const BracketChallengeEntryPage = () => {
 		}
 		fetchBracketChallengeEntry();
 	}, [slug]);
-
-	const handleShareToX = () => {
-		const text = encodeURIComponent(
-			"Check out my bracket predictions! #BracketChallenge"
-		);
-		const url = encodeURIComponent(window.location.href);
-		window.open(
-			`https://x.com/intent/tweet?text=${text}&url=${url}`,
-			"_blank"
-		);
-	};
-
-	const handleShareToFacebook = () => {
-		const url = encodeURIComponent(window.location.href);
-		window.open(
-			`https://www.facebook.com/sharer/sharer.php?u=${url}`,
-			"_blank"
-		);
-	};
 
 	return (
 		<ContentBase className="px-4 py-7">
@@ -88,13 +76,26 @@ const BracketChallengeEntryPage = () => {
 									{bracketChallengeEntry.bracket_challenge.league}
 								</Detail>
 								<Detail label="Bracket Challenge">
-									{bracketChallengeEntry.bracket_challenge.name}
+									<Link
+										to={`/bracket-challenges/${bracketChallengeEntry.bracket_challenge.slug}`}
+									>
+										<span className="hover:text-gray-400 border-b border-gray-400">
+											{bracketChallengeEntry.bracket_challenge.name}
+										</span>
+									</Link>
 								</Detail>
 								<Detail label="Date Submitted">
 									{displayLocalDate(bracketChallengeEntry.created_at)}
 								</Detail>
 								<Detail label="Correct Predictions">
-									{bracketChallengeEntry.correct_predictions_count}
+									<span
+										className={`font-semibold ${
+											bracketChallengeEntry.correct_predictions_count >
+												0 && "text-yellow-500"
+										}`}
+									>
+										{bracketChallengeEntry.correct_predictions_count}
+									</span>
 								</Detail>
 
 								<Detail label="Status">
@@ -116,21 +117,15 @@ const BracketChallengeEntryPage = () => {
 							</div>
 						</div>
 
-						<div className="flex items-center justify-end space-x-1 mt-3">
-							<span className="font-bold">SHARE</span>
-							<img
-								src={fbImage}
-								alt="fb"
-								className="h-8 object-contain shadow-lg border border-gray-400 rounded p-1 cursor-pointer hover:bg-gray-200"
-								onClick={handleShareToFacebook}
-							/>
-							<img
-								src={xImage}
-								alt="x"
-								className="h-8 object-contain shadow-lg border border-gray-400 rounded p-1 cursor-pointer hover:bg-gray-200"
-								onClick={handleShareToX}
-							/>
-						</div>
+						<ShareToSocials />
+
+						<CommentsProvider
+							resource="entries"
+							resourceId={bracketChallengeEntry.id}
+							totalCount={totalCommentsCount}
+						>
+							<CommentsSection className="mt-1" />
+						</CommentsProvider>
 					</>
 				) : (
 					<>

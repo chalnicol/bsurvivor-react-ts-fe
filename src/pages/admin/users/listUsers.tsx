@@ -14,6 +14,7 @@ import Pagination from "../../../components/pagination";
 // Import the custom debounce hook
 import useDebounce from "../../../hooks/useDebounce"; // Adjust path if needed
 import ContentBase from "../../../components/contentBase";
+import { displayLocalDate } from "../../../utils/dateTime";
 
 const ListUsers = () => {
 	// const users: UserInfo[] = [
@@ -139,9 +140,10 @@ const ListUsers = () => {
 									<td className="px-2 py-1">ID</td>
 									<td className="px-2 py-1">Name</td>
 									<td className="px-2 py-1">Email</td>
-									<td className="px-2 py-1">Roles</td>
-									<td className="px-2 py-1">Email Verified</td>
+									<td className="px-2 py-1">Verified</td>
+									<td className="px-2 py-1">Date Joined</td>
 									<td className="px-2 py-1">Account Status</td>
+									<td className="px-2 py-1">Roles</td>
 									<td className="px-2 py-1">Actions</td>
 								</tr>
 							</thead>
@@ -153,10 +155,8 @@ const ListUsers = () => {
 										<td className="px-2 py-1">
 											{truncateEmail(user.email)}
 										</td>
-										<td className="px-2 py-1 space-x-1">
-											<RolesPills roles={user.roles} />
-										</td>
-										<td>
+
+										<td className="px-2 py-1">
 											{user.email_verified_at ? (
 												<span className="text-xs font-bold text-green-600">
 													YES
@@ -167,6 +167,10 @@ const ListUsers = () => {
 												</span>
 											)}
 										</td>
+										<td className="px-2 py-1 space-x-1">
+											{displayLocalDate(user.created_at)}
+										</td>
+
 										<td className="px-2 py-1 ">
 											<span
 												className={`text-xs border font-bold rounded bg-white px-2 shadow ${
@@ -179,6 +183,9 @@ const ListUsers = () => {
 											</span>
 										</td>
 
+										<td className="px-2 py-1 space-x-1">
+											<RolesPills roles={user.roles} />
+										</td>
 										<td className="px-2 py-1 flex items-center space-x-1">
 											<Link
 												to={`/admin/users/${user.id}`}

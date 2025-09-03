@@ -4,10 +4,11 @@ import EndOfPage from "../components/endOfPage";
 const PrivacyPolicyPage = () => {
 	return (
 		<ContentBase className="p-4">
-			<div className="border border-gray-400 bg-gray-100 px-4 pb-4 mt-4 mb-7 rounded-lg shadow">
-				<h1 className="text-3xl font-bold mt-4 mb-3">Privacy Policy</h1>
-
-				<div className="bg-gray-800 text-white rounded px-8 py-6 ">
+			<div className="border border-gray-400 bg-gray-100 p-4 mt-4 mb-7 rounded-lg shadow">
+				<div className="h-24 flex items-center justify-center bg-gray-900 text-white rounded-t">
+					<h1 className="text-4xl font-bold">Privacy Policy</h1>
+				</div>
+				<div className="bg-gray-800 text-white rounded-b px-8 py-6">
 					<p className="mb-2">
 						Your privacy is important to us. This Privacy Policy describes
 						how BasketballSurvivor ("we," "us," or "our") collects, uses,

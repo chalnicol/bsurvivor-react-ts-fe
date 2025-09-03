@@ -13,6 +13,8 @@ const HomePage = () => {
 		return <LoadAuth />;
 	}
 
+	// return <LoadAuth />;
+
 	return (
 		<ContentBase className="py-0 px-4">
 			<Hero />

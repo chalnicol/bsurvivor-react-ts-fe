@@ -5,6 +5,7 @@ import Finals from "./finals";
 import StatusMessage from "../statusMessage";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
+import LoadingPrompt from "../loadingPrompt";
 
 const Bracket = () => {
 	const { isAuthenticated } = useAuth();
@@ -68,7 +69,7 @@ const Bracket = () => {
 			)}
 
 			<div className="w-full rounded relative text-black select-none">
-				<div ref={bracketRef} className="overflow-x-auto">
+				<div ref={bracketRef} className="overflow-x-auto thin-scrollbar">
 					{league == "NBA" && (
 						<div className="flex gap-x-6 items-center min-w-4xl mb-3">
 							<Conference
@@ -92,18 +93,14 @@ const Bracket = () => {
 					)}
 				</div>
 				{isLoading && (
-					<div className="absolute top-0 left-0 w-full h-full">
-						<div className="absolute top-0 left-0 w-full h-full bg-black opacity-70"></div>
+					<div className="absolute top-0 left-0 w-full h-full bg-gray-900/60">
 						<div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-							<div className="px-4 py-3 bg-white rounded">
-								<p className="font-semibold">
-									{mode === "submit" ? "Submitting..." : "Saving..."}.
-								</p>
-							</div>
+							<LoadingPrompt prompt="SAVING" />
 						</div>
 					</div>
 				)}
 			</div>
+
 			{mode == "submit" && !hasProgressed && (
 				<>
 					<hr className="my-2 border-gray-400" />
@@ -180,22 +177,44 @@ const Bracket = () => {
 			{mode == "preview" && hasPredictions && (
 				<>
 					<hr className="my-2 border-gray-400" />
-					{hasPredictions && (
-						<div className="flex items-center">
-							<button
-								className={`cursor-pointer w-full sm:w-65 px-3 py-2 rounded text-white font-bold ${
-									previewState == "entry"
-										? "bg-sky-600 hover:bg-sky-500"
-										: "bg-green-600 hover:bg-green-500"
-								}`}
-								onClick={toggleBracket}
-							>
-								{previewState === "entry"
-									? "SEE BRACKET CHALLENGE RESULTS"
-									: "VIEW BRACKET CHALLENGE ENTRY"}
-							</button>
+					{/* legend */}
+					<div className="md:flex items-center justify-between gap-x-7 space-y-4 md:space-y-0">
+						<div className="flex flex-wrap items-center gap-x-5 md:order-2">
+							<div className="flex items-center gap-x-2">
+								<div className="w-3.5 h-auto aspect-square bg-green-600 flex-none border border-green-500"></div>
+								<span className="font-semibold">
+									CORRECT PREDICTION
+								</span>
+							</div>
+							<div className="flex items-center gap-x-2">
+								<div className="w-3.5 h-auto aspect-square bg-red-700 flex-none border border-red-600"></div>
+								<span className="font-semibold">
+									INCORRECT PREDICTION
+								</span>
+							</div>
+							<div className="flex items-center gap-x-2">
+								<div className="w-3.5 h-auto aspect-square bg-yellow-500 flex-none border border-yellow-400"></div>
+								<span className="font-semibold">ADVANCED/SELECTED</span>
+							</div>
+							<div className="flex items-center gap-x-2">
+								<div className="w-3.5 h-auto aspect-square bg-yellow-800 flex-none border border-yellow-700"></div>
+								<span className="font-semibold">VOIDED</span>
+							</div>
 						</div>
-					)}
+						<button
+							className={`flex-none cursor-pointer w-full md:w-65 px-3 py-2 rounded text-white font-bold md:order-1 ${
+								previewState == "entry"
+									? "bg-sky-600 hover:bg-sky-500"
+									: "bg-green-600 hover:bg-green-500"
+							}`}
+							onClick={toggleBracket}
+						>
+							{/* {previewState === "entry"
+								? "TOGGLE CHALLENGE RESULTS/ENTRY"
+								: "VIEW BRACKET CHALLENGE ENTRY"} */}
+							TOGGLE CHALLENGE RESULTS/ENTRY
+						</button>
+					</div>
 				</>
 			)}
 		</>

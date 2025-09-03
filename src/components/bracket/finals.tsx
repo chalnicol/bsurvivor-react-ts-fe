@@ -150,7 +150,7 @@ const Finals = ({ league, className }: PBAFinalsProps) => {
 					>
 						<p className="flex-1">
 							<span className="bg-gray-600 px-1">Match ID</span>
-							<span className="bg-orange-800 px-1 text-white">
+							<span className="bg-orange-900 px-1 text-white">
 								{league == "NBA" ? "F_R4M1" : "R3M1"}
 							</span>
 						</p>

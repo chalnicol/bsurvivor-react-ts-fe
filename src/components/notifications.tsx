@@ -38,9 +38,15 @@ const Notification = ({
 		if (type == "FriendRequestSentNotification") {
 			bgClass = "bg-amber-500 hover:bg-amber-400";
 			label = "FRIENDS";
-		} else if (type == "WelcomeUserNotification") {
+		} else if (
+			type == "WelcomeUserNotification" ||
+			type == "PasswordResetSuccess"
+		) {
 			bgClass = "bg-emerald-500 hover:bg-emerald-400";
 			label = "PROFILE";
+		} else if (type == "BracketEntryUpdated") {
+			bgClass = "bg-rose-500 hover:bg-rose-400";
+			label = "ENTRY";
 		} else {
 			bgClass = "bg-gray-500 hover:bg-gray-400";
 			label = "PAGE";

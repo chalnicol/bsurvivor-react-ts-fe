@@ -39,7 +39,7 @@ const TopEntries = () => {
 				REFRESH LIST
 			</button>
 			{ongoingChallenges.length > 0 ? (
-				<div className="space-y-6 mb-4 mt-2">
+				<div className="space-y-4 mb-4 mt-2">
 					{ongoingChallenges.map((bracketChallenge) => (
 						<TopEntryList
 							key={bracketChallenge.id}

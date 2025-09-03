@@ -6,7 +6,7 @@ import { useOutsideClick } from "../hooks/useOutsideClick";
 // import Dropdown from "./dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import NotificationLink from "./NotificationLink";
-import img from "../assets/bsurvivor.png";
+import Icon from "./icon";
 
 interface LinksInfo {
 	name: string;
@@ -41,8 +41,8 @@ const Navbar = () => {
 
 	const userLinks: LinksInfo[] = [
 		{ name: "profile", label: "Profile", route: "/profile" },
-		{ name: "entries", label: "Entries", route: "/entries" },
 		{ name: "friends", label: "Friends", route: "/friends" },
+		{ name: "entries", label: "Entries", route: "/entries" },
 	];
 
 	const handleLogout = async () => {
@@ -133,7 +133,7 @@ const Navbar = () => {
 		const handleResize = () => {
 			setShowDropdown(false);
 
-			if (window.innerWidth >= 1024) {
+			if (window.innerWidth >= 768) {
 				setShowMenu(false);
 				setShowMenuDropDown(false);
 			}
@@ -162,7 +162,7 @@ const Navbar = () => {
 			<div className="max-w-7xl mx-auto flex justify-between items-center gap-x-6 h-full px-4">
 				<Link to="/" className="text-lg text-white font-bold">
 					{/* <FontAwesomeIcon icon="basketball" /> BBSurvivor */}
-					<img src={img} alt="brand" className="h-10 object-contain" />
+					<Icon className="h-10 object-contain" />
 				</Link>
 
 				<div className="hidden md:flex items-center text-white font-medium flex-1">
@@ -194,7 +194,7 @@ const Navbar = () => {
 												<Link
 													key={link.name}
 													to={link.route}
-													className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
+													className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer block text-right"
 													onClick={() => setShowDropdown(false)}
 												>
 													{link.label}
@@ -203,7 +203,7 @@ const Navbar = () => {
 											{hasRole("admin") && (
 												<Link
 													to="/admin"
-													className="px-3 py-2 hover:bg-gray-100 cursor-pointer block text-right"
+													className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer block text-right"
 													onClick={() => setShowDropdown(false)}
 												>
 													Admin Page
@@ -211,7 +211,7 @@ const Navbar = () => {
 											)}
 
 											<button
-												className="w-full text-right px-3 py-2 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
+												className="w-full text-right px-3 py-1.5 border-t border-gray-300 font-medium hover:bg-gray-100 cursor-pointer"
 												onClick={handleLogout}
 											>
 												Logout

@@ -196,7 +196,16 @@ const ListBracketChallengeEntries = () => {
 											{displayLocalDate(entry.created_at)}
 										</td>
 										<td className="px-2 py-1">
-											{entry.bracket_challenge.league}
+											{entry.bracket_challenge.league == "NBA" && (
+												<span className="text-red-600 font-semibold">
+													NBA
+												</span>
+											)}
+											{entry.bracket_challenge.league == "PBA" && (
+												<span className="text-blue-600 font-semibold">
+													PBA
+												</span>
+											)}
 										</td>
 										<td className="px-2 py-1">
 											{entry.user.username}

@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { isElementInViewport } from "../utils/elements";
 
 interface StatusMessageProps {
 	message: string;
@@ -72,7 +73,12 @@ const StatusMessage = ({
 		if (!message) return;
 
 		openAnim();
-		scrollAnim();
+		// scrollAnim();
+		// Conditionally trigger the scroll animation ONLY if the element is out of view
+		if (containerRef.current && !isElementInViewport(containerRef.current)) {
+			scrollAnim();
+		}
+
 		let timer = fixed ? null : setTimeout(() => closeAnim(), 5000);
 
 		return () => {

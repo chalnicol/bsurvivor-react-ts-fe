@@ -70,6 +70,7 @@ import {
 	faThumbsDown,
 	faArrowAltCircleDown,
 	faQuoteLeft,
+	faExternalLink,
 } from "@fortawesome/free-solid-svg-icons";
 import FriendsList from "./pages/user/friends";
 import NotificationsList from "./pages/user/notificationsList";
@@ -104,7 +105,8 @@ library.add(
 	faThumbsUp,
 	faThumbsDown,
 	faArrowAltCircleDown,
-	faQuoteLeft
+	faQuoteLeft,
+	faExternalLink
 );
 
 function App() {

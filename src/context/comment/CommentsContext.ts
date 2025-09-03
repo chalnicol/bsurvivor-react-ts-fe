@@ -24,6 +24,8 @@ export interface CommentsContextType {
 		parentId: number | null,
 		voteType: "like" | "dislike"
 	) => Promise<void>;
+	activeId: number | null;
+	updateActiveId: (id: number | null) => void;
 }
 
 export const CommentsContext = React.createContext<

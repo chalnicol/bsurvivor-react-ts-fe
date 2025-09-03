@@ -8,6 +8,7 @@ import Loader from "../../../components/loader";
 import { useAdmin } from "../../../context/admin/AdminProvider";
 import { useAuth } from "../../../context/auth/AuthProvider";
 import ContentBase from "../../../components/contentBase";
+import { displayLocalDate } from "../../../utils/dateTime";
 
 const ViewUser = () => {
 	const { id } = useParams<{ id: string }>();
@@ -162,6 +163,25 @@ const ViewUser = () => {
 									<p className="bg-gray-300 px-2 py-1">Email</p>
 									<p className="p-2 bg-gray-200">{user.email}</p>
 								</div>
+								{/* Email Verified */}
+								<div>
+									<p className="bg-gray-300 px-2 py-1">
+										Email Verified At
+									</p>
+									<p className="p-2 bg-gray-200">
+										{user.email_verified_at
+											? displayLocalDate(user.email_verified_at)
+											: "--"}
+									</p>
+								</div>
+								{/* Date Joined */}
+								<div>
+									<p className="bg-gray-300 px-2 py-1">Date Joined</p>
+									<p className="p-2 bg-gray-200">
+										{displayLocalDate(user.created_at)}
+									</p>
+								</div>
+
 								{/* is blocked */}
 								<div>
 									<p className="bg-gray-300 px-2 py-1">
@@ -186,7 +206,7 @@ const ViewUser = () => {
 												className={`font-bold text-xs px-2 rounded text-white select-none ${
 													user.is_blocked
 														? "bg-red-500"
-														: "bg-green-500"
+														: "bg-green-600"
 												}`}
 											>
 												{user.is_blocked ? "BLOCKED" : "ACTIVE"}

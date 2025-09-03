@@ -52,7 +52,7 @@ const FriendsList = () => {
 
 	const fetchFriends = async (type: FriendsType) => {
 		setIsLoading(true);
-		// setFriends(null);
+		setFriends([]);
 		try {
 			const response = await apiClient.get(`/get-friends?type=${type}`);
 			setFriends(response.data.friends);
@@ -181,6 +181,12 @@ const FriendsList = () => {
 		fetchFriends(activeTab);
 	};
 
+	const tabs: { id: number; label: string; type: FriendsType }[] = [
+		{ id: 1, label: "ACTIVE", type: "active" },
+		{ id: 2, label: "REQUEST RECEIVED", type: "received" },
+		{ id: 2, label: "REQUEST SENT", type: "sent" },
+	];
+
 	return (
 		<ContentBase className="py-7 px-4">
 			<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
@@ -223,39 +229,20 @@ const FriendsList = () => {
 							</h2>
 							<div className="h-64 overflow-y-auto">
 								<div className="grid grid-cols-3 text-sm md:text-base border-y border-gray-500 overflow-hidden">
-									<button
-										className={`font-bold text-gray-300 border-r border-gray-500 py-0.5 ${
-											activeTab == "active"
-												? "bg-gray-500 text-yellow-400"
-												: "hover:text-gray-400 cursor-pointer"
-										}`}
-										onClick={() => setActiveTab("active")}
-										disabled={isLoading}
-									>
-										ACTIVE
-									</button>
-									<button
-										className={`font-bold text-gray-300 border-r border-gray-500 py-0.5 ${
-											activeTab == "received"
-												? "bg-gray-500 text-yellow-400"
-												: "hover:text-gray-400 cursor-pointer"
-										}`}
-										onClick={() => setActiveTab("received")}
-										disabled={isLoading}
-									>
-										REQUEST RECEIVED
-									</button>
-									<button
-										className={`font-bold text-gray-300 py-0.5 ${
-											activeTab == "sent"
-												? "bg-gray-500 text-yellow-400"
-												: "hover:text-gray-400 cursor-pointer"
-										}`}
-										onClick={() => setActiveTab("sent")}
-										disabled={isLoading}
-									>
-										REQUEST SENT
-									</button>
+									{tabs.map((tab) => (
+										<button
+											key={tab.id}
+											className={`font-bold text-sm text-gray-300 border-r border-gray-500 last:border-r-0 py-1 ${
+												activeTab == tab.type
+													? "bg-gray-500 text-yellow-400"
+													: "hover:text-gray-400 cursor-pointer"
+											}`}
+											onClick={() => setActiveTab(tab.type)}
+											disabled={isLoading}
+										>
+											{tab.label}
+										</button>
+									))}
 								</div>
 
 								<div>
@@ -264,10 +251,13 @@ const FriendsList = () => {
 											{friends.map((friend) => (
 												<li
 													key={friend.id}
-													className="odd:bg-gray-700 text-sm text-white px-2 py-2 flex items-center justify-between last:border-b border-gray-500"
+													className="even:bg-gray-700 odd:bg-gray-700/30 text-sm text-white px-2 py-1.5 flex items-center justify-between border-b border-gray-500"
 												>
 													<p>
-														<FontAwesomeIcon icon="user" />{" "}
+														<FontAwesomeIcon
+															icon="user"
+															className="mr-2"
+														/>
 														{friend.username}
 													</p>
 													<div className="space-x-1">

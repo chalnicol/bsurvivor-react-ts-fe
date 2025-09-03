@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { isElementInViewport } from "../utils/elements";
 interface ToDeleteProps {
 	name: string;
 	onCancel: () => void;
@@ -57,26 +58,25 @@ const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
 
 	useEffect(() => {
 		openAnim();
-		scrollAnim();
+		// scrollAnim();
+		if (containerRef.current && !isElementInViewport(containerRef.current)) {
+			scrollAnim();
+		}
 
-		// return () => {
-		// 	if (containerRef.current) {
-		// 		gsap.killTweensOf(containerRef.current);
-		// 	}
-		// };
+		return () => {
+			if (containerRef.current) {
+				gsap.killTweensOf(containerRef.current);
+			}
+		};
 	}, [name]);
 
 	return (
 		<div
 			ref={containerRef}
-			className="px-3 py-2 rounded border border-gray-300 shadow mt-2 text-sm bg-amber-200 md:flex items-center justify-between space-y-2 md:space-y-0"
+			className="px-3 py-2 rounded border border-gray-300 shadow mt-2 bg-amber-300 font-semibold md:flex items-center justify-between space-y-2 md:space-y-0"
 		>
 			<p className="">
-				{name !== "" ? (
-					<>Are you sure you want to delete "{name}"?</>
-				) : (
-					"Are you sure you want to delete?"
-				)}
+				<span>{`Are you sure you want to delete ${name}?`}</span>
 			</p>
 			<div className="flex-none space-x-1 font-bold">
 				<button

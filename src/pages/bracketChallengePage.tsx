@@ -33,7 +33,9 @@ const BracketChallengePage = () => {
 	const [isPast, setIsPast] = useState<boolean>(false);
 	const [totalCommentsCount, setTotalCommentsCount] = useState<number>(0);
 
-	const containerRef = useRef<HTMLDivElement>(null);
+	//
+
+	const leaderboardRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		//fetch bracket challenge..
@@ -41,10 +43,18 @@ const BracketChallengePage = () => {
 			setIsLoading(true);
 			try {
 				const response = await apiClient.get(`/bracket-challenges/${slug}`);
-				setBracketChallenge(response.data.bracketChallenge);
-				setEntrySlug(response.data.bracketEntrySlug);
-				setIsPast(response.data.isPast);
-				setTotalCommentsCount(response.data.totalCommentsCount);
+
+				const {
+					bracketChallenge,
+					bracketEntrySlug,
+					isPast,
+					totalCommentsCount,
+				} = response.data;
+
+				setBracketChallenge(bracketChallenge);
+				setEntrySlug(bracketEntrySlug);
+				setIsPast(isPast);
+				setTotalCommentsCount(totalCommentsCount);
 			} catch (error) {
 				console.error(error);
 			} finally {
@@ -57,16 +67,16 @@ const BracketChallengePage = () => {
 	}, [slug]);
 
 	useEffect(() => {
-		if (!containerRef.current) return;
-		gsap.to(containerRef.current, {
-			xPercent: showLeaderboard ? -100 : 0,
-			duration: 0.5,
+		if (!leaderboardRef.current) return;
+		gsap.to(leaderboardRef.current, {
+			yPercent: showLeaderboard ? 100.1 : 0,
+			duration: 0.3,
 			ease: "power4.out",
 		});
 
 		return () => {
-			if (containerRef.current) {
-				gsap.killTweensOf(containerRef.current);
+			if (leaderboardRef.current) {
+				gsap.killTweensOf(leaderboardRef.current);
 			}
 		};
 	}, [showLeaderboard]);
@@ -97,9 +107,12 @@ const BracketChallengePage = () => {
 							be made after submission.
 						</p>
 						<div className="bg-gray-800 text-white p-4 rounded border text-sm border border-gray-300 mt-4">
-							<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-2">
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
 								<Detail label="Challenge Name">
 									{bracketChallenge.name}
+								</Detail>
+								<Detail label="Entries Submitted">
+									{bracketChallenge.entries_count}
 								</Detail>
 								<Detail label="Submission Opens">
 									{displayLocalDate(bracketChallenge.start_date)}
@@ -111,13 +124,13 @@ const BracketChallengePage = () => {
 							<hr className="my-3 border-gray-400" />
 
 							{isAuthenticated && entrySlug && (
-								<div className="py-1 px-4 py-2 rounded mb-3 bg-rose-600 font-semibold sm:flex items-center justify-between space-y-2 sm:space-y-0">
+								<div className="py-1 px-4 py-2 rounded mb-3 bg-teal-600 font-semibold sm:flex items-center justify-between space-y-2 sm:space-y-0">
 									<p className="text-white">
 										You have an entry for this bracket challenge.
 									</p>
 									<Link
 										to={`/bracket-challenge-entries/${entrySlug}`}
-										className="bg-red-900 hover:bg-red-800 font-semibold text-white px-2 py-1 rounded text-xs block text-center w-26 mb-1 sm:mb-0"
+										className="bg-teal-900 hover:bg-teal-800 font-semibold text-white px-2 py-1 rounded text-xs block text-center w-26 mb-1 sm:mb-0"
 									>
 										VIEW ENTRY
 									</Link>
@@ -151,32 +164,36 @@ const BracketChallengePage = () => {
 								</div>
 							)}
 
-							{/* bracket */}
-							<div className="w-full overflow-hidden">
-								<div ref={containerRef} className="flex">
-									<div className="flex-none w-full">
-										<BracketProvider
-											bracketChallenge={bracketChallenge}
-											bracketMode={bracketMode()}
-										>
-											<Bracket />
-										</BracketProvider>
+							<div className="relative overflow-hidden">
+								<BracketProvider
+									bracketChallenge={bracketChallenge}
+									bracketMode={bracketMode()}
+								>
+									<Bracket />
+								</BracketProvider>
+
+								{/* bracket */}
+								{isPast && (
+									<div
+										ref={leaderboardRef}
+										className="absolute w-full h-full bottom-full left-0 bg-gray-800"
+									>
+										<Leaderboard
+											bracketChallengeId={bracketChallenge.id}
+										/>
 									</div>
-									{isPast && (
-										<div className="flex-none w-full py-3">
-											<Leaderboard
-												bracketChallengeId={bracketChallenge.id}
-											/>
-										</div>
-									)}
-								</div>
+								)}
 							</div>
 
 							{isPast && (
 								<>
 									<hr className="my-3 border-gray-400" />
 									<button
-										className="text-white px-3 py-2 bg-orange-600 cursor-pointer w-full sm:w-auto rounded font-semibold hover:bg-orange-500"
+										className={`text-white px-3 py-2 cursor-pointer w-full sm:w-44 rounded font-bold ${
+											showLeaderboard
+												? "bg-orange-500 hover:bg-orange-400"
+												: "bg-blue-500 hover:bg-blue-400"
+										}`}
 										onClick={() =>
 											setShowLeaderboard((prev) => !prev)
 										}
