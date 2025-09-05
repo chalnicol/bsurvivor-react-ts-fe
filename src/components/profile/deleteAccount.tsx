@@ -1,11 +1,34 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import gsap from "gsap";
 
 const DeleteAccount = () => {
-	const { deleteAccount, isLoading } = useAuth();
+	const { deleteAccount, isLoading, hasRole } = useAuth();
 	const navigate = useNavigate();
 	const [showConfirmation, setShowConfirmation] = useState(false);
+
+	const confirmRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (showConfirmation && confirmRef.current) {
+			gsap.fromTo(
+				confirmRef.current,
+				{ height: 0 },
+				{
+					height: "auto",
+					duration: 0.5,
+					ease: "elastic.out(1, 0.8)",
+					transformOrigin: "50% 0",
+				}
+			);
+		}
+		return () => {
+			if (confirmRef.current) {
+				gsap.killTweensOf(confirmRef.current);
+			}
+		};
+	}, [showConfirmation]);
 
 	const handleDeleteClick = () => {
 		setShowConfirmation(true); // Show the confirmation dialog
@@ -19,59 +42,62 @@ const DeleteAccount = () => {
 		setShowConfirmation(false); // Hide confirmation dialog regardless of success/failure
 	};
 
-	return (
-		<div className="p-6 rounded-lg shadow border border-gray-400 bg-gray-100">
-			<div className="max-w-lg">
-				<h1 className="text-lg font-bold">Delete Account</h1>
-				<hr className="mt-2 mb-4 border-gray-400 shadow-lg" />
-				<p className="text-sm">
-					Deleting your account is permanent and cannot be undone.
-				</p>
-				{/* {error && <p className="text-red-500 text-sm my-3">{error}</p>} */}
-				{!showConfirmation ? (
-					<button
-						className={`mt-5 px-4 py-2 rounded text-white font-bold  ${
-							isLoading
-								? "bg-red-400 opacity-70"
-								: "bg-red-600 hover:bg-red-500 cursor-pointer"
-						}`}
-						onClick={handleDeleteClick}
-						disabled={isLoading}
-					>
-						DELETE ACCOUNT
-					</button>
-				) : (
-					<div className="px-4 py-3 border border-gray-300 mt-6 rounded bg-gray-600 text-white shadow">
-						<p>
-							Are you absolutely sure you want to delete your account?
-						</p>
-						<div className="space-x-2 mt-3">
-							<button
-								className={`px-4 py-1 rounded text-white font-bold  ${
-									isLoading
-										? "bg-amber-300 opacity-70"
-										: "bg-amber-500 hover:bg-amber-400 cursor-pointer"
-								}`}
-								onClick={() => setShowConfirmation(false)}
-								disabled={isLoading}
-							>
-								Cancel
-							</button>
-							<button
-								className={`px-4 py-1 rounded text-white font-bold  ${
-									isLoading
-										? "bg-red-400 opacity-70"
-										: "bg-red-500 hover:bg-red-400 cursor-pointer"
-								}`}
-								onClick={handleConfirmDelete}
-								disabled={isLoading}
-							>
-								Delete
-							</button>
-						</div>
-					</div>
-				)}
+	if (hasRole("admin")) {
+		return (
+			<div className="bg-gray-600 flex items-center justify-center h-20 rounded">
+				You are not allowed to delete your account.
 			</div>
+		);
+	}
+
+	return (
+		<div>
+			<p>Deleting your account is permanent and cannot be undone.</p>
+			<hr className="my-3" />
+			{showConfirmation ? (
+				<div
+					ref={confirmRef}
+					className="px-4 py-3 bg-gray-600 rounded text-white shadow overflow-hidden"
+				>
+					<p>Are you absolutely sure you want to delete your account?</p>
+					<div className="space-x-2 mt-3">
+						<button
+							className={`px-4 py-1 rounded text-white font-bold  ${
+								isLoading
+									? "bg-amber-300 opacity-70"
+									: "bg-amber-500 hover:bg-amber-400 cursor-pointer"
+							}`}
+							onClick={() => setShowConfirmation(false)}
+							disabled={isLoading}
+						>
+							CANCEL
+						</button>
+						<button
+							className={`px-4 py-1 rounded text-white font-bold  ${
+								isLoading
+									? "bg-red-400 opacity-70"
+									: "bg-red-500 hover:bg-red-400 cursor-pointer"
+							}`}
+							onClick={handleConfirmDelete}
+							disabled={isLoading}
+						>
+							DELETE
+						</button>
+					</div>
+				</div>
+			) : (
+				<button
+					className={`px-4 py-2 rounded text-white font-bold  ${
+						isLoading
+							? "bg-red-400 opacity-70"
+							: "bg-red-600 hover:bg-red-500 cursor-pointer"
+					}`}
+					onClick={handleDeleteClick}
+					disabled={isLoading}
+				>
+					DELETE ACCOUNT
+				</button>
+			)}
 		</div>
 	);
 };

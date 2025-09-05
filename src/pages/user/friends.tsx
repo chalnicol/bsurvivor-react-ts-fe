@@ -6,11 +6,30 @@ import apiClient from "../../utils/axiosConfig";
 
 // Import the custom debounce hook
 import useDebounce from "../../hooks/useDebounce"; // Adjust path if needed
-import Loader from "../../components/loader";
-import type { SearchedUserInfo, UserMiniInfo } from "../../data/adminData";
+import type {
+	ColorType,
+	SearchedUserInfo,
+	UserMiniInfo,
+} from "../../data/adminData";
 import StatusMessage from "../../components/statusMessage";
+import RefreshButton from "../../components/refreshButton";
+import CustomButton from "../../components/customButton";
+import Spinner from "../../components/spinner";
+import { Link } from "react-router-dom";
 
 type FriendsType = "active" | "sent" | "received";
+
+interface FriendsCountInfo {
+	active: number;
+	sent: number;
+	received: number;
+}
+
+interface TabInfo {
+	id: number;
+	label: string;
+	type: FriendsType;
+}
 
 const FriendsList = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -24,13 +43,16 @@ const FriendsList = () => {
 
 	const [activeTab, setActiveTab] = useState<FriendsType>("active");
 	const [buttons, setButtons] = useState<string[]>([]);
+	const [friendsCount, setFriendsCount] = useState<FriendsCountInfo | null>(
+		null
+	);
 
 	// Use the debounced value of searchTerm
 	const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
 
 	const fetchSearchedUsers = async (term: string) => {
 		// setIsLoading(true);
-		setIsSearchLoading;
+		setIsSearchLoading(true);
 		setSearchedUsers([]);
 		try {
 			const response = await apiClient.get(`/search-users?search=${term}`);
@@ -55,7 +77,9 @@ const FriendsList = () => {
 		setFriends([]);
 		try {
 			const response = await apiClient.get(`/get-friends?type=${type}`);
-			setFriends(response.data.friends);
+			const { friends, count } = response.data;
+			setFriends(friends);
+			setFriendsCount(count);
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -108,6 +132,37 @@ const FriendsList = () => {
 				return prev.filter((newUser) => newUser.id !== user.id);
 			});
 		}
+		setFriendsCount((prev) => {
+			if (!prev) return null;
+			if (action == "add") {
+				return {
+					...prev,
+					sent: prev.sent + 1,
+				};
+			} else if (action == "accept") {
+				return {
+					...prev,
+					active: prev.active + 1,
+					received: prev.received - 1,
+				};
+			} else if (action == "cancel") {
+				return {
+					...prev,
+					sent: prev.sent - 1,
+				};
+			} else if (action == "remove") {
+				return {
+					...prev,
+					active: prev.active - 1,
+				};
+			} else if (action == "reject") {
+				return {
+					...prev,
+					received: prev.received - 1,
+				};
+			}
+			return prev;
+		});
 		//..
 		setSearchedUsers((prev) => {
 			return prev.map((newUser) => {
@@ -134,43 +189,53 @@ const FriendsList = () => {
 	};
 
 	const renderButton = (user: SearchedUserInfo): React.ReactNode => {
-		const { id, username } = user;
+		const { id, username, fullname } = user;
 
 		switch (user.status) {
 			case "friends":
-				return <span className="text-xs text-green-400">IS FRIEND</span>;
+				return (
+					<span className="text-xs text-green-400 font-semibold">
+						FRIEND
+					</span>
+				);
 			case "request_received":
 				return (
-					<span className="text-xs text-amber-400">REQUEST RECEIVED</span>
+					<span className="text-xs text-amber-400 font-semibold">
+						REQUEST RECEIVED
+					</span>
 				);
 			case "request_sent":
-				return <span className="text-xs text-amber-400">REQUEST SENT</span>;
+				return (
+					<span className="text-xs text-amber-400 font-semibold">
+						REQUEST SENT
+					</span>
+				);
 			default:
 				return (
-					<button
-						className="bg-blue-500 hover:bg-blue-400 cursor-pointer text-white text-xs px-2 py-0.5 rounded font-bold"
-						onClick={() => friendQuery("add", { id, username })}
-					>
-						ADD FRIEND
-					</button>
+					<CustomButton
+						label="ADD FRIEND"
+						color="blue"
+						onClick={() => friendQuery("add", { id, username, fullname })}
+						size="sm"
+						className="shadow"
+						disabled={isSearchLoading}
+					/>
 				);
 		}
 	};
 
-	const btnClass = (btn: string): string => {
+	const getColorType = (btn: string): ColorType => {
 		switch (btn) {
-			case "remove":
-				return "bg-red-500 hover:bg-red-400";
-			case "add":
-				return "bg-blue-500 hover:bg-blue-400";
-			case "cancel":
-				return "bg-amber-500 hover:bg-amber-400";
 			case "accept":
-				return "bg-green-500 hover:bg-green-400";
+				return "emerald";
 			case "reject":
-				return "bg-red-500 hover:bg-red-400";
+				return "red";
+			case "cancel":
+				return "yellow";
+			case "remove":
+				return "red";
 			default:
-				return "bg-gray-500 hover:bg-gray-400";
+				return "blue";
 		}
 	};
 
@@ -181,11 +246,18 @@ const FriendsList = () => {
 		fetchFriends(activeTab);
 	};
 
-	const tabs: { id: number; label: string; type: FriendsType }[] = [
+	const tabs: TabInfo[] = [
 		{ id: 1, label: "ACTIVE", type: "active" },
 		{ id: 2, label: "REQUEST RECEIVED", type: "received" },
-		{ id: 2, label: "REQUEST SENT", type: "sent" },
+		{ id: 3, label: "REQUEST SENT", type: "sent" },
 	];
+
+	const getLabel = (tab: TabInfo): string => {
+		if (friendsCount && friendsCount[tab.type] > 0) {
+			return `${tab.label} (${friendsCount[tab.type]})`;
+		}
+		return tab.label;
+	};
 
 	return (
 		<ContentBase className="py-7 px-4">
@@ -195,15 +267,17 @@ const FriendsList = () => {
 				</h1>
 				<p className="font-medium text-sm my-1">
 					<span>
-						You can add friends and manage your existing friend list here.
+						Add friends and manage your existing friends list here.
 					</span>
 				</p>
-				<button
-					className="text-xs bg-sky-500 hover:bg-sky-400 cursor-pointer text-white px-2 py-0.5 rounded font-semibold mt-2 mb-2"
+
+				<RefreshButton
+					label="REFRESH LIST"
+					size="sm"
+					color="sky"
+					className="mt-2 mb-3 shadow"
 					onClick={handleRefreshListClick}
-				>
-					REFRESH LIST
-				</button>
+				/>
 
 				{success && (
 					<StatusMessage
@@ -227,63 +301,72 @@ const FriendsList = () => {
 							<h2 className="bg-gray-800 text-white px-3 py-2 font-semibold">
 								Friends
 							</h2>
-							<div className="h-64 overflow-y-auto">
-								<div className="grid grid-cols-3 text-sm md:text-base border-y border-gray-500 overflow-hidden">
-									{tabs.map((tab) => (
-										<button
-											key={tab.id}
-											className={`font-bold text-sm text-gray-300 border-r border-gray-500 last:border-r-0 py-1 ${
-												activeTab == tab.type
-													? "bg-gray-500 text-yellow-400"
-													: "hover:text-gray-400 cursor-pointer"
-											}`}
-											onClick={() => setActiveTab(tab.type)}
-											disabled={isLoading}
-										>
-											{tab.label}
-										</button>
-									))}
-								</div>
+							<div className="flex flex-wrap text-xs md:text-sm border-y border-gray-500 overflow-hidden">
+								{tabs.map((tab) => (
+									<button
+										key={tab.id}
+										className={`flex-1 font-bold text-gray-300 border-r border-gray-500 last:border-r-0 py-1 ${
+											activeTab == tab.type
+												? "bg-gray-500 text-yellow-400"
+												: "hover:text-gray-400 cursor-pointer"
+										}`}
+										onClick={() => setActiveTab(tab.type)}
+										disabled={isLoading}
+									>
+										{getLabel(tab)}
+									</button>
+								))}
+							</div>
 
-								<div>
-									{friends && friends.length > 0 ? (
-										<ul>
-											{friends.map((friend) => (
-												<li
-													key={friend.id}
-													className="even:bg-gray-700 odd:bg-gray-700/30 text-sm text-white px-2 py-1.5 flex items-center justify-between border-b border-gray-500"
-												>
-													<p>
-														<FontAwesomeIcon
-															icon="user"
-															className="mr-2"
-														/>
+							<div className="h-57 overflow-y-auto">
+								{friends && friends.length > 0 ? (
+									<ul>
+										{friends.map((friend) => (
+											<li
+												key={friend.id}
+												className="even:bg-gray-700 odd:bg-gray-700/30 text-sm text-white px-2 py-1.5 flex items-center justify-between border-b border-gray-500"
+											>
+												<p>
+													<FontAwesomeIcon
+														icon="user"
+														className="mr-2"
+													/>
+													<Link
+														to={`/users/${friend.username}`}
+														className="hover:text-gray-400"
+													>
 														{friend.username}
-													</p>
-													<div className="space-x-1">
-														{buttons.map((btn) => (
-															<button
-																key={btn}
-																className={`cursor-pointer  text-white text-xs px-2 py-0.5 rounded font-bold ${btnClass(
-																	btn
-																)}`}
-																onClick={() =>
-																	friendQuery(btn, friend)
-																}
-															>
-																{btn.toUpperCase()}
-															</button>
-														))}
-													</div>
-												</li>
-											))}
-										</ul>
-									) : (
-										<p className="px-3 py-2 text-sm text-white">
-											{isLoading ? "Loading.." : "No data found."}
-										</p>
-									)}
-								</div>
+													</Link>
+												</p>
+												<div className="space-x-1">
+													{buttons.map((btn) => (
+														<CustomButton
+															key={btn}
+															label={btn.toUpperCase()}
+															color={getColorType(btn)}
+															onClick={() =>
+																friendQuery(btn, friend)
+															}
+															size="sm"
+															className="shadow"
+															disabled={isSearchLoading}
+														/>
+													))}
+												</div>
+											</li>
+										))}
+									</ul>
+								) : (
+									<>
+										{isLoading ? (
+											<Spinner />
+										) : (
+											<p className="px-3 py-2 h-full text-gray-400">
+												No users to display.
+											</p>
+										)}
+									</>
+								)}
 							</div>
 						</div>
 					</div>
@@ -300,6 +383,7 @@ const FriendsList = () => {
 										onChange={handleSearchInputChange}
 										className="flex-1 px-2 py-1 font-medium text-white focus:outline-none"
 										placeholder="Search users here..."
+										disabled={isSearchLoading}
 									/>
 									{searchTerm && searchTerm !== "" && (
 										<button
@@ -310,13 +394,13 @@ const FriendsList = () => {
 										</button>
 									)}
 								</div>
-								<div className="border  mt-3 border-zinc-500 bg-gray-800 h-30 xl:h-47 overflow-y-auto">
+								<div className="border  mt-3 border-zinc-500 bg-gray-800 h-34 xl:h-47 overflow-y-auto">
 									{searchedUsers.length > 0 ? (
-										<>
+										<ul>
 											{searchedUsers.map((user) => (
 												<li
 													key={user.id}
-													className="odd:bg-gray-700 text-white px-2 py-1 flex items-center justify-between"
+													className="odd:bg-gray-700 text-sm text-white px-2 py-1 flex items-center justify-between"
 												>
 													<p>
 														<FontAwesomeIcon icon="user" />{" "}
@@ -325,13 +409,17 @@ const FriendsList = () => {
 													{renderButton(user)}
 												</li>
 											))}
-										</>
+										</ul>
 									) : (
-										<p className="px-3 py-2 h-full text-gray-400">
-											{isSearchLoading
-												? "Loading..."
-												: "No users to display."}
-										</p>
+										<>
+											{isSearchLoading ? (
+												<Spinner />
+											) : (
+												<p className="px-3 py-2 h-full text-gray-400">
+													No users to display.
+												</p>
+											)}
+										</>
 									)}
 								</div>
 							</div>
@@ -339,7 +427,6 @@ const FriendsList = () => {
 					</div>
 				</div>
 			</div>
-			{(isLoading || isSearchLoading) && <Loader />}
 			<EndOfPage />
 		</ContentBase>
 	);

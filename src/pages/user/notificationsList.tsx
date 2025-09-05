@@ -10,6 +10,7 @@ import StatusMessage from "../../components/statusMessage";
 import ToDelete from "../../components/toDelete";
 import { useAuth } from "../../context/auth/AuthProvider";
 import Notification from "../../components/notifications";
+import CustomButton from "../../components/customButton";
 
 const NotificationsList = () => {
 	const { user, fetchUnreadCount, updateUnreadCount } = useAuth();
@@ -163,7 +164,7 @@ const NotificationsList = () => {
 					You can view all your notifications here.
 				</p>
 
-				<div className="mt-3 mb-4">
+				{/* <div className="mt-3 mb-4">
 					{hasNewNotifications ? (
 						<button
 							className={`text-xs text-white px-3 py-0.5 rounded font-semibold bg-sky-500 hover:bg-sky-400 cursor-pointer relative`}
@@ -177,7 +178,15 @@ const NotificationsList = () => {
 							GET NEW NOTIFICATIONS
 						</span>
 					)}
-				</div>
+				</div> */}
+				<CustomButton
+					label="GET NEW NOTIFICATIONS"
+					onClick={handleRefreshClick}
+					disabled={!hasNewNotifications}
+					size="sm"
+					color="sky"
+					className="mt-2 mb-3 px-3 shadow"
+				/>
 
 				{success && (
 					<StatusMessage
@@ -193,7 +202,6 @@ const NotificationsList = () => {
 						onClose={() => setError(null)}
 					/>
 				)}
-
 				{toDelete && (
 					<ToDelete
 						name={toDelete.id}

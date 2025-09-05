@@ -150,15 +150,24 @@ export interface LeagueInfo {
 	teams?: AnyTeamInfo[];
 }
 
-export interface UserInfo {
+export interface UserMiniInfo {
 	id: number;
 	username: string;
+	fullname: string;
+}
+
+export interface UserInfo extends UserMiniInfo {
 	email: string;
-	roles: string[];
-	is_blocked: boolean;
 	email_verified_at: string | null;
 	created_at: string;
 	updated_at: string;
+	roles: string[]; // Array of role names
+	permissions: string[]; // Array of permission names
+	is_blocked: boolean;
+}
+
+export interface SearchedUserInfo extends UserMiniInfo {
+	status: "friends" | "request_sent" | "request_received" | "not_friends";
 }
 
 export interface RoleInfo {
@@ -222,15 +231,6 @@ export interface NotificationDataInfo {
 	message: string;
 }
 
-export interface UserMiniInfo {
-	id: number;
-	username: string;
-}
-
-export interface SearchedUserInfo extends UserMiniInfo {
-	status: "friends" | "request_sent" | "request_received" | "not_friends";
-}
-
 export interface FriendsInfo {
 	active_friends: UserMiniInfo[];
 	pending_friends: UserMiniInfo[];
@@ -274,6 +274,21 @@ export interface VotesInfo {
 	likes: number;
 	dislikes: number;
 }
+
+export type ColorType =
+	| "red"
+	| "emerald"
+	| "orange"
+	| "yellow"
+	| "green"
+	| "teal"
+	| "blue"
+	| "indigo"
+	| "purple"
+	| "pink"
+	| "amber"
+	| "lime"
+	| "sky";
 
 // export interface GeneralApiErrorResponse {
 // 	message: string;

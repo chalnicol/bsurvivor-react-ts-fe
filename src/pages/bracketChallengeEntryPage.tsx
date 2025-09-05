@@ -16,8 +16,10 @@ import { Link } from "react-router-dom";
 import { CommentsProvider } from "../context/comment/CommentsProvider";
 import CommentsSection from "../components/commentsSection";
 import ShareToSocials from "../components/shareToSocials";
+// import { useAuth } from "../context/auth/AuthProvider";
 
 const BracketChallengeEntryPage = () => {
+	// const { isAuthenticated, user } = useAuth();
 	const { slug } = useParams<{ slug: string }>();
 
 	const [bracketChallengeEntry, setBracketChallengeEnry] =
@@ -51,6 +53,16 @@ const BracketChallengeEntryPage = () => {
 		fetchBracketChallengeEntry();
 	}, [slug]);
 
+	// const isMyself = useCallback(
+	// 	(entryUser: UserInfo): boolean => {
+	// 		if (isAuthenticated && user && user.id == entryUser.id) {
+	// 			return true;
+	// 		}
+	// 		return false;
+	// 	},
+	// 	[user, isAuthenticated]
+	// );
+
 	return (
 		<ContentBase className="px-4 py-7">
 			<div className="p-3 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
@@ -61,32 +73,35 @@ const BracketChallengeEntryPage = () => {
 				{bracketChallengeEntry ? (
 					<>
 						<p className="text-sm font-medium my-1">
-							View your bracket challenge entry below.
+							View bracket challenge entry below.
 						</p>
 
 						<div className="bg-gray-800 text-white p-4 rounded border text-sm border border-gray-300 mt-4">
 							<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-2">
-								<Detail label="Entry Name">
+								<Detail label="Entry ID">
 									{bracketChallengeEntry.name}
 								</Detail>
-								<Detail label="Entry By">
-									{bracketChallengeEntry.user.username}
+								<Detail label="Date Submitted">
+									{displayLocalDate(bracketChallengeEntry.created_at)}
 								</Detail>
-								<Detail label="League">
-									{bracketChallengeEntry.bracket_challenge.league}
+								<Detail label="Entry By">
+									<Link
+										to={`/users/${bracketChallengeEntry.user.username}`}
+										className="hover:text-gray-400 border-b border-gray-300"
+									>
+										{bracketChallengeEntry.user.username}
+									</Link>
 								</Detail>
 								<Detail label="Bracket Challenge">
 									<Link
 										to={`/bracket-challenges/${bracketChallengeEntry.bracket_challenge.slug}`}
 									>
-										<span className="hover:text-gray-400 border-b border-gray-400">
+										<span className="hover:text-gray-400 border-b border-gray-300">
 											{bracketChallengeEntry.bracket_challenge.name}
 										</span>
 									</Link>
 								</Detail>
-								<Detail label="Date Submitted">
-									{displayLocalDate(bracketChallengeEntry.created_at)}
-								</Detail>
+
 								<Detail label="Correct Predictions">
 									<span
 										className={`font-semibold ${

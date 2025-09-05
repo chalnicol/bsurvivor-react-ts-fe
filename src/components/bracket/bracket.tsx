@@ -93,10 +93,8 @@ const Bracket = () => {
 					)}
 				</div>
 				{isLoading && (
-					<div className="absolute top-0 left-0 w-full h-full bg-gray-900/60">
-						<div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-							<LoadingPrompt prompt="SAVING" />
-						</div>
+					<div className="absolute top-0 left-0 w-full h-full bg-gray-900/70 flex items-center justify-center">
+						<LoadingPrompt prompt="SAVING" size="sm" />
 					</div>
 				)}
 			</div>

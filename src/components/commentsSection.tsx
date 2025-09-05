@@ -4,6 +4,7 @@ import { useAuth } from "../context/auth/AuthProvider";
 import { useComments } from "../context/comment/CommentsProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CommentForm from "./commentForm";
+import CustomButton from "./customButton";
 
 interface CommentsSectionProps {
 	className?: string;
@@ -64,20 +65,17 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 
 	return (
 		<div className={`${className}`}>
-			<div className="flex gap-x-4 items-baseline">
+			<div className="flex gap-x-4 items-center">
 				<h2 className="font-bold text-lg">Comments {commentsCount}</h2>
 				{isAuthenticated && (
-					<button
-						className={`rounded text-xs font-bold text-white px-3 py-0.5 ${
-							addCommentMode
-								? "bg-gray-400"
-								: "bg-amber-600 hover:bg-amber-500 cursor-pointer"
-						}`}
+					<CustomButton
+						label="ADD COMMENT"
 						onClick={handleAddComment}
+						size="sm"
 						disabled={addCommentMode}
-					>
-						ADD COMMENT
-					</button>
+						color="amber"
+						className="shadow"
+					/>
 				)}
 			</div>
 

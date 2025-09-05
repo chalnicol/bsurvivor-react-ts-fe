@@ -1,25 +1,26 @@
 import React from "react";
-import type { ProfileWindow } from "../../data/adminData";
+import type { ProfileWindow, UserInfo } from "../../data/adminData";
 
-export interface User {
-	id: number;
-	username: string;
-	email: string;
-	email_verified_at: string | null;
-	created_at: string;
-	updated_at: string;
-	roles: string[]; // Array of role names
-	permissions: string[]; // Array of permission names
-	// Add other user properties you expect from your API
-}
+// export interface User {
+// 	id: number;
+// 	username: string;
+// 	email: string;
+// 	email_verified_at: string | null;
+// 	created_at: string;
+// 	updated_at: string;
+// 	roles: string[]; // Array of role names
+// 	permissions: string[]; // Array of permission names
+// 	// Add other user properties you expect from your API
+// }
 
 export interface AuthContextType {
-	user: User | null;
+	user: UserInfo | null;
 	// token: string | null;
 	isAuthenticated: boolean;
+	success: string | null;
 	error: string | null;
 	fieldErrors: Record<string, string[]> | null;
-	message: string | null;
+
 	isLoading: boolean;
 	authLoading: boolean;
 	login: (email: string, password: string) => Promise<boolean>;
@@ -37,7 +38,11 @@ export interface AuthContextType {
 		password: string,
 		password_confirmation: string
 	) => Promise<boolean>;
-	updateProfile: (email: string, username: string) => Promise<boolean>;
+	updateProfile: (
+		email: string,
+		username: string,
+		fullname: string
+	) => Promise<boolean>;
 	updatePassword: (
 		currentPassword: string,
 		password: string,
@@ -45,7 +50,7 @@ export interface AuthContextType {
 	) => Promise<boolean>;
 	deleteAccount: () => Promise<boolean>;
 	clearMessages: () => void;
-	updateUser: (updatedUser: User) => void;
+	updateUser: (updatedUser: UserInfo) => void;
 	hasRole: (role: string) => boolean;
 	can: (permission: string) => boolean;
 	sendVerificationEmail: () => Promise<boolean>;

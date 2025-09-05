@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
 import ContentBase from "../contentBase";
+import TransparentIcon from "../transparentIcon";
 
 const resetPassword = () => {
 	const location = useLocation();
@@ -91,76 +92,81 @@ const resetPassword = () => {
 
 	return (
 		<ContentBase className="flex items-center justify-center p-4">
-			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md border border-gray-400">
-				<h2 className="text-2xl font-bold mb-4 text-center">
-					Reset Password
-				</h2>
-				<form onSubmit={handleSubmit}>
-					<div className="mb-4">
-						<label
-							htmlFor="email"
-							className="block text-sm font-medium text-gray-700"
-						>
-							Email
-						</label>
-						<input
-							type="email"
-							id="email"
-							value={email}
-							disabled
-							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-						/>
-					</div>
-					<div className="mb-4">
-						<label
-							htmlFor="new_password"
-							className="block text-sm font-medium text-gray-700"
-						>
-							Password
-						</label>
-						<input
-							type="password"
-							id="password"
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-							required
+			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md border border-gray-400 overflow-hidden relative">
+				<TransparentIcon className="absolute w-60 opacity-15 rotate-30 -right-10 -top-10 z-0" />
+				<div className="relative z-10">
+					<h2 className="text-2xl font-bold mb-4 text-center">
+						Reset Password
+					</h2>
+					<form onSubmit={handleSubmit}>
+						<div className="mb-4">
+							<label
+								htmlFor="email"
+								className="block text-sm font-medium text-gray-700"
+							>
+								Email
+							</label>
+							<input
+								type="email"
+								id="email"
+								value={email}
+								disabled
+								className="mt-1 block w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+							/>
+						</div>
+						<div className="mb-4">
+							<label
+								htmlFor="new_password"
+								className="block text-sm font-medium text-gray-700"
+							>
+								Password
+							</label>
+							<input
+								type="password"
+								id="password"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								className="mt-1 block w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+								required
+								disabled={isLoading}
+							/>
+						</div>
+						<div className="mb-6">
+							<label
+								htmlFor="password_confirmation"
+								className="block text-sm font-medium text-gray-700"
+							>
+								Confirm Password
+							</label>
+							<input
+								type="password"
+								id="password_confirmation"
+								value={passwordConfirmation}
+								onChange={(e) =>
+									setPasswordConfirmation(e.target.value)
+								}
+								className="mt-1 block w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+								required
+								disabled={isLoading}
+							/>
+						</div>
+						<button
+							type="submit"
+							className={`w-full text-white font-bold py-2 px-4 rounded transition duration-200 ${
+								isLoading
+									? "bg-gray-600 opacity-70"
+									: "bg-gray-700 hover:bg-gray-600 cursor-pointer"
+							}`}
 							disabled={isLoading}
-						/>
-					</div>
-					<div className="mb-6">
-						<label
-							htmlFor="password_confirmation"
-							className="block text-sm font-medium text-gray-700"
 						>
-							Confirm Password
-						</label>
-						<input
-							type="password"
-							id="password_confirmation"
-							value={passwordConfirmation}
-							onChange={(e) => setPasswordConfirmation(e.target.value)}
-							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-							required
-							disabled={isLoading}
-						/>
-					</div>
-					<button
-						type="submit"
-						className={`w-full text-white font-bold py-2 px-4 rounded transition duration-200 ${
-							isLoading
-								? "bg-gray-600 opacity-70"
-								: "bg-gray-700 hover:bg-gray-600 cursor-pointer"
-						}`}
-						disabled={isLoading}
-					>
-						UPDATE PASSWORD
-					</button>
-				</form>
-				{message && (
-					<p className="text-green-600 text-sm my-3">{message}</p>
-				)}
-				{error && <p className="text-red-500 text-sm my-3">{error}</p>}
+							UPDATE PASSWORD
+						</button>
+					</form>
+					{message && (
+						<p className="text-green-600 text-sm my-3">{message}</p>
+					)}
+					{error && <p className="text-red-500 text-sm my-3">{error}</p>}
+				</div>
 			</div>
 		</ContentBase>
 	);

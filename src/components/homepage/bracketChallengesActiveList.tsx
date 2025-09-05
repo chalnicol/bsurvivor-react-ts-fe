@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAdmin } from "../../context/admin/AdminProvider";
 import { displayLocalDate } from "../../utils/dateTime";
 import Detail from "../detail";
+import RefreshButton from "../refreshButton";
 
 const BracketChallengeActiveList = () => {
 	const {
@@ -29,17 +30,15 @@ const BracketChallengeActiveList = () => {
 					Take a look of the active bracket challenges and submit your
 					bracket challenge entry.
 				</p>
-				<button
-					className={`font-bold text-xs px-2 py-0.5 block rounded text-white mt-3 ${
-						isLoading
-							? "bg-amber-400 opacity-80"
-							: "bg-amber-500 hover:bg-amber-400 cursor-pointer"
-					}`}
+
+				<RefreshButton
+					label="REFRESH LIST"
+					color="amber"
+					size="sm"
+					className="mt-2 shadow"
 					onClick={() => fetchBracketChallenges("active")}
 					disabled={isLoading}
-				>
-					REFRESH LIST
-				</button>
+				/>
 
 				{/* <hr className="my-2 border-gray-400 text-gray-500" /> */}
 				<div className="overflow-x-hidden mt-2">
@@ -56,15 +55,16 @@ const BracketChallengeActiveList = () => {
 												{bracketChallenge.name}
 											</Detail>
 											<Detail label="League">
-												<span
-													className={`font-semibold px-1 ${
-														bracketChallenge.league == "NBA"
-															? "text-red-500"
-															: "text-blue-500"
-													}`}
-												>
-													{bracketChallenge.league}
-												</span>
+												{bracketChallenge.league == "NBA" && (
+													<span className="font-semibold bg-red-600 px-2 rounded text-white">
+														NBA
+													</span>
+												)}
+												{bracketChallenge.league == "PBA" && (
+													<span className="font-semibold bg-blue-600 px-2 rounded text-white">
+														PBA
+													</span>
+												)}
 											</Detail>
 											<Detail label="Start Date">
 												{displayLocalDate(
@@ -81,7 +81,7 @@ const BracketChallengeActiveList = () => {
 								))}
 							</>
 						) : (
-							<div className="py-2 px-3 bg-gray-200">
+							<div className="py-2 px-3 bg-gray-200 shadow-lg rounded">
 								{isLoading
 									? "Fetching active bracket challenges..."
 									: "No active bracket challenges to display."}

@@ -41,8 +41,8 @@ const Navbar = () => {
 
 	const userLinks: LinksInfo[] = [
 		{ name: "profile", label: "Profile", route: "/profile" },
-		{ name: "friends", label: "Friends", route: "/friends" },
 		{ name: "entries", label: "Entries", route: "/entries" },
+		{ name: "friends", label: "Friends", route: "/friends" },
 	];
 
 	const handleLogout = async () => {
@@ -246,7 +246,7 @@ const Navbar = () => {
 				</div>
 
 				{showMenu && (
-					<div className="fixed w-full h-[calc(100dvh-57px)] bottom-0 end-0">
+					<div className="fixed w-full h-[calc(100dvh-55px)] bottom-0 end-0">
 						<div
 							className="absolute w-full h-full bg-[#3a3a3a66]"
 							onClick={handleMenuOptionsClick}

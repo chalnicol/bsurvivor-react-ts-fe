@@ -158,6 +158,11 @@ const ViewUser = () => {
 									<p className="bg-gray-300 px-2 py-1">Username</p>
 									<p className="p-2 bg-gray-200">{user.username}</p>
 								</div>
+								{/* fullname */}
+								<div>
+									<p className="bg-gray-300 px-2 py-1">Full Name</p>
+									<p className="p-2 bg-gray-200">{user.fullname}</p>
+								</div>
 								{/* email */}
 								<div>
 									<p className="bg-gray-300 px-2 py-1">Email</p>

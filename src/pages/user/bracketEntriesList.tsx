@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import ContentBase from "../../components/contentBase";
 import { apiClient } from "../../utils/api";
 import {
@@ -9,15 +8,14 @@ import {
 import { useEffect, useState } from "react";
 import Pagination from "../../components/pagination";
 import Loader from "../../components/loader";
-import Detail from "../../components/detail";
 
 // Import the custom debounce hook
 import useDebounce from "../../hooks/useDebounce"; // Adjust path if needed
-import { displayLocalDate } from "../../utils/dateTime";
 import EndOfPage from "../../components/endOfPage";
 import FailPrompt from "../../components/failPrompt";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import BracketEntrySlot from "../../components/bracket/backetEntrySlot";
 
 const BracketEntriesList = () => {
 	const { isAuthenticated } = useAuth();
@@ -80,19 +78,6 @@ const BracketEntriesList = () => {
 		// setCurrentPage(1);
 	}, [debouncedSearchTerm]);
 
-	const getStatusBgColorClass = (status: string) => {
-		switch (status) {
-			case "won":
-				return "bg-green-600";
-			case "eliminated":
-				return "bg-red-600";
-			case "active":
-				return "bg-blue-600";
-			default:
-				return "bg-gray-600";
-		}
-	};
-
 	return (
 		<ContentBase className="py-7 px-4">
 			<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
@@ -118,49 +103,7 @@ const BracketEntriesList = () => {
 							<div className="overflow-x-hidden">
 								<div className="min-w-xl">
 									{bracketChallengeEntries.map((entry) => (
-										<Link
-											to={`/bracket-challenge-entries/${entry.name}`}
-											key={entry.id}
-										>
-											<div className="sm:grid md:grid-cols-2 xl:grid-cols-3 px-4 py-3 space-y-1 border hover:bg-gray-700 mb-1 text-sm bg-gray-800 text-white rounded">
-												<Detail label="Entry Name">
-													{entry.name}
-												</Detail>
-												<Detail label="League">
-													{entry.bracket_challenge.league}
-												</Detail>
-												<Detail label="Bracket Challenge">
-													{entry.bracket_challenge.name}
-												</Detail>
-
-												<Detail label="Date Submitted">
-													{displayLocalDate(entry.created_at)}
-												</Detail>
-												<Detail label="Status">
-													<span
-														className={`${getStatusBgColorClass(
-															entry.status
-														)} text-white font-bold px-3 rounded text-xs select-none`}
-													>
-														{entry.status.toLocaleUpperCase()}
-													</span>
-												</Detail>
-
-												{/* <div className="space-y-0.5">
-											<div className="text-xs font-semibold text-gray-500">
-												Actions
-											</div>
-											<div className="space-x-2">
-												<Link
-													to={`/bracket-challenge-entries/${entry.name}`}
-													className="bg-green-600 hover:bg-green-500 text-white font-bold px-4 rounded text-sm"
-												>
-													VIEW
-												</Link>
-											</div>
-										</div> */}
-											</div>
-										</Link>
+										<BracketEntrySlot key={entry.id} entry={entry} />
 									))}
 								</div>
 							</div>

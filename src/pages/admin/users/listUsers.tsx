@@ -139,6 +139,7 @@ const ListUsers = () => {
 								<tr>
 									<td className="px-2 py-1">ID</td>
 									<td className="px-2 py-1">Name</td>
+									<td className="px-2 py-1">Full Name</td>
 									<td className="px-2 py-1">Email</td>
 									<td className="px-2 py-1">Verified</td>
 									<td className="px-2 py-1">Date Joined</td>
@@ -152,6 +153,8 @@ const ListUsers = () => {
 									<tr key={user.id} className="even:bg-gray-200">
 										<td className="px-2 py-1">{user.id}</td>
 										<td className="px-2 py-1">{user.username}</td>
+										<td className="px-2 py-1">{user.fullname}</td>
+
 										<td className="px-2 py-1">
 											{truncateEmail(user.email)}
 										</td>

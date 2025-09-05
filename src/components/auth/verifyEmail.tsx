@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
 import ContentBase from "../contentBase";
+import TransparentIcon from "../transparentIcon";
 
 const VerifyEmail = () => {
 	const { message, error, authLoading, verifyEmail, clearMessages } =
@@ -58,15 +59,25 @@ const VerifyEmail = () => {
 	}
 	return (
 		<ContentBase className="flex items-center justify-center p-4">
-			<div className="border bg-white border-gray-500 p-3 rounded max-w-lg shadow-lg mx-auto">
-				<h1 className="font-bold text-lg">Email Verification</h1>
-				<p className="text-sm mt-2 mb-6">
-					Almost done! Just a moment while we confirm your details..
-				</p>
-				{error && <p className="text-red-500 text-sm my-3">{error}</p>}
-				{message && (
-					<p className="text-green-500 text-sm my-3">{message}</p>
-				)}
+			<div className="border bg-white border-gray-500 p-3 rounded max-w-lg text-center shadow-lg mx-auto relative overflow-hidden">
+				<TransparentIcon className="absolute w-60 opacity-10 rotate-30 -right-10 -top-10 z-0" />
+				<div className="relative z-10">
+					<h1 className="font-bold text-lg text-center mt-2">
+						Email Verification
+					</h1>
+
+					<div className="px-3 mt-3 rounded">
+						<p className="text-sm font-medium">
+							Almost done! Just a moment while we confirm your details..
+						</p>
+						<p className="text-sm my-3 font-semibold border border-gray-500 bg-gray-900 px-3 py-1">
+							{error && <span className="text-red-400">{error}</span>}
+							{message && (
+								<span className="text-green-500">{message}</span>
+							)}
+						</p>
+					</div>
+				</div>
 			</div>
 		</ContentBase>
 	);

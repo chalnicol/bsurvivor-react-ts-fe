@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TopEntryList from "./topEntryList";
 import { useAdmin } from "../../context/admin/AdminProvider";
 import { useEffect } from "react";
+import RefreshButton from "../refreshButton";
 
 const TopEntries = () => {
 	const {
@@ -27,17 +28,16 @@ const TopEntries = () => {
 			<p className="text-sm">
 				This is the list of ongoing bracket challenges.
 			</p>
-			<button
-				className={`font-bold text-xs px-2 py-0.5 block rounded text-white mt-3 ${
-					isLoading
-						? "bg-amber-400 opacity-80"
-						: "bg-amber-500 hover:bg-amber-400 cursor-pointer"
-				}`}
+
+			<RefreshButton
+				label="REFRESH LIST"
+				color="amber"
+				size="sm"
+				className="mt-2 shadow"
 				onClick={() => fetchBracketChallenges("ongoing")}
 				disabled={isLoading}
-			>
-				REFRESH LIST
-			</button>
+			/>
+
 			{ongoingChallenges.length > 0 ? (
 				<div className="space-y-4 mb-4 mt-2">
 					{ongoingChallenges.map((bracketChallenge) => (

@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
+import img from "../assets/logo/square_logo.png";
 
 interface AdminThumbsProps {
 	// children: React.ReactNode;
@@ -33,6 +34,7 @@ const AdminThumbs = ({
 			default:
 				return "bg-gray-100";
 		}
+		// return "bg-gray-200";
 	};
 
 	//capitalize first letter
@@ -47,8 +49,14 @@ const AdminThumbs = ({
 
 	return (
 		<div
-			className={`p-3 border rounded-lg shadow border-gray-400 flex flex-col overflow-hidden ${backgroundClr()}`}
+			className={`p-3 border rounded-lg shadow border-gray-400 flex flex-col overflow-hidden relative ${backgroundClr()}`}
 		>
+			<img
+				src={img}
+				alt="bgimg"
+				draggable="false"
+				className="absolute w-40 -right-8 -top-5 opacity-15 rotate-40"
+			/>
 			<div>
 				<h2 className="font-semibold">
 					{capitalizeEachWord(resource)} ({total})

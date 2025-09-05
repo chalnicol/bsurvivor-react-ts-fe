@@ -4,6 +4,7 @@ import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import ContentBase from "../contentBase";
 import LoadAuth from "./loadAuth";
+import TransparentIcon from "../transparentIcon";
 
 const Login = () => {
 	const [email, setEmail] = useState("");
@@ -45,8 +46,9 @@ const Login = () => {
 
 	return (
 		<ContentBase className="flex items-center justify-center p-4">
-			<div className="w-full max-w-md relative">
-				<div className="border border-gray-400 bg-white px-8 pt-6 pb-8 rounded shadow-md">
+			<div className="border border-gray-400 bg-white px-8 pt-6 pb-8 rounded shadow-md overflow-hidden w-full max-w-md relative">
+				<TransparentIcon className="absolute w-60 opacity-15 rotate-30 -right-10 -top-10 z-0" />
+				<div className="relative z-10">
 					<h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 					<form onSubmit={handleSubmit}>
 						<div className="mb-4">
@@ -60,7 +62,7 @@ const Login = () => {
 								type="email"
 								id="email"
 								value={email}
-								className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+								className="w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 								onChange={(e) => setEmail(e.target.value)}
 								disabled={isLoading}
 								required
@@ -77,7 +79,7 @@ const Login = () => {
 								type="password"
 								id="password"
 								value={password}
-								className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+								className="w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 								onChange={(e) => setPassword(e.target.value)}
 								disabled={isLoading}
 								required

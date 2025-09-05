@@ -1,78 +1,72 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
-
-const ChangePassword = () => {
-	const { updatePassword, isLoading } = useAuth();
-
-	const [currentPassword, setCurrentPassword] = useState("");
-	const [password, setPassword] = useState("");
-	const [passwordConfirmation, setPasswordConfirmation] = useState("");
-
-	const resetForms = () => {
-		setCurrentPassword("");
-		setPassword("");
-		setPasswordConfirmation("");
-	};
+const EditInfo = () => {
+	const { user, isLoading, updateProfile } = useAuth();
+	// const navigate = useNavigate();
+	const [username, setUsername] = useState<string>("");
+	const [fullname, setFullName] = useState<string>("");
+	const [email, setEmail] = useState<string>("");
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		await updateProfile(username, email, fullname);
+	};
 
-		const newResponse = await updatePassword(
-			currentPassword,
-			password,
-			passwordConfirmation
-		);
-		if (newResponse) {
-			resetForms();
+	const resetForms = () => {
+		if (user) {
+			setEmail(user.email);
+			setUsername(user.username);
+			setFullName(user.fullname);
 		}
 	};
 
+	useEffect(() => {
+		resetForms();
+	}, [user]);
+
+	if (!user) {
+		return null;
+	}
+
 	return (
 		<div>
-			<form onSubmit={handleSubmit} className="space-y-2">
+			<form className="space-y-2" onSubmit={handleSubmit}>
 				<div>
-					<p className="font-semibold text-sm border-b py-1">
-						Current Password
-					</p>
+					<p className="font-semibold text-sm border-b py-1">Full Name</p>
 					<input
-						type="password"
-						value={currentPassword}
-						onChange={(e) => setCurrentPassword(e.target.value)}
+						type="text"
+						value={fullname}
+						onChange={(e) => setFullName(e.target.value)}
 						className="mt-2 w-full px-3 py-1.5 rounded bg-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-						// placeholder="password here"
+						placeholder="full name here"
 						required
 						disabled={isLoading}
 					/>
 				</div>
 				<div>
-					<p className="font-semibold text-sm border-b py-1">
-						New Password
-					</p>
+					<p className="font-semibold text-sm border-b py-1">Username</p>
 					<input
-						type="password"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
+						type="text"
+						value={username}
+						onChange={(e) => setUsername(e.target.value)}
 						className="mt-2 w-full px-3 py-1.5 rounded bg-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-						// placeholder="password here"
+						placeholder="username here"
 						required
 						disabled={isLoading}
 					/>
 				</div>
 				<div>
-					<p className="font-semibold text-sm border-b py-1">
-						Confirm New Password
-					</p>
+					<p className="font-semibold text-sm border-b py-1">E-mail</p>
 					<input
-						type="password"
-						value={passwordConfirmation}
-						onChange={(e) => setPasswordConfirmation(e.target.value)}
+						type="text"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
 						className="mt-2 w-full px-3 py-1.5 rounded bg-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-						// placeholder="password here"
+						placeholder="username here"
 						required
 						disabled={isLoading}
 					/>
 				</div>
-
 				<div className="space-x-2 mt-6 text-sm">
 					<button
 						type="button"
@@ -103,4 +97,4 @@ const ChangePassword = () => {
 	);
 };
 
-export default ChangePassword;
+export default EditInfo;

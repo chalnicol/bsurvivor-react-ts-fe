@@ -71,10 +71,12 @@ import {
 	faArrowAltCircleDown,
 	faQuoteLeft,
 	faExternalLink,
+	faEllipsis,
 } from "@fortawesome/free-solid-svg-icons";
 import FriendsList from "./pages/user/friends";
 import NotificationsList from "./pages/user/notificationsList";
 import BracketChallengesList from "./pages/bracketChallengesList";
+import PublicProfile from "./pages/user/publicProfile";
 
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 
@@ -106,7 +108,8 @@ library.add(
 	faThumbsDown,
 	faArrowAltCircleDown,
 	faQuoteLeft,
-	faExternalLink
+	faExternalLink,
+	faEllipsis
 );
 
 function App() {
@@ -122,6 +125,8 @@ function App() {
 						<Route path="/about" element={<About />} />
 						{/* <Route path="/nba" element={<NBAPage />} /> */}
 						{/* <Route path="/pba" element={<PBAPage />} /> */}
+
+						<Route path="/users/:username" element={<PublicProfile />} />
 
 						<Route
 							path="/bracket-challenges"
