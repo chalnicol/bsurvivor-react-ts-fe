@@ -1,16 +1,18 @@
 import { useParams } from "react-router-dom";
-import apiClient from "../../utils/axiosConfig";
+
+import ContentBase from "../../components/contentBase";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import EndOfPage from "../../components/endOfPage";
+import { useEffect, useState } from "react";
 import type {
 	BracketChallengeEntryInfo,
 	UserMiniInfo,
 } from "../../data/adminData";
-import { useEffect, useState } from "react";
-import Loader from "../../components/loader";
-import ContentBase from "../../components/contentBase";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Detail from "../../components/detail";
+import apiClient from "../../utils/axiosConfig";
 import { Link } from "react-router-dom";
-import EndOfPage from "../../components/endOfPage";
+import Detail from "../../components/detail";
+import StatusPills from "../../components/statusPills";
+import Loader from "../../components/loader";
 
 const PublicProfile = () => {
 	const { username } = useParams<{ username: string }>();
@@ -32,19 +34,6 @@ const PublicProfile = () => {
 		}
 	};
 
-	const getStatusBgColorClass = (status: string) => {
-		switch (status) {
-			case "won":
-				return "bg-green-600";
-			case "eliminated":
-				return "bg-red-600";
-			case "active":
-				return "bg-blue-600";
-			default:
-				return "bg-gray-600";
-		}
-	};
-
 	useEffect(() => {
 		fetchUser();
 	}, [username]);
@@ -59,7 +48,7 @@ const PublicProfile = () => {
 					View user profile information.
 				</p>
 				{user ? (
-					<div className="mt-4 bg-gray-800 text-white p-4 pb-6 rounded">
+					<div className="bg-gray-800 text-white p-4 rounded mt-4">
 						<div className="sm:flex gap-x-3">
 							<div className="flex-none">
 								<div className="w-18 mx-auto aspect-square border-2 border-gray-400 text-gray-400 rounded-full shadow-lg overflow-hidden flex items-center justify-center">
@@ -68,64 +57,62 @@ const PublicProfile = () => {
 							</div>
 							<div className="flex-1 space-y-2">
 								<div>
-									<p className="font-semibold text-sm border-b py-1">
+									<p className="font-semibold text-xs border-gray-300 py-1">
 										Full Name
 									</p>
-									<p className="py-1.5 px-2 rounded bg-gray-700 mt-2">
+									<p className="py-1.5 px-3 rounded bg-gray-600">
 										{user.fullname}
 									</p>
 								</div>
 								<div>
-									<p className="font-semibold text-sm border-b py-1">
+									<p className="font-semibold text-xs border-gray-300 py-1">
 										Username
 									</p>
-									<p className="py-1.5 px-2 rounded bg-gray-700 mt-2">
+									<p className="py-1.5 px-3 rounded bg-gray-600">
 										{user.username}
 									</p>
 								</div>
-								<div>
-									<p className="font-semibold text-sm border-b py-1">
-										Top Recent Bracket Entries Submitted
-									</p>
-									<div className="space-y-1 mt-2 mb-4">
-										{entries.length > 0 ? (
-											<>
-												{entries.map((entry) => (
-													<Link
-														key={entry.id}
-														to={`/bracket-challenge-entries/${entry.slug}`}
-														className="border border-gray-600 hover:border-gray-400 rounded py-2 px-2 grid lg:grid-cols-2 bg-gray-700 text-sm space-y-1"
-													>
-														<Detail label="Entry ID">
-															{entry.name}
-														</Detail>
+								{/* <hr className="my-4 border-gray-500" /> */}
 
+								<div className="my-4">
+									<p className="font-semibold text-sm py-1">
+										Top Bracket Challenge Entries
+									</p>
+
+									{entries.length > 0 ? (
+										<div className="space-y-1 mt-2">
+											{entries.map((entry, index) => (
+												<Link
+													key={entry.id}
+													to={`/bracket-challenge-entries/${entry.slug}`}
+													className="border-t last:border-b border-gray-500 hover:bg-gray-700  block flex items-center gap-x-3 py-1"
+												>
+													<p className="text-2xl md:text-xl font-bold w-10 text-center">
+														0{index + 1}
+													</p>
+													<div className="flex-1 grid md:grid-cols-2 lg:grid-cols-3 text-sm gap-y-1">
 														<Detail label="Bracket Challenge">
 															{entry.bracket_challenge.name}
 														</Detail>
 
-														<Detail label="Correct Predictions">
+														<Detail label="Correct Picks Count">
 															{entry.correct_predictions_count}
 														</Detail>
 
 														<Detail label="Status">
-															<span
-																className={`${getStatusBgColorClass(
-																	entry.status
-																)} text-white font-bold px-3 rounded text-sm select-none`}
-															>
-																{entry.status.toLocaleUpperCase()}
-															</span>
+															<StatusPills
+																status={entry.status}
+															/>
 														</Detail>
-													</Link>
-												))}
-											</>
-										) : (
-											<p className="py-1.5 px-2 rounded bg-gray-700 mt-2">
-												No entries data found
-											</p>
-										)}
-									</div>
+													</div>
+												</Link>
+											))}
+										</div>
+									) : (
+										<p className="py-1.5 px-3 mt-0.5 rounded bg-gray-600">
+											No entries data found
+										</p>
+									)}
 								</div>
 							</div>
 						</div>

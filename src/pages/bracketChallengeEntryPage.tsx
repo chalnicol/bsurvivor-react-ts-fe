@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiClient } from "../utils/api";
 import Loader from "../components/loader";
@@ -16,10 +16,11 @@ import { Link } from "react-router-dom";
 import { CommentsProvider } from "../context/comment/CommentsProvider";
 import CommentsSection from "../components/commentsSection";
 import ShareToSocials from "../components/shareToSocials";
+import { useAuth } from "../context/auth/AuthProvider";
 // import { useAuth } from "../context/auth/AuthProvider";
 
 const BracketChallengeEntryPage = () => {
-	// const { isAuthenticated, user } = useAuth();
+	const { isAuthenticated, user } = useAuth();
 	const { slug } = useParams<{ slug: string }>();
 
 	const [bracketChallengeEntry, setBracketChallengeEnry] =
@@ -53,15 +54,19 @@ const BracketChallengeEntryPage = () => {
 		fetchBracketChallengeEntry();
 	}, [slug]);
 
-	// const isMyself = useCallback(
-	// 	(entryUser: UserInfo): boolean => {
-	// 		if (isAuthenticated && user && user.id == entryUser.id) {
-	// 			return true;
-	// 		}
-	// 		return false;
-	// 	},
-	// 	[user, isAuthenticated]
-	// );
+	const getEntryUsername = useCallback((): string => {
+		if (bracketChallengeEntry) {
+			if (
+				isAuthenticated &&
+				user &&
+				user.id == bracketChallengeEntry.user.id
+			) {
+				return "You";
+			}
+			return bracketChallengeEntry.user.username;
+		}
+		return "";
+	}, [user, isAuthenticated, bracketChallengeEntry]);
 
 	return (
 		<ContentBase className="px-4 py-7">
@@ -81,28 +86,38 @@ const BracketChallengeEntryPage = () => {
 								<Detail label="Entry ID">
 									{bracketChallengeEntry.name}
 								</Detail>
+
 								<Detail label="Date Submitted">
 									{displayLocalDate(bracketChallengeEntry.created_at)}
+								</Detail>
+
+								<Detail label="Bracket Challenge">
+									<Link
+										to={`/bracket-challenges/${bracketChallengeEntry.bracket_challenge.slug}`}
+										className="hover:text-gray-400 border-b border-gray-300"
+									>
+										{bracketChallengeEntry.bracket_challenge.name}
+										<FontAwesomeIcon
+											icon="external-link"
+											size="sm"
+											className="ms-2"
+										/>
+									</Link>
 								</Detail>
 								<Detail label="Entry By">
 									<Link
 										to={`/users/${bracketChallengeEntry.user.username}`}
 										className="hover:text-gray-400 border-b border-gray-300"
 									>
-										{bracketChallengeEntry.user.username}
+										{getEntryUsername()}
+										<FontAwesomeIcon
+											icon="external-link"
+											size="sm"
+											className="ms-2"
+										/>
 									</Link>
 								</Detail>
-								<Detail label="Bracket Challenge">
-									<Link
-										to={`/bracket-challenges/${bracketChallengeEntry.bracket_challenge.slug}`}
-									>
-										<span className="hover:text-gray-400 border-b border-gray-300">
-											{bracketChallengeEntry.bracket_challenge.name}
-										</span>
-									</Link>
-								</Detail>
-
-								<Detail label="Correct Predictions">
+								<Detail label="Correct Picks Count">
 									<span
 										className={`font-semibold ${
 											bracketChallengeEntry.correct_predictions_count >
@@ -112,7 +127,6 @@ const BracketChallengeEntryPage = () => {
 										{bracketChallengeEntry.correct_predictions_count}
 									</span>
 								</Detail>
-
 								<Detail label="Status">
 									<StatusPills status={bracketChallengeEntry.status} />
 								</Detail>

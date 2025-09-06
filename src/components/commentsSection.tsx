@@ -5,6 +5,7 @@ import { useComments } from "../context/comment/CommentsProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CommentForm from "./commentForm";
 import CustomButton from "./customButton";
+import Spinner from "./spinner";
 
 interface CommentsSectionProps {
 	className?: string;
@@ -125,9 +126,15 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 						)}
 					</>
 				) : (
-					<p className="border-t border-gray-300 py-2">
-						No comments to display.
-					</p>
+					<>
+						{isLoading ? (
+							<Spinner className="text-black" />
+						) : (
+							<p className="border-t border-gray-300 py-2">
+								No comments to display.
+							</p>
+						)}
+					</>
 				)}
 			</div>
 		</div>

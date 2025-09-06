@@ -3,6 +3,7 @@ import TopEntryList from "./topEntryList";
 import { useAdmin } from "../../context/admin/AdminProvider";
 import { useEffect } from "react";
 import RefreshButton from "../refreshButton";
+import Spinner from "../spinner";
 
 const TopEntries = () => {
 	const {
@@ -33,6 +34,7 @@ const TopEntries = () => {
 				label="REFRESH LIST"
 				color="amber"
 				size="sm"
+				delay={3}
 				className="mt-2 shadow"
 				onClick={() => fetchBracketChallenges("ongoing")}
 				disabled={isLoading}
@@ -48,11 +50,15 @@ const TopEntries = () => {
 					))}
 				</div>
 			) : (
-				<div className="py-2 px-3 bg-gray-200 mt-2">
-					{isOngoingLoading
-						? "Fetching top entries..."
-						: "No top entries to display."}
-				</div>
+				<>
+					{isOngoingLoading ? (
+						<Spinner />
+					) : (
+						<div className="py-2 px-3 bg-gray-200 mt-2">
+							No top entries to display
+						</div>
+					)}
+				</>
 			)}
 		</div>
 	);

@@ -12,7 +12,7 @@ const NotificationLink = ({
 }: NotificationLinkProps) => {
 	return (
 		<div className={`relative ${className}`}>
-			<Link to="/notifications" className="hover:text-gray-200">
+			<Link to="/notifications" className="hover:text-gray-400 px-1">
 				<FontAwesomeIcon icon="bell" size="lg" />
 				{unreadCount > 0 && (
 					<p className="bg-red-500 font-bold rounded-full text-[0.65rem] text-white absolute bottom-2.5 left-3 z-10 w-4 text-center leading-4 h-auto aspect-square">

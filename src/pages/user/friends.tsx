@@ -9,31 +9,28 @@ import useDebounce from "../../hooks/useDebounce"; // Adjust path if needed
 import type {
 	ColorType,
 	SearchedUserInfo,
+	TabInfo,
 	UserMiniInfo,
 } from "../../data/adminData";
 import StatusMessage from "../../components/statusMessage";
-import RefreshButton from "../../components/refreshButton";
-import CustomButton from "../../components/customButton";
-import Spinner from "../../components/spinner";
 import { Link } from "react-router-dom";
+import CustomButton from "../../components/customButton";
+import MenuBar from "../../components/menuBar";
+import Spinner from "../../components/spinner";
 
-type FriendsType = "active" | "sent" | "received";
+export type FriendsTab = "active" | "sent" | "received" | "search";
 
-interface FriendsCountInfo {
-	active: number;
-	sent: number;
-	received: number;
-}
+// interface FriendsCountInfo {
+// 	active: number;
+// 	sent: number;
+// 	received: number;
+// }
 
-interface TabInfo {
-	id: number;
-	label: string;
-	type: FriendsType;
-}
+interface FriendsTabInfo extends TabInfo<FriendsTab> {}
 
 const FriendsList = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
+	// const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
 
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [searchedUsers, setSearchedUsers] = useState<SearchedUserInfo[]>([]);
@@ -41,18 +38,19 @@ const FriendsList = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
 
-	const [activeTab, setActiveTab] = useState<FriendsType>("active");
+	const [activeTab, setActiveTab] = useState<FriendsTab>("active");
 	const [buttons, setButtons] = useState<string[]>([]);
-	const [friendsCount, setFriendsCount] = useState<FriendsCountInfo | null>(
-		null
-	);
+	const [friendsCount, setFriendsCount] = useState<Record<
+		FriendsTab,
+		number
+	> | null>(null);
 
 	// Use the debounced value of searchTerm
 	const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
 
 	const fetchSearchedUsers = async (term: string) => {
 		// setIsLoading(true);
-		setIsSearchLoading(true);
+		setIsLoading(true);
 		setSearchedUsers([]);
 		try {
 			const response = await apiClient.get(`/search-users?search=${term}`);
@@ -60,7 +58,7 @@ const FriendsList = () => {
 		} catch (error) {
 			console.error(error);
 		} finally {
-			setIsSearchLoading(false);
+			setIsLoading(false);
 		}
 	};
 
@@ -72,7 +70,7 @@ const FriendsList = () => {
 		setSearchTerm(e.target.value);
 	};
 
-	const fetchFriends = async (type: FriendsType) => {
+	const fetchFriends = async (type: string) => {
 		setIsLoading(true);
 		setFriends([]);
 		try {
@@ -95,8 +93,17 @@ const FriendsList = () => {
 		} else if (activeTab == "received") {
 			setButtons(["accept", "reject"]);
 		}
-		fetchFriends(activeTab);
+		if (activeTab !== "search") {
+			fetchFriends(activeTab);
+		}
 	}, [activeTab]);
+
+	const tabs: FriendsTabInfo[] = [
+		{ id: 1, label: "FRIENDS", tab: "active", type: "button" },
+		{ id: 2, label: "REQUEST SENT", tab: "sent", type: "button" },
+		{ id: 3, label: "REQUEST RECEIVED", tab: "received", type: "button" },
+		{ id: 4, label: "FRIENDS SEARCH", tab: "search", type: "button" },
+	];
 
 	const friendQuery = async (action: string, user: UserMiniInfo) => {
 		setIsLoading(true);
@@ -109,7 +116,6 @@ const FriendsList = () => {
 			});
 			// setFriends(response.data.friends);
 			setSuccess(response.data.message);
-
 			updateFriends(action, user);
 		} catch (error: any) {
 			console.error(error);
@@ -121,13 +127,15 @@ const FriendsList = () => {
 
 	const updateFriends = (action: string, user: UserMiniInfo) => {
 		//update
-		if (action == "add") {
-			if (activeTab == "sent") {
-				setFriends((prev) => {
-					return [...prev, user];
-				});
-			}
-		} else {
+		// if (action == "add") {
+		// 	if (activeTab == "sent") {
+		// 		setFriends((prev) => {
+		// 			return [...prev, user];
+		// 		});
+		// 	}
+		// }
+
+		if (action !== "add") {
 			setFriends((prev) => {
 				return prev.filter((newUser) => newUser.id !== user.id);
 			});
@@ -189,45 +197,46 @@ const FriendsList = () => {
 	};
 
 	const renderButton = (user: SearchedUserInfo): React.ReactNode => {
-		const { id, username, fullname } = user;
-
-		switch (user.status) {
-			case "friends":
-				return (
-					<span className="text-xs text-green-400 font-semibold">
-						FRIEND
-					</span>
-				);
-			case "request_received":
-				return (
-					<span className="text-xs text-amber-400 font-semibold">
-						REQUEST RECEIVED
-					</span>
-				);
-			case "request_sent":
-				return (
-					<span className="text-xs text-amber-400 font-semibold">
-						REQUEST SENT
-					</span>
-				);
-			default:
-				return (
-					<CustomButton
-						label="ADD FRIEND"
-						color="blue"
-						onClick={() => friendQuery("add", { id, username, fullname })}
-						size="sm"
-						className="shadow"
-						disabled={isSearchLoading}
-					/>
-				);
+		if (user.status == "not_friends") {
+			return (
+				<CustomButton
+					label="ADD FRIEND"
+					color="blue"
+					onClick={() => friendQuery("add", user)}
+					size="sm"
+					className="px-4"
+					disabled={isLoading}
+				/>
+			);
 		}
+		if (user.status == "request_sent") {
+			return (
+				<p className="font-bold text-xs text-orange-300 text-center px-2 bg-gray-500">
+					REQUEST SENT
+				</p>
+			);
+		}
+		if (user.status == "request_received") {
+			return (
+				<p className="font-bold text-xs text-yellow-100 text-center px-2 bg-gray-500">
+					REQUEST RECEIVED
+				</p>
+			);
+		}
+		if (user.status == "friends") {
+			return (
+				<p className="font-bold text-xs text-green-300 text-center px-2 bg-gray-500">
+					FRIEND
+				</p>
+			);
+		}
+		return <span>--</span>;
 	};
 
 	const getColorType = (btn: string): ColorType => {
 		switch (btn) {
 			case "accept":
-				return "emerald";
+				return "green";
 			case "reject":
 				return "red";
 			case "cancel":
@@ -239,22 +248,23 @@ const FriendsList = () => {
 		}
 	};
 
-	const handleRefreshListClick = async () => {
-		if (searchTerm !== "") {
-			await fetchSearchedUsers(searchTerm);
+	// const handleRefreshListClick = async () => {
+	// 	if (searchTerm !== "") {
+	// 		await fetchSearchedUsers(searchTerm);
+	// 	}
+	// 	fetchFriends(activeTab);
+	// };
+
+	const handleTabCLick = (tab: FriendsTab) => {
+		setActiveTab(tab);
+		if (tab !== "search") {
+			fetchFriends(tab);
 		}
-		fetchFriends(activeTab);
 	};
 
-	const tabs: TabInfo[] = [
-		{ id: 1, label: "ACTIVE", type: "active" },
-		{ id: 2, label: "REQUEST RECEIVED", type: "received" },
-		{ id: 3, label: "REQUEST SENT", type: "sent" },
-	];
-
-	const getLabel = (tab: TabInfo): string => {
-		if (friendsCount && friendsCount[tab.type] > 0) {
-			return `${tab.label} (${friendsCount[tab.type]})`;
+	const getLabel = (tab: FriendsTabInfo): string => {
+		if (friendsCount && friendsCount[tab.tab] > 0) {
+			return `${tab.label} (${friendsCount[tab.tab]})`;
 		}
 		return tab.label;
 	};
@@ -271,162 +281,187 @@ const FriendsList = () => {
 					</span>
 				</p>
 
-				<RefreshButton
+				{/* <RefreshButton
 					label="REFRESH LIST"
 					size="sm"
 					color="sky"
 					className="mt-2 mb-3 shadow"
 					onClick={handleRefreshListClick}
-				/>
+				/> */}
 
-				{success && (
-					<StatusMessage
-						message={success}
-						type="success"
-						onClose={() => setSuccess(null)}
-					/>
-				)}
-				{error && (
-					<StatusMessage
-						message={error}
-						type="error"
-						onClose={() => setError(null)}
-					/>
-				)}
+				<div className="mt-5">
+					{success && (
+						<StatusMessage
+							message={success}
+							type="success"
+							onClose={() => setSuccess(null)}
+						/>
+					)}
+					{error && (
+						<StatusMessage
+							message={error}
+							type="error"
+							onClose={() => setError(null)}
+						/>
+					)}
+					{/*friends */}
+					<div className="flex flex-col md:flex-row border border-gray-400 rounded overflow-hidden bg-gray-800 h-100">
+						<div className="block md:hidden border-b border-gray-300 px-3 py-1.5">
+							<MenuBar<FriendsTab>
+								activeTab={activeTab}
+								tabs={tabs}
+								onClick={handleTabCLick}
+								tabsCount={friendsCount}
+								isLoading={isLoading}
+								className="text-white"
+							/>
+						</div>
 
-				<div className="w-full xl:flex space-y-4 xl:space-y-0 mt-2 gap-x-4">
-					<div className="space-y-4 flex-2">
-						{/* active friends */}
-						<div className="border border-gray-400 rounded overflow-hidden bg-gray-600">
-							<h2 className="bg-gray-800 text-white px-3 py-2 font-semibold">
-								Friends
-							</h2>
-							<div className="flex flex-wrap text-xs md:text-sm border-y border-gray-500 overflow-hidden">
-								{tabs.map((tab) => (
-									<button
-										key={tab.id}
-										className={`flex-1 font-bold text-gray-300 border-r border-gray-500 last:border-r-0 py-1 ${
-											activeTab == tab.type
-												? "bg-gray-500 text-yellow-400"
-												: "hover:text-gray-400 cursor-pointer"
-										}`}
-										onClick={() => setActiveTab(tab.type)}
-										disabled={isLoading}
-									>
-										{getLabel(tab)}
-									</button>
-								))}
-							</div>
-
-							<div className="h-57 overflow-y-auto">
-								{friends && friends.length > 0 ? (
-									<ul>
-										{friends.map((friend) => (
-											<li
-												key={friend.id}
-												className="even:bg-gray-700 odd:bg-gray-700/30 text-sm text-white px-2 py-1.5 flex items-center justify-between border-b border-gray-500"
-											>
-												<p>
-													<FontAwesomeIcon
-														icon="user"
-														className="mr-2"
-													/>
-													<Link
-														to={`/users/${friend.username}`}
-														className="hover:text-gray-400"
-													>
-														{friend.username}
-													</Link>
-												</p>
-												<div className="space-x-1">
-													{buttons.map((btn) => (
-														<CustomButton
-															key={btn}
-															label={btn.toUpperCase()}
-															color={getColorType(btn)}
-															onClick={() =>
-																friendQuery(btn, friend)
-															}
-															size="sm"
-															className="shadow"
-															disabled={isSearchLoading}
-														/>
-													))}
-												</div>
-											</li>
-										))}
-									</ul>
-								) : (
+						<div className="flex-none hidden md:flex flex-col text-sm border-e border-gray-500 p-3 space-y-1.5 min-w-50 lg:min-w-60">
+							{tabs.map((t) => (
+								<button
+									key={t.id}
+									className={`font-bold text-left text-gray-300 border border-gray-400 py-1.5 px-3 ${
+										activeTab == t.tab
+											? "text-yellow-500"
+											: "bg-gray-700 hover:bg-gray-600 cursor-pointer"
+									}`}
+									onClick={() => handleTabCLick(t.tab)}
+									disabled={isLoading}
+								>
+									{getLabel(t)}
+								</button>
+							))}
+						</div>
+						<div className="flex-1 p-3">
+							<div className="h-full overflow-y-auto">
+								{activeTab !== "search" ? (
 									<>
-										{isLoading ? (
-											<Spinner />
+										{friends && friends.length > 0 ? (
+											<ul>
+												{friends.map((friend) => (
+													<li
+														key={friend.id}
+														className="even:bg-gray-700 odd:bg-gray-600 text-sm text-white px-3 py-0.5 flex items-center justify-between border-b border-gray-500"
+													>
+														<Link
+															to={`/users/${friend.username}`}
+															className="group flex items-center"
+														>
+															<div>
+																<FontAwesomeIcon
+																	icon="user"
+																	size="lg"
+																	className="mr-2"
+																/>
+															</div>
+															<div>
+																<p className="group-hover:text-gray-300">
+																	{friend.fullname}
+																</p>
+																<p className="text-xs text-gray-300 group-hover:text-gray-400">
+																	{friend.username}
+																</p>
+															</div>
+														</Link>
+														<div className="space-x-1">
+															{buttons.map((btn) => (
+																<CustomButton
+																	key={btn}
+																	label={btn.toUpperCase()}
+																	color={getColorType(btn)}
+																	onClick={() =>
+																		friendQuery(btn, friend)
+																	}
+																	size="sm"
+																	className="shadow"
+																	disabled={isLoading}
+																/>
+															))}
+														</div>
+													</li>
+												))}
+											</ul>
 										) : (
-											<p className="px-3 py-2 h-full text-gray-400">
-												No users to display.
-											</p>
+											<>
+												{isLoading ? (
+													<Spinner className="text-white" />
+												) : (
+													<p className="px-3 py-2 bg-gray-600 text-white">
+														No users to display.
+													</p>
+												)}
+											</>
 										)}
 									</>
-								)}
-							</div>
-						</div>
-					</div>
-					<div className="flex-1">
-						<div className="border border-gray-400 rounded overflow-hidden">
-							<h2 className="bg-gray-800 text-white px-3 py-2 font-semibold">
-								Add Friends
-							</h2>
-							<div className="p-3 bg-gray-600">
-								<div className="flex items-center border-b border-gray-400">
-									<input
-										type="text"
-										value={searchTerm}
-										onChange={handleSearchInputChange}
-										className="flex-1 px-2 py-1 font-medium text-white focus:outline-none"
-										placeholder="Search users here..."
-										disabled={isSearchLoading}
-									/>
-									{searchTerm && searchTerm !== "" && (
-										<button
-											className="text-white hover:bg-gray-500 cursor-pointer font-bold w-5 h-5 leading-3"
-											onClick={() => setSearchTerm("")}
-										>
-											<FontAwesomeIcon icon="xmark" />
-										</button>
-									)}
-								</div>
-								<div className="border  mt-3 border-zinc-500 bg-gray-800 h-34 xl:h-47 overflow-y-auto">
-									{searchedUsers.length > 0 ? (
-										<ul>
-											{searchedUsers.map((user) => (
-												<li
-													key={user.id}
-													className="odd:bg-gray-700 text-sm text-white px-2 py-1 flex items-center justify-between"
+								) : (
+									<div className="flex flex-col w-full h-full">
+										<div className="flex items-center border-b border-gray-400">
+											<input
+												type="text"
+												value={searchTerm}
+												onChange={handleSearchInputChange}
+												className="flex-1 px-1 py-1 font-medium text-white focus:outline-none"
+												placeholder="Search users here..."
+												// disabled={isSearchLoading}
+											/>
+											{searchTerm && searchTerm !== "" && (
+												<button
+													className="text-white hover:bg-gray-500 cursor-pointer font-bold w-5 h-5 leading-3"
+													onClick={() => setSearchTerm("")}
 												>
-													<p>
-														<FontAwesomeIcon icon="user" />{" "}
-														{user.username}
-													</p>
-													{renderButton(user)}
-												</li>
-											))}
-										</ul>
-									) : (
-										<>
-											{isSearchLoading ? (
-												<Spinner />
-											) : (
-												<p className="px-3 py-2 h-full text-gray-400">
-													No users to display.
-												</p>
+													<FontAwesomeIcon icon="xmark" />
+												</button>
 											)}
-										</>
-									)}
-								</div>
+										</div>
+										<div className="flex-1 mt-3 border border-gray-500 bg-gray-800 overflow-y-auto">
+											{searchedUsers.length > 0 ? (
+												<ul>
+													{searchedUsers.map((user) => (
+														<li
+															key={user.id}
+															className="odd:bg-gray-600 even:bg-gray-700 border-b border-gray-500 text-sm text-white px-2 py-1 flex items-center justify-between"
+														>
+															<div className="flex items-center">
+																<div>
+																	<FontAwesomeIcon
+																		icon="user"
+																		className="mr-2"
+																		size="lg"
+																	/>
+																</div>
+																<div>
+																	<p>{user.fullname}</p>
+																	<p className="text-xs text-gray-400">
+																		{user.username}
+																	</p>
+																</div>
+															</div>
+
+															{renderButton(user)}
+														</li>
+													))}
+												</ul>
+											) : (
+												<>
+													{isLoading ? (
+														<Spinner className="text-white" />
+													) : (
+														<p className="px-3 py-2 h-full text-gray-400">
+															No users to display.
+														</p>
+													)}
+												</>
+											)}
+										</div>
+									</div>
+								)}
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+			{/* {(isLoading || isSearchLoading) && <Loader />} */}
 			<EndOfPage />
 		</ContentBase>
 	);

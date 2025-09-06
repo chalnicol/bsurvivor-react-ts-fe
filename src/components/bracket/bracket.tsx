@@ -61,9 +61,9 @@ const Bracket = () => {
 				>
 					<Link
 						to="/entries"
-						className="text-white bg-green-900 hover:bg-gray-700 px-3 py-0.5 rounded text-xs"
+						className="text-white bg-green-800 hover:bg-green-700 rounded px-3 py-0.5 text-xs"
 					>
-						View My Entries Page
+						VIEW ENTRIES PAGE
 					</Link>
 				</StatusMessage>
 			)}
@@ -176,29 +176,29 @@ const Bracket = () => {
 				<>
 					<hr className="my-2 border-gray-400" />
 					{/* legend */}
-					<div className="md:flex items-center justify-between gap-x-7 space-y-4 md:space-y-0">
-						<div className="flex flex-wrap items-center gap-x-5 md:order-2">
+					<div className="md:flex items-center justify-between space-y-3 md:space-y-0">
+						<div className="flex-none grid grid-cols-2 justify-end md:order-2 gap-x-4">
 							<div className="flex items-center gap-x-2">
-								<div className="w-3.5 h-auto aspect-square bg-green-600 flex-none border border-green-500"></div>
-								<span className="font-semibold">
-									CORRECT PREDICTION
-								</span>
+								<div className="w-3 h-auto aspect-square bg-green-600 flex-none border border-green-500"></div>
+								<span className="font-semibold">CORRECT PICK</span>
 							</div>
+
 							<div className="flex items-center gap-x-2">
-								<div className="w-3.5 h-auto aspect-square bg-red-700 flex-none border border-red-600"></div>
-								<span className="font-semibold">
-									INCORRECT PREDICTION
-								</span>
+								<div className="w-3 h-auto aspect-square bg-red-700 flex-none border border-red-600"></div>
+								<span className="font-semibold">WRONG PICK</span>
 							</div>
+
 							<div className="flex items-center gap-x-2">
-								<div className="w-3.5 h-auto aspect-square bg-yellow-500 flex-none border border-yellow-400"></div>
-								<span className="font-semibold">ADVANCED/SELECTED</span>
+								<div className="w-3 h-auto aspect-square bg-yellow-800 flex-none border border-yellow-700"></div>
+								<span className="font-semibold">INVALID PICK</span>
 							</div>
+
 							<div className="flex items-center gap-x-2">
-								<div className="w-3.5 h-auto aspect-square bg-yellow-800 flex-none border border-yellow-700"></div>
-								<span className="font-semibold">VOIDED</span>
+								<div className="w-3 h-auto aspect-square bg-yellow-600 flex-none border border-yellow-500"></div>
+								<span className="font-semibold">PICKED/ADVANCED</span>
 							</div>
 						</div>
+
 						<button
 							className={`flex-none cursor-pointer w-full md:w-65 px-3 py-2 rounded text-white font-bold md:order-1 ${
 								previewState == "entry"

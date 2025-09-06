@@ -32,6 +32,8 @@ const Navbar = () => {
 
 	const menuRef = useRef<HTMLDivElement>(null);
 
+	const otherMenuRef = useRef<HTMLDivElement>(null);
+
 	const dropdownMenuRef = useRef<HTMLDivElement>(null);
 
 	const dropdownRef = useOutsideClick<HTMLDivElement>(() => {
@@ -115,6 +117,25 @@ const Navbar = () => {
 	}, [showMenu]);
 
 	useEffect(() => {
+		if (showDropdown && otherMenuRef.current) {
+			gsap.fromTo(
+				otherMenuRef.current,
+				{ scaleY: 0 },
+				{
+					scaleY: 1,
+					duration: 0.4,
+					ease: "elastic.out(1, 0.8)",
+					transformOrigin: "top center",
+				}
+			);
+		}
+		return () => {
+			if (!otherMenuRef.current) return;
+			gsap.killTweensOf(otherMenuRef.current);
+		};
+	}, [showDropdown]);
+
+	useEffect(() => {
 		if (showMenuDropDown) {
 			if (!dropdownMenuRef.current) return;
 			gsap.from(dropdownMenuRef.current, {
@@ -158,7 +179,7 @@ const Navbar = () => {
 	}, [user]);
 
 	return (
-		<nav className="bg-gray-800 border-b border-gray-600 h-14 sticky top-0 z-20">
+		<nav className="bg-gray-800 border-b border-gray-500 h-14 sticky top-0 z-20">
 			<div className="max-w-7xl mx-auto flex justify-between items-center gap-x-6 h-full px-4">
 				<Link to="/" className="text-lg text-white font-bold">
 					{/* <FontAwesomeIcon icon="basketball" /> BBSurvivor */}
@@ -167,29 +188,43 @@ const Navbar = () => {
 
 				<div className="hidden md:flex items-center text-white font-medium flex-1">
 					<div className="flex-1 space-x-4">
-						<Link to="/">Home</Link>
-						<Link to="/bracket-challenges">Bracket Challenges</Link>
-						<Link to="/about">About</Link>
+						<Link to="/" className="hover:text-gray-400">
+							Home
+						</Link>
+						<Link
+							to="/bracket-challenges"
+							className="hover:text-gray-400"
+						>
+							Bracket Challenges
+						</Link>
+						<Link to="/about" className="hover:text-gray-400">
+							About
+						</Link>
 					</div>
-					<div className="flex items-center space-x-5">
+					<div className="flex items-center space-x-3.5">
 						{isAuthenticated && user ? (
 							<>
 								<NotificationLink unreadCount={unreadCount} />
 
 								<div className="relative" ref={dropdownRef}>
 									<button
-										className="block cursor-pointer "
+										className="block cursor-pointer hover:text-gray-300"
 										onClick={() => setShowDropdown((prev) => !prev)}
 									>
-										<div className="bg-gray-700 border rounded overflow-hidden px-2 space-x-1.5">
-											<span className="font-semibold">
-												{user.username}
-											</span>
-											<FontAwesomeIcon icon="caret-down" />
+										<div className="bg-gray-700 font-semibold border border-gray-300 rounded overflow-hidden px-2">
+											{user.username}{" "}
+											<FontAwesomeIcon
+												icon={
+													showDropdown ? "caret-up" : "caret-down"
+												}
+											/>
 										</div>
 									</button>
 									{showDropdown && (
-										<div className="absolute font-medium border border-gray-300 bg-white rounded-lg min-w-40 text-gray-700 shadow-lg right-0 mt-2 overflow-hidden">
+										<div
+											ref={otherMenuRef}
+											className="absolute font-medium border-1 border-gray-7 00 bg-white rounded-lg min-w-40 text-gray-700 shadow-lg right-0 mt-2 overflow-hidden"
+										>
 											{userLinks.map((link) => (
 												<Link
 													key={link.name}
@@ -229,7 +264,7 @@ const Navbar = () => {
 					</div>
 				</div>
 
-				<div className="md:hidden flex space-x-4 items-center">
+				<div className="md:hidden flex space-x-3 items-center">
 					{isAuthenticated && user && (
 						<NotificationLink
 							unreadCount={unreadCount}
@@ -238,37 +273,40 @@ const Navbar = () => {
 					)}
 
 					<button
-						className="cursor-pointer text-white border rounded font-bold px-2"
+						className="cursor-pointer text-white font-bold hover:text-gray-400 w-8 border border-gray-300 rounded"
 						onClick={handleMenuOptionsClick}
 					>
-						<FontAwesomeIcon icon={showMenu ? "xmark" : "bars"} />
+						<FontAwesomeIcon
+							icon={showMenu ? "xmark" : "bars"}
+							size="lg"
+						/>
 					</button>
 				</div>
 
 				{showMenu && (
-					<div className="fixed w-full h-[calc(100dvh-55px)] bottom-0 end-0">
+					<div className="fixed w-full h-[calc(100dvh-56px)] bottom-0 end-0">
 						<div
 							className="absolute w-full h-full bg-[#3a3a3a66]"
 							onClick={handleMenuOptionsClick}
 						></div>
 						<div
 							ref={menuRef}
-							className="absolute end-0 w-full max-w-[350px] h-full bg-gray-700 text-white pointer-events-auto"
+							className="absolute end-0 w-full max-w-[350px] h-full bg-gray-800 text-white pointer-events-auto"
 						>
 							<button
-								className="border-b p-2 w-full text-left"
+								className="p-2 w-full text-left border-b border-gray-300 hover:text-gray-400 cursor-pointer"
 								onClick={() => handleMenuClick("/")}
 							>
 								Home
 							</button>
 							<button
-								className="border-b p-2 w-full text-left"
+								className="p-2 w-full text-left border-b border-gray-300 hover:text-gray-400 cursor-pointer"
 								onClick={() => handleMenuClick("/bracket-challenges")}
 							>
 								Bracket Challenges
 							</button>
 							<button
-								className="border-b p-2 w-full text-left"
+								className="p-2 w-full text-left border-b border-gray-300 hover:text-gray-400 cursor-pointer"
 								onClick={() => handleMenuClick("/about")}
 							>
 								About
@@ -277,10 +315,9 @@ const Navbar = () => {
 							{isAuthenticated ? (
 								<>
 									<button
-										className="border-b p-2 w-full text-left flex items-center gap-x-2"
+										className="p-2 w-full text-left flex items-center gap-x-2 border-b border-gray-300 hover:text-gray-400 cursor-pointer"
 										onClick={handleDropdownMenuClick}
 									>
-										{/* <img src="/user.png" className="h-6" alt="user" /> */}
 										<FontAwesomeIcon icon="user" />
 										<div>
 											<span className="me-2">
@@ -300,12 +337,12 @@ const Navbar = () => {
 									{showMenuDropDown && (
 										<div
 											ref={dropdownMenuRef}
-											className="overflow-hidden bg-gray-600"
+											className="overflow-hidden ps-3 border-b border-gray-300"
 										>
 											{userLinks.map((link) => (
 												<button
 													key={link.name}
-													className="border-b p-2 w-full text-left"
+													className="p-2 w-full text-left border-b border-gray-300 hover:text-gray-400 cursor-pointer"
 													onClick={() =>
 														handleMenuClick(link.route)
 													}
@@ -316,7 +353,7 @@ const Navbar = () => {
 
 											{hasRole("admin") && (
 												<button
-													className="border-b p-2 w-full text-left"
+													className="p-2 w-full text-left border-b border-gray-300 hover:text-gray-400 cursor-pointer"
 													onClick={() => handleMenuClick("/admin")}
 												>
 													Admin Page
@@ -324,7 +361,7 @@ const Navbar = () => {
 											)}
 
 											<button
-												className="border-b p-2 w-full text-left"
+												className="p-2 w-full text-left hover:text-gray-400 cursor-pointer"
 												onClick={() => handleLogout()}
 											>
 												Logout

@@ -23,7 +23,7 @@ const ShareToSocials = () => {
 
 	return (
 		<div className="flex items-center justify-end space-x-1 py-2">
-			<span className="font-bold">SHARE</span>
+			{/* <span className="font-bold">SHARE</span> */}
 			<img
 				src={fbImage}
 				alt="fb"

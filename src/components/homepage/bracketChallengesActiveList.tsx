@@ -5,6 +5,7 @@ import { useAdmin } from "../../context/admin/AdminProvider";
 import { displayLocalDate } from "../../utils/dateTime";
 import Detail from "../detail";
 import RefreshButton from "../refreshButton";
+import Spinner from "../spinner";
 
 const BracketChallengeActiveList = () => {
 	const {
@@ -35,6 +36,7 @@ const BracketChallengeActiveList = () => {
 					label="REFRESH LIST"
 					color="amber"
 					size="sm"
+					delay={3}
 					className="mt-2 shadow"
 					onClick={() => fetchBracketChallenges("active")}
 					disabled={isLoading}
@@ -81,11 +83,20 @@ const BracketChallengeActiveList = () => {
 								))}
 							</>
 						) : (
-							<div className="py-2 px-3 bg-gray-200 shadow-lg rounded">
-								{isLoading
-									? "Fetching active bracket challenges..."
-									: "No active bracket challenges to display."}
-							</div>
+							<>
+								{isLoading ? (
+									<Spinner />
+								) : (
+									<div className="py-2 px-3 bg-gray-200 shadow-lg rounded">
+										No active bracket challenges to display.
+									</div>
+								)}
+							</>
+							// <div className="py-2 px-3 bg-gray-200 shadow-lg rounded">
+							// 	{isLoading
+							// 		? "Fetching active bracket challenges..."
+							// 		: "No active bracket challenges to display."}
+							// </div>
 						)}
 					</div>
 				</div>

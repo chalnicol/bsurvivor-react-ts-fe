@@ -70,13 +70,19 @@ const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
 		};
 	}, [name]);
 
+	const getShortenedName = (name: string): string => {
+		return name.length > 20 ? name.slice(0, 20) + "..." : name;
+	};
+
 	return (
 		<div
 			ref={containerRef}
 			className="px-3 py-2 rounded border border-gray-300 shadow mt-2 bg-amber-300 font-semibold md:flex items-center justify-between space-y-2 md:space-y-0"
 		>
 			<p className="">
-				<span>{`Are you sure you want to delete ${name}?`}</span>
+				<span>{`Are you sure you want to delete "${getShortenedName(
+					name
+				)}"?`}</span>
 			</p>
 			<div className="flex-none space-x-1 font-bold">
 				<button

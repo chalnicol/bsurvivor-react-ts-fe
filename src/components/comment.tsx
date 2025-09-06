@@ -8,6 +8,7 @@ import { useOutsideClick } from "../hooks/useOutsideClick";
 import { useComments } from "../context/comment/CommentsProvider";
 import ReactionVote from "./reactions";
 import CommentForm from "./commentForm";
+import { Link } from "react-router-dom";
 
 interface CommentProps {
 	comment: CommentInfo;
@@ -176,7 +177,9 @@ const Comment = ({ comment, className }: CommentProps) => {
 								isOwned ? "text-yellow-500" : "text-white"
 							}`}
 						>
-							{comment.user.username}
+							<Link to={`/users/${comment.user.username}`}>
+								{comment.user.username}
+							</Link>
 						</p>
 						<p className="text-sm">{displayTime}</p>
 						{isEdited && <span className="text-sm">(edited)</span>}

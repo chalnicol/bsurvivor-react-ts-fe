@@ -19,11 +19,32 @@ const CustomButton = ({
 }: CustomButtonProps) => {
 	const clrClass = useCallback((): string => {
 		const btnClr = color ? color : "gray";
-
 		if (disabled) {
 			return `bg-gray-400 opacity-40`;
 		}
-		return `bg-${btnClr}-500 hover:bg-${btnClr}-400 cursor-pointer`;
+		if (btnClr == "sky") {
+			return `bg-sky-500 hover:bg-sky-400 cursor-pointer`;
+		}
+		if (btnClr == "green") {
+			return `bg-green-500 hover:bg-green-400 cursor-pointer`;
+		}
+		if (btnClr == "red") {
+			return `bg-red-500 hover:bg-red-400 cursor-pointer`;
+		}
+		if (btnClr == "yellow") {
+			return `bg-yellow-500 hover:bg-yellow-400 cursor-pointer`;
+		}
+		if (btnClr == "blue") {
+			return `bg-blue-500 hover:bg-blue-400 cursor-pointer`;
+		}
+		if (btnClr == "teal") {
+			return `bg-teal-500 hover:bg-teal-400 cursor-pointer`;
+		}
+		if (btnClr == "amber") {
+			return `bg-amber-500 hover:bg-amber-400 cursor-pointer`;
+		}
+
+		return `bg-gray-500 hover:bg-gray-400 cursor-pointer`;
 	}, [color, disabled]);
 
 	const sizeClass = useCallback((): string => {

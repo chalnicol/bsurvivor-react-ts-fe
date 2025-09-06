@@ -72,6 +72,10 @@ import {
 	faQuoteLeft,
 	faExternalLink,
 	faEllipsis,
+	faLink,
+	faRectangleXmark,
+	faEnvelope,
+	faEnvelopeOpen,
 } from "@fortawesome/free-solid-svg-icons";
 import FriendsList from "./pages/user/friends";
 import NotificationsList from "./pages/user/notificationsList";
@@ -109,7 +113,11 @@ library.add(
 	faArrowAltCircleDown,
 	faQuoteLeft,
 	faExternalLink,
-	faEllipsis
+	faEllipsis,
+	faLink,
+	faRectangleXmark,
+	faEnvelope,
+	faEnvelopeOpen
 );
 
 function App() {

@@ -22,16 +22,6 @@ const Notification = ({
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	const renderLink = (type: string, url: string): React.ReactNode => {
-		// if (type == "FriendRequestSentNotification") {
-		// 	return (
-		// 		<Link
-		// 			to={url}
-		// 			className="text-white bg-amber-500 hover:bg-amber-400 text-xs px-2 mx-2 rounded font-bold"
-		// 		>
-		// 			FRIENDS
-		// 		</Link>
-		// 	);
-		// }
 		let bgClass = "";
 		let label = "";
 
@@ -47,6 +37,9 @@ const Notification = ({
 		} else if (type == "BracketEntryUpdated") {
 			bgClass = "bg-rose-500 hover:bg-rose-400";
 			label = "ENTRY";
+		} else if (type == "CommentToEntry") {
+			bgClass = "bg-orange-500 hover:bg-orange-400";
+			label = "COMMENT";
 		} else {
 			bgClass = "bg-gray-500 hover:bg-gray-400";
 			label = "PAGE";
@@ -64,12 +57,16 @@ const Notification = ({
 
 	const openAnim = () => {
 		if (contentRef.current) {
-			gsap.from(contentRef.current, {
-				height: 0,
-				duration: 0.4,
-				ease: "power4.out",
-				transformOrigin: "0% 100%",
-			});
+			gsap.fromTo(
+				contentRef.current,
+				{ height: 0 },
+				{
+					height: "auto",
+					duration: 0.4,
+					ease: "power4.out",
+					transformOrigin: "0% 100%",
+				}
+			);
 		}
 	};
 
@@ -91,34 +88,49 @@ const Notification = ({
 	return (
 		<div
 			key={notification.id}
-			className={`px-3 py-2 border-b border-gray-400 last:border-b-0 select-none flex items-center gap-x-2 cursor-pointer ${
+			className={`px-3 py-2 border-b border-gray-400 last:border-b-0 select-none flex items-center gap-x-4 cursor-pointer ${
 				isOpen ? "bg-gray-800" : "hover:bg-gray-600"
 			}`}
 		>
-			{!notification.is_read && <FontAwesomeIcon icon="circle" size="2xs" />}
 			<div
 				className="flex-1 space-y-0.5"
 				onClick={() => onClick(notification.id, notification.is_read)}
 			>
 				<p
-					className={`${
+					className={`space-x-2 ${
 						notification.is_read
 							? "text-gray-200"
 							: "text-white font-semibold"
 					}`}
 				>
-					{notification.data.message}
+					{/* <FontAwesomeIcon
+						icon={notification.is_read ? "envelope-open" : "envelope"}
+					/> */}
+					{!notification.is_read && (
+						<FontAwesomeIcon icon="circle" size="2xs" />
+					)}
+					<span>{notification.data.message}</span>
 				</p>
+
 				{isOpen && (
 					<div
 						ref={contentRef}
-						className="text-sm max-w-md my-2 px-3 overflow-hidden h-12 bg-gray-700 flex items-center rounded"
+						className="my-2 px-3 py-2 overflow-hidden bg-gray-700 rounded"
 					>
-						View
-						{renderLink(notification.type, notification.data.url)}
+						<div className="flex items-center text-xs">
+							<span>View</span>
+							{renderLink(notification.type, notification.data.url)}
+						</div>
 					</div>
 				)}
-				<div className="sm:flex max-w-md items-center gap-x-3 space-y-1 sm:space-y-0 mt-1">
+
+				<div className="sm:flex items-center gap-x-3 space-y-1 sm:space-y-0 mt-1">
+					<div className="text-xs space-x-2 flex">
+						<p className="text-orange-400 bg-zinc-600 px-1 min-w-10 font-semibold">
+							ID
+						</p>
+						<p className="text-gray-400">{notification.id}</p>
+					</div>
 					<div className="text-xs space-x-2 flex">
 						<p className="text-orange-400 bg-zinc-600 px-1 min-w-10 font-semibold">
 							Date
@@ -127,16 +139,10 @@ const Notification = ({
 							{displayLocalDate(notification.created_at)}
 						</p>
 					</div>
-					<div className="text-xs space-x-2 flex">
-						<p className="text-orange-400 bg-zinc-600 px-1 min-w-10 font-semibold">
-							ID
-						</p>
-						<p className="text-gray-400">{notification.id}</p>
-					</div>
 				</div>
 			</div>
 			<button
-				className="hover:text-gray-700 cursor-pointer ms-auto w-7 h-7 rounded-full border bg-gray-300 text-gray-600"
+				className="flex-nonehover:text-gray-700 cursor-pointer ms-auto w-7 h-7 rounded-full border bg-gray-300 text-gray-600"
 				onClick={() => onDelete(notification)}
 			>
 				<FontAwesomeIcon icon="trash" size="sm" />

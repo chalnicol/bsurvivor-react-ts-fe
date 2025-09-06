@@ -177,8 +177,8 @@ const ListBracketChallengeEntries = () => {
 									<td className="px-2 py-1">Name</td>
 									<td className="px-2 py-1">Bracket Challenge</td>
 									<td className="px-2 py-1">Date Submitted</td>
-									<td className="px-2 py-1">League</td>
 									<td className="px-2 py-1">User</td>
+									<td className="px-2 py-1">League</td>
 									<td className="px-2 py-1">Status</td>
 									<td className="px-2 py-1">Actions</td>
 								</tr>
@@ -196,20 +196,21 @@ const ListBracketChallengeEntries = () => {
 											{displayLocalDate(entry.created_at)}
 										</td>
 										<td className="px-2 py-1">
+											{entry.user.username}
+										</td>
+										<td className="px-2 py-1">
 											{entry.bracket_challenge.league == "NBA" && (
-												<span className="text-red-600 font-semibold">
+												<span className="bg-red-600 px-1.5 rounded text-xs text-white font-bold">
 													NBA
 												</span>
 											)}
 											{entry.bracket_challenge.league == "PBA" && (
-												<span className="text-blue-600 font-semibold">
+												<span className="bg-red-600 px-1.5 rounded text-xs text-white font-bold">
 													PBA
 												</span>
 											)}
 										</td>
-										<td className="px-2 py-1">
-											{entry.user.username}
-										</td>
+
 										<td className="px-2 py-1">
 											<StatusPills status={entry.status} />
 										</td>

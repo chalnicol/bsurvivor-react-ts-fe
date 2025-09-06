@@ -226,9 +226,10 @@ export type SlotModeType =
 export type ProfileWindow = "details" | "password" | "delete" | null;
 
 export interface NotificationDataInfo {
-	sender_id: number;
-	sender_name: string;
+	sender_id?: number;
+	sender_name?: string;
 	message: string;
+	url: string;
 }
 
 export interface FriendsInfo {
@@ -277,18 +278,19 @@ export interface VotesInfo {
 
 export type ColorType =
 	| "red"
-	| "emerald"
-	| "orange"
 	| "yellow"
 	| "green"
 	| "teal"
 	| "blue"
-	| "indigo"
-	| "purple"
-	| "pink"
 	| "amber"
-	| "lime"
 	| "sky";
+
+export interface TabInfo<T> {
+	id: number;
+	label: string;
+	tab: T;
+	type: "button" | "link";
+}
 
 // export interface GeneralApiErrorResponse {
 // 	message: string;

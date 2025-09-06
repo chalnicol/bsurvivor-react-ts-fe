@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import StatusPills from "../statusPills";
 import Detail from "../detail";
 import { useAuth } from "../../context/auth/AuthProvider";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface topEntryListProps {
 	bracketChallenge: BracketChallengeInfo;
@@ -27,9 +28,14 @@ const TopEntryList = ({ bracketChallenge }: topEntryListProps) => {
 					</p>
 					<Link
 						to={`/bracket-challenges/${bracketChallenge.slug}`}
-						className="text-white text-xs border-b border-b-gray-100 font-semibold hover:text-gray-200"
+						className="text-white text-xs border-b font-semibold hover:text-gray-300"
 					>
 						{bracketChallenge.name}
+						<FontAwesomeIcon
+							icon="external-link"
+							size="sm"
+							className="ms-2"
+						/>
 					</Link>
 				</div>
 				<div className="px-6 pt-4 pb-6 bg-gray-800 ">
@@ -61,7 +67,7 @@ const TopEntryList = ({ bracketChallenge }: topEntryListProps) => {
 												{entry.user.username}
 											</span>
 										</Detail>
-										<Detail label="Correct Predictions">
+										<Detail label="Correct Picks Count">
 											{entry.correct_predictions_count}
 										</Detail>
 										<Detail label="Status">
