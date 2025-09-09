@@ -22,26 +22,28 @@ const TopEntries = () => {
 
 	return (
 		<div className="mb-12">
-			<h3 className="font-bold text-xl">
-				<FontAwesomeIcon icon="caret-right" /> Top Challenge Entries
-			</h3>
+			<div className="flex flex-wrap items-center gap-x-3">
+				<h3 className="font-bold text-xl">
+					<FontAwesomeIcon icon="caret-right" /> Top Bracket Challenge
+					Entries
+				</h3>
+				<RefreshButton
+					label="REFRESH"
+					color="amber"
+					size="sm"
+					delay={3}
+					className="shadow"
+					onClick={() => fetchBracketChallenges("ongoing")}
+					disabled={isLoading}
+				/>
+			</div>
 
 			<p className="text-sm">
 				This is the list of ongoing bracket challenges.
 			</p>
 
-			<RefreshButton
-				label="REFRESH LIST"
-				color="amber"
-				size="sm"
-				delay={3}
-				className="mt-2 shadow"
-				onClick={() => fetchBracketChallenges("ongoing")}
-				disabled={isLoading}
-			/>
-
 			{ongoingChallenges.length > 0 ? (
-				<div className="space-y-4 mb-4 mt-2">
+				<div className="space-y-4 mb-4 mt-4">
 					{ongoingChallenges.map((bracketChallenge) => (
 						<TopEntryList
 							key={bracketChallenge.id}
@@ -52,9 +54,15 @@ const TopEntries = () => {
 			) : (
 				<>
 					{isOngoingLoading ? (
-						<Spinner />
+						<div className="mt-4 bg-gray-200 h-13">
+							<Spinner
+								colorTheme="dark"
+								alignment="horizontal"
+								size="sm"
+							/>
+						</div>
 					) : (
-						<div className="py-2 px-3 bg-gray-200 mt-2">
+						<div className="py-2 px-3 bg-gray-200 mt-4">
 							No top entries to display
 						</div>
 					)}

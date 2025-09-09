@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { NotificationInfo } from "../data/adminData";
 import { Link } from "react-router-dom";
-import { displayLocalDate } from "../utils/dateTime";
+import { getRelativeTime } from "../utils/dateTime";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
@@ -18,6 +18,7 @@ const Notification = ({
 	onDelete,
 }: NotificationProps) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const [displayTime, setDisplayTime] = useState<string>("");
 
 	const contentRef = useRef<HTMLDivElement>(null);
 
@@ -85,10 +86,19 @@ const Notification = ({
 		};
 	}, [isOpen]);
 
+	useEffect(() => {
+		setDisplayTime(getRelativeTime(notification.created_at));
+
+		const timer = setInterval(() => {
+			setDisplayTime(getRelativeTime(notification.created_at));
+		}, 60 * 1000);
+		return () => clearInterval(timer);
+	}, [notification.created_at]);
+
 	return (
 		<div
 			key={notification.id}
-			className={`px-3 py-2 border-b border-gray-400 last:border-b-0 select-none flex items-center gap-x-4 cursor-pointer ${
+			className={`px-3 py-2 border-b border-gray-500 last:border-b-0 select-none flex items-center gap-x-6 cursor-pointer ${
 				isOpen ? "bg-gray-800" : "hover:bg-gray-600"
 			}`}
 		>
@@ -97,7 +107,7 @@ const Notification = ({
 				onClick={() => onClick(notification.id, notification.is_read)}
 			>
 				<p
-					className={`space-x-2 ${
+					className={`space-x-2 text-sm ${
 						notification.is_read
 							? "text-gray-200"
 							: "text-white font-semibold"
@@ -124,28 +134,16 @@ const Notification = ({
 					</div>
 				)}
 
-				<div className="sm:flex items-center gap-x-3 space-y-1 sm:space-y-0 mt-1">
-					<div className="text-xs space-x-2 flex">
-						<p className="text-orange-400 bg-zinc-600 px-1 min-w-10 font-semibold">
-							ID
-						</p>
-						<p className="text-gray-400">{notification.id}</p>
-					</div>
-					<div className="text-xs space-x-2 flex">
-						<p className="text-orange-400 bg-zinc-600 px-1 min-w-10 font-semibold">
-							Date
-						</p>
-						<p className="text-gray-400">
-							{displayLocalDate(notification.created_at)}
-						</p>
-					</div>
+				<div className="flex text-xs text-gray-400 gap-x-2 mt-1">
+					<p>{displayTime}</p>
+					<p>ID: {notification.id}</p>
 				</div>
 			</div>
 			<button
-				className="flex-nonehover:text-gray-700 cursor-pointer ms-auto w-7 h-7 rounded-full border bg-gray-300 text-gray-600"
+				className="flex-nonehover:text-gray-700 cursor-pointer ms-auto px-1 w-6 aspect-square rounded-full border bg-gray-300 text-gray-600"
 				onClick={() => onDelete(notification)}
 			>
-				<FontAwesomeIcon icon="trash" size="sm" />
+				<FontAwesomeIcon icon="trash" size="xs" />
 			</button>
 		</div>
 	);

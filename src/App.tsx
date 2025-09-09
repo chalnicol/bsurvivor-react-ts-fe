@@ -7,7 +7,7 @@ import ResetPassword from "./components/auth/resetPassword";
 import ProtectedRoute from "./components/protectedRoute";
 import PublicOnlyRoute from "./components/publicOnlyRoute";
 import Unauthorized from "./pages/unauthorized";
-import PageNotFound from "./components/pageNotFound";
+import PageNotFound from "./pages/pageNotFound";
 import AdminDashboard from "./pages/admin/adminDashboard";
 import About from "./pages/about";
 import ProfilePage from "./pages/user/profile";
@@ -76,7 +76,13 @@ import {
 	faRectangleXmark,
 	faEnvelope,
 	faEnvelopeOpen,
+	faCircleQuestion,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+	faThumbsUp as farThumbsUp,
+	faThumbsDown as farThumbsDown,
+} from "@fortawesome/free-regular-svg-icons";
+
 import FriendsList from "./pages/user/friends";
 import NotificationsList from "./pages/user/notificationsList";
 import BracketChallengesList from "./pages/bracketChallengesList";
@@ -117,7 +123,10 @@ library.add(
 	faLink,
 	faRectangleXmark,
 	faEnvelope,
-	faEnvelopeOpen
+	faEnvelopeOpen,
+	faCircleQuestion,
+	farThumbsUp,
+	farThumbsDown
 );
 
 function App() {

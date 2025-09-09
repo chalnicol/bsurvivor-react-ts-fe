@@ -11,14 +11,16 @@ import ToDelete from "../../components/toDelete";
 import { useAuth } from "../../context/auth/AuthProvider";
 import Notification from "../../components/notifications";
 import CustomButton from "../../components/customButton";
+import { useSearchParams } from "react-router-dom";
 
 const NotificationsList = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
 	const { user, fetchUnreadCount, updateUnreadCount } = useAuth();
 
 	const [notifications, setNotifications] = useState<NotificationInfo[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
-	const [currentPage, setCurrentPage] = useState<number>(1);
+	// const [currentPage, setCurrentPage] = useState<number>(1);
 	const [meta, setMeta] = useState<MetaInfo | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
@@ -26,6 +28,8 @@ const NotificationsList = () => {
 	const [hasNewNotifications, setHasNewNotifications] =
 		useState<boolean>(false);
 	const [toView, setToView] = useState<string | null>(null);
+
+	const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
 	const fetchNotifications = async (page: number) => {
 		setIsLoading(true);
@@ -35,7 +39,8 @@ const NotificationsList = () => {
 			);
 			setNotifications(response.data.data);
 			setMeta(response.data.meta);
-			setCurrentPage(page);
+			// setCurrentPage(page);
+			// setSearchParams({ page: page.toString() });
 			setHasNewNotifications(false);
 		} catch (error) {
 			console.error(error);
@@ -75,7 +80,8 @@ const NotificationsList = () => {
 			if (meta) {
 				const newTotal = notifications.length - 1;
 				if (newTotal === 0 && meta.current_page > 1) {
-					setCurrentPage((prev) => prev - 1);
+					// setCurrentPage((prev) => prev - 1);
+					setSearchParams({ page: (currentPage - 1).toString() });
 				} else {
 					fetchNotifications(currentPage);
 				}
@@ -124,14 +130,16 @@ const NotificationsList = () => {
 	};
 
 	const handlePageClick = (page: number) => {
-		setCurrentPage(page);
+		// setCurrentPage(page);
+		setSearchParams({ page: page.toString() });
 	};
 
 	const handleRefreshClick = () => {
 		// setToView(null);
 		fetchUnreadCount();
 		if (currentPage > 1) {
-			setCurrentPage(1);
+			// setCurrentPage(1);
+			setSearchParams({ page: "1" });
 		} else {
 			fetchNotifications(1);
 			// setCurrentPage(1);
@@ -155,92 +163,82 @@ const NotificationsList = () => {
 	}, [user]);
 
 	return (
-		<ContentBase className="py-7 px-4">
-			<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
-				<h1 className="text-xl font-bold">
-					<FontAwesomeIcon icon="caret-right" /> My Notifications
-				</h1>
-				<p className="font-medium text-sm my-1">
-					You can view all your notifications here.
-				</p>
+		<>
+			<title>{`NOTIFICATIONS | ${import.meta.env.VITE_APP_NAME}`}</title>
+			<ContentBase className="py-7 px-4">
+				<div className="p-3 lg:p-5 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+					<h1 className="text-xl font-bold">
+						<FontAwesomeIcon icon="caret-right" /> My Notifications
+					</h1>
+					<p className="font-medium text-sm my-1">
+						You can view all your notifications here.
+					</p>
 
-				{/* <div className="mt-3 mb-4">
-					{hasNewNotifications ? (
-						<button
-							className={`text-xs text-white px-3 py-0.5 rounded font-semibold bg-sky-500 hover:bg-sky-400 cursor-pointer relative`}
-							onClick={handleRefreshClick}
-						>
-							GET NEW NOTIFICATIONS
-							<p className="absolute w-2.5 h-2.5 rounded-full bg-red-500 -top-1 -right-1"></p>
-						</button>
-					) : (
-						<span className="text-xs text-white px-3 py-0.5 rounded font-semibold bg-sky-400 opacity-70 select-none">
-							GET NEW NOTIFICATIONS
-						</span>
+					<CustomButton
+						label="GET NEW NOTIFICATIONS"
+						onClick={handleRefreshClick}
+						disabled={!hasNewNotifications}
+						size="sm"
+						color="sky"
+						className="mt-2 mb-3 px-3 shadow"
+					/>
+
+					{success && (
+						<StatusMessage
+							type="success"
+							message={success}
+							onClose={() => setSuccess(null)}
+						/>
 					)}
-				</div> */}
-				<CustomButton
-					label="GET NEW NOTIFICATIONS"
-					onClick={handleRefreshClick}
-					disabled={!hasNewNotifications}
-					size="sm"
-					color="sky"
-					className="mt-2 mb-3 px-3 shadow"
-				/>
+					{error && (
+						<StatusMessage
+							type="error"
+							message={error}
+							onClose={() => setError(null)}
+						/>
+					)}
+					{toDelete && (
+						<ToDelete
+							name={toDelete.id}
+							onConfirm={deleteNotification}
+							onCancel={() => setToDelete(null)}
+						/>
+					)}
 
-				{success && (
-					<StatusMessage
-						type="success"
-						message={success}
-						onClose={() => setSuccess(null)}
-					/>
-				)}
-				{error && (
-					<StatusMessage
-						type="error"
-						message={error}
-						onClose={() => setError(null)}
-					/>
-				)}
-				{toDelete && (
-					<ToDelete
-						name={toDelete.id}
-						onConfirm={deleteNotification}
-						onCancel={() => setToDelete(null)}
-					/>
-				)}
-
-				<div className="mt-2 overflow-x-auto">
-					<div className="bg-gray-700 text-white overflow-hidden rounded min-w-[350px]">
-						{notifications.length > 0 ? (
-							<>
-								{notifications.map((notification) => (
-									<Notification
-										key={notification.id}
-										notification={notification}
-										toView={toView}
-										onClick={handleNotificationClick}
-										onDelete={handleDeleteNotification}
-									/>
-								))}
-							</>
-						) : (
-							<p className="px-3 py-2 bg-gray-300 text-gray-700">
-								{isLoading ? "Loading..." : "No notifications found."}
-							</p>
-						)}
+					<div className="mt-2 overflow-x-auto">
+						<div className="bg-gray-700 text-white overflow-hidden rounded min-w-[350px]">
+							{notifications.length > 0 ? (
+								<>
+									{notifications.map((notification) => (
+										<Notification
+											key={notification.id}
+											notification={notification}
+											toView={toView}
+											onClick={handleNotificationClick}
+											onDelete={handleDeleteNotification}
+										/>
+									))}
+								</>
+							) : (
+								<p className="px-3 py-2 bg-gray-300 text-gray-700">
+									{isLoading
+										? "Loading..."
+										: "No notifications found."}
+								</p>
+							)}
+						</div>
 					</div>
-				</div>
 
-				<Pagination
-					meta={meta}
-					onPageChange={handlePageClick}
-					className="mt-5"
-				/>
-			</div>
-			{isLoading && <Loader />}
-			<EndOfPage />
-		</ContentBase>
+					<Pagination
+						meta={meta}
+						onPageChange={handlePageClick}
+						className="mt-5"
+					/>
+				</div>
+				{isLoading && <Loader />}
+				<EndOfPage />
+			</ContentBase>
+		</>
 	);
 };
 

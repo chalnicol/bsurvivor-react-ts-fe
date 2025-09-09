@@ -205,7 +205,7 @@ const ListBracketChallengeEntries = () => {
 												</span>
 											)}
 											{entry.bracket_challenge.league == "PBA" && (
-												<span className="bg-red-600 px-1.5 rounded text-xs text-white font-bold">
+												<span className="bg-blue-600 px-1.5 rounded text-xs text-white font-bold">
 													PBA
 												</span>
 											)}

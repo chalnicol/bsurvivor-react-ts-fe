@@ -42,7 +42,7 @@ const MenuBar = <T extends string | number>({
 	};
 
 	useEffect(() => {
-		const tab = tabs.find((tab) => tab.type == activeTab);
+		const tab = tabs.find((tab) => tab.tab == activeTab);
 		if (tab) {
 			setTabTitle(getLabel(tab));
 		}
@@ -99,12 +99,12 @@ const MenuBar = <T extends string | number>({
 						<button
 							key={t.id}
 							className={`py-1.5 px-3 text-left text-sm w-full font-semibold ${
-								t.type == activeTab
+								t.tab == activeTab
 									? "bg-gray-800/90 text-amber-400"
 									: "bg-gray-600/90 hover:bg-gray-500/90 cursor-pointer"
 							}`}
 							onClick={() => handleMenuClick(t.tab)}
-							disabled={isLoading || t.type == activeTab}
+							disabled={isLoading || t.tab == activeTab}
 						>
 							{t.type == "link" ? (
 								<>

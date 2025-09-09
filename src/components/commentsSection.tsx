@@ -88,6 +88,7 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 					onSubmit={() => handleSubmit()}
 					onCancel={() => handleCancel()}
 					onChange={(e: string) => setBody(e)}
+					btnSizes="sm"
 				/>
 			)}
 
@@ -128,7 +129,7 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 				) : (
 					<>
 						{isLoading ? (
-							<Spinner className="text-black" />
+							<Spinner colorTheme="dark" />
 						) : (
 							<p className="border-t border-gray-300 py-2">
 								No comments to display.

@@ -45,82 +45,85 @@ const Login = () => {
 	}
 
 	return (
-		<ContentBase className="flex items-center justify-center p-4">
-			<div className="border border-gray-400 bg-white px-8 pt-6 pb-8 rounded shadow-md overflow-hidden w-full max-w-md relative">
-				<TransparentIcon className="absolute w-60 opacity-15 rotate-30 -right-10 -top-10 z-0" />
-				<div className="relative z-10">
-					<h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-					<form onSubmit={handleSubmit}>
-						<div className="mb-4">
-							<label
-								className="block text-sm font-medium mb-2"
-								htmlFor="email"
-							>
-								Email
-							</label>
-							<input
-								type="email"
-								id="email"
-								value={email}
-								className="w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-								onChange={(e) => setEmail(e.target.value)}
+		<>
+			<title>{`LOGIN | ${import.meta.env.VITE_APP_NAME}`}</title>
+			<ContentBase className="flex items-center justify-center p-4">
+				<div className="border border-gray-400 bg-white px-8 pt-6 pb-8 rounded shadow-md overflow-hidden w-full max-w-md relative">
+					<TransparentIcon className="absolute w-60 opacity-10 rotate-30 -right-12 -top-12 z-0" />
+					<div className="relative z-10">
+						<h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+						<form onSubmit={handleSubmit}>
+							<div className="mb-4">
+								<label
+									className="block text-sm font-medium mb-2"
+									htmlFor="email"
+								>
+									Email
+								</label>
+								<input
+									type="email"
+									id="email"
+									value={email}
+									className="w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									onChange={(e) => setEmail(e.target.value)}
+									disabled={isLoading}
+									required
+								/>
+							</div>
+							<div className="mb-6">
+								<label
+									className="block text-sm font-medium mb-2"
+									htmlFor="password"
+								>
+									Password
+								</label>
+								<input
+									type="password"
+									id="password"
+									value={password}
+									className="w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+									onChange={(e) => setPassword(e.target.value)}
+									disabled={isLoading}
+									required
+								/>
+							</div>
+							<button
+								type="submit"
+								className={`w-full  text-white py-2 rounded font-bold ${
+									isLoading
+										? "bg-gray-600 opacity-70"
+										: "bg-gray-700 hover:bg-gray-600 cursor-pointer "
+								}`}
 								disabled={isLoading}
-								required
-							/>
-						</div>
-						<div className="mb-6">
-							<label
-								className="block text-sm font-medium mb-2"
-								htmlFor="password"
 							>
-								Password
-							</label>
-							<input
-								type="password"
-								id="password"
-								value={password}
-								className="w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-								onChange={(e) => setPassword(e.target.value)}
-								disabled={isLoading}
-								required
-							/>
-						</div>
-						<button
-							type="submit"
-							className={`w-full  text-white py-2 rounded font-bold ${
-								isLoading
-									? "bg-gray-600 opacity-70"
-									: "bg-gray-700 hover:bg-gray-600 cursor-pointer "
-							}`}
-							disabled={isLoading}
-						>
-							LOGIN
-						</button>
-					</form>
+								LOGIN
+							</button>
+						</form>
 
-					{error && (
-						<div>
-							<p className="my-3 text-red-500">{error}</p>
-						</div>
-					)}
-
-					<div className="mt-3">
-						{isLoading ? (
-							<span className="text-sm	text-gray-700 ">
-								Forgot Password?
-							</span>
-						) : (
-							<Link
-								to="/forgot-password"
-								className="text-sm	text-gray-700 hover:underline"
-							>
-								Forgot Password?
-							</Link>
+						{error && (
+							<div>
+								<p className="my-3 text-red-500">{error}</p>
+							</div>
 						)}
+
+						<div className="mt-3">
+							{isLoading ? (
+								<span className="text-sm	text-gray-700 ">
+									Forgot Password?
+								</span>
+							) : (
+								<Link
+									to="/forgot-password"
+									className="text-sm	text-gray-700 hover:underline"
+								>
+									Forgot Password?
+								</Link>
+							)}
+						</div>
 					</div>
 				</div>
-			</div>
-		</ContentBase>
+			</ContentBase>
+		</>
 	);
 };
 export default Login;

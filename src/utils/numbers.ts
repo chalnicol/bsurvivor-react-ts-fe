@@ -3,24 +3,31 @@ export const formatNumberShorthand = (num: number): string => {
 		return num.toString();
 	}
 
-	const si = [
-		{ value: 1, symbol: "" },
+	const units = [
 		{ value: 1e3, symbol: "K" }, // Thousand
 		{ value: 1e6, symbol: "M" }, // Million
-		// You can extend this for B (billion), T (trillion) etc. if needed
-		// { value: 1E9, symbol: "B" },
+		{ value: 1e9, symbol: "B" }, // Billion
+		{ value: 1e12, symbol: "T" }, // Trillion
 	];
 
-	const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-	let i;
-	for (i = si.length - 1; i > 0; i--) {
-		if (num >= si[i].value) {
-			break;
+	const threshold = 0.9995; // Adjust this value to control rounding behavior
+
+	for (let i = units.length - 1; i >= 0; i--) {
+		const unit = units[i];
+		if (num >= unit.value * threshold) {
+			let formattedValue = (num / unit.value).toFixed(1);
+
+			// Check for rounding up to the next unit
+			if (parseFloat(formattedValue) >= 1000 && i < units.length - 1) {
+				// If it rounds up to the next unit, use that unit instead
+				const nextUnit = units[i + 1];
+				formattedValue = (num / nextUnit.value).toFixed(1);
+				return formattedValue.replace(/\.0+$/, "") + nextUnit.symbol;
+			}
+
+			return formattedValue.replace(/\.0+$/, "") + unit.symbol;
 		}
 	}
 
-	// Calculate the value and format it to one decimal place if necessary
-	const formattedValue = (num / si[i].value).toFixed(1).replace(rx, "$1");
-
-	return formattedValue + si[i].symbol;
+	return num.toString();
 };

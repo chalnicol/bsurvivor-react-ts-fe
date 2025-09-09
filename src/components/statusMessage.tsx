@@ -6,7 +6,7 @@ import { isElementInViewport } from "../utils/elements";
 
 interface StatusMessageProps {
 	message: string;
-	type?: string;
+	type: "success" | "error" | "info";
 	onClose: () => void;
 	fixed?: boolean;
 	children?: React.ReactNode;
@@ -29,6 +29,8 @@ const StatusMessage = ({
 				return "bg-green-600";
 			case "error":
 				return "bg-red-600";
+			case "info":
+				return "bg-teal-600";
 			default:
 				return "bg-gray-600";
 		}
@@ -94,16 +96,14 @@ const StatusMessage = ({
 	return (
 		<div
 			ref={containerRef}
-			className={`w-full my-2 relative flex items-center justify-between gap-x-2 text-white font-semibold px-3 py-2 rounded ${bgClr()}`}
+			className={`w-full my-2 relative flex items-start md:items-center justify-between gap-x-2 text-white font-semibold px-3 pt-2 pb-3 md:pb-2 rounded ${bgClr()}`}
 		>
 			<div className="md:flex items-center w-full space-y-1 md:space-y-0">
-				<p className="flex-1">{message}</p>
+				<p className="flex-1 text-sm">{message}</p>
 				{children}
 			</div>
 			<button
-				className={`px-1 cursor-pointer  ${
-					type == "success" ? "hover:bg-green-300" : "hover:bg-red-300"
-				}`}
+				className={`px-1 cursor-pointer hover:bg-white/20`}
 				onClick={closeAnim}
 			>
 				<FontAwesomeIcon icon="xmark" />

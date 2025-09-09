@@ -7,6 +7,7 @@ import { useOutsideClick } from "../hooks/useOutsideClick";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import NotificationLink from "./NotificationLink";
 import Icon from "./icon";
+import { useSearchParams } from "react-router-dom";
 
 interface LinksInfo {
 	name: string;
@@ -14,6 +15,8 @@ interface LinksInfo {
 	route: string;
 }
 const Navbar = () => {
+	const [searchParams] = useSearchParams();
+
 	const [showDropdown, setShowDropdown] = useState<boolean>(false);
 	const [showMenu, setShowMenu] = useState<boolean>(false);
 	const [showMenuDropDown, setShowMenuDropDown] = useState<boolean>(false);
@@ -41,10 +44,31 @@ const Navbar = () => {
 		setShowDropdown(false);
 	});
 
+	const friendsTab = searchParams.get("tab") || "active";
+
+	const entriesPage = searchParams.get("page") || "1";
+	const entriesSearch = searchParams.get("search");
+
+	const bracketPage = searchParams.get("page") || "1";
+	const bracketSearch = searchParams.get("search");
+	const bracketUrl = `/bracket-challenges?page=${bracketPage}${
+		bracketSearch ? `&search=${bracketSearch}` : ""
+	}`;
+
 	const userLinks: LinksInfo[] = [
 		{ name: "profile", label: "Profile", route: "/profile" },
-		{ name: "entries", label: "Entries", route: "/entries" },
-		{ name: "friends", label: "Friends", route: "/friends" },
+		{
+			name: "entries",
+			label: "Entries",
+			route: `/entries?page=${entriesPage}${
+				entriesSearch ? `&search=${entriesSearch}` : ""
+			}`,
+		},
+		{
+			name: "friends",
+			label: "Friends",
+			route: `/friends?tab=${friendsTab}`,
+		},
 	];
 
 	const handleLogout = async () => {
@@ -191,10 +215,7 @@ const Navbar = () => {
 						<Link to="/" className="hover:text-gray-400">
 							Home
 						</Link>
-						<Link
-							to="/bracket-challenges"
-							className="hover:text-gray-400"
-						>
+						<Link to={bracketUrl} className="hover:text-gray-400">
 							Bracket Challenges
 						</Link>
 						<Link to="/about" className="hover:text-gray-400">
@@ -301,7 +322,7 @@ const Navbar = () => {
 							</button>
 							<button
 								className="p-2 w-full text-left border-b border-gray-300 hover:text-gray-400 cursor-pointer"
-								onClick={() => handleMenuClick("/bracket-challenges")}
+								onClick={() => handleMenuClick(bracketUrl)}
 							>
 								Bracket Challenges
 							</button>

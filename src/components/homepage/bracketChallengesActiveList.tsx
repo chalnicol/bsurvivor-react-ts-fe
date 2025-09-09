@@ -24,82 +24,74 @@ const BracketChallengeActiveList = () => {
 	return (
 		<>
 			<div className="w-full">
-				<h3 className="font-bold text-xl">
-					<FontAwesomeIcon icon="caret-right" /> Active Bracket Challenges
-				</h3>
-				<p className="text-sm">
-					Take a look of the active bracket challenges and submit your
-					bracket challenge entry.
+				<div className="flex flex-wrap items-center gap-x-3 ">
+					<h3 className="font-bold text-xl">
+						<FontAwesomeIcon icon="caret-right" /> Open Bracket Challenges
+					</h3>
+					<RefreshButton
+						label="REFRESH"
+						color="amber"
+						size="sm"
+						delay={3}
+						className="shadow"
+						onClick={() => fetchBracketChallenges("active")}
+						disabled={isLoading}
+					/>
+				</div>
+
+				<p className="text-sm mt-1">
+					Take a look of the open bracket challenges and submit your
+					bracket challenge entry. Hurry up before the end date!
 				</p>
 
-				<RefreshButton
-					label="REFRESH LIST"
-					color="amber"
-					size="sm"
-					delay={3}
-					className="mt-2 shadow"
-					onClick={() => fetchBracketChallenges("active")}
-					disabled={isLoading}
-				/>
-
-				{/* <hr className="my-2 border-gray-400 text-gray-500" /> */}
-				<div className="overflow-x-hidden mt-2">
-					<div className="min-w-xl">
-						{activeChallenges.length > 0 ? (
-							<>
-								{activeChallenges.map((bracketChallenge) => (
-									<Link
-										to={`/bracket-challenges/${bracketChallenge.slug}`}
-										key={bracketChallenge.id}
-									>
-										<div className="sm:grid md:grid-cols-2 px-3 py-2 space-y-1 border border-gray-400 bg-gray-800 hover:bg-gray-700 text-sm text-white rounded mb-1 shadow">
-											<Detail label="Name">
-												{bracketChallenge.name}
-											</Detail>
-											<Detail label="League">
-												{bracketChallenge.league == "NBA" && (
-													<span className="font-semibold bg-red-600 px-2 rounded text-white">
-														NBA
-													</span>
-												)}
-												{bracketChallenge.league == "PBA" && (
-													<span className="font-semibold bg-blue-600 px-2 rounded text-white">
-														PBA
-													</span>
-												)}
-											</Detail>
-											<Detail label="Start Date">
-												{displayLocalDate(
-													bracketChallenge.start_date
-												)}
-											</Detail>
-											<Detail label="End Date">
-												{displayLocalDate(
-													bracketChallenge.end_date
-												)}
-											</Detail>
-										</div>
-									</Link>
-								))}
-							</>
-						) : (
-							<>
-								{isLoading ? (
-									<Spinner />
-								) : (
-									<div className="py-2 px-3 bg-gray-200 shadow-lg rounded">
-										No active bracket challenges to display.
-									</div>
-								)}
-							</>
-							// <div className="py-2 px-3 bg-gray-200 shadow-lg rounded">
-							// 	{isLoading
-							// 		? "Fetching active bracket challenges..."
-							// 		: "No active bracket challenges to display."}
-							// </div>
-						)}
+				{activeChallenges.length > 0 ? (
+					<div className="space-y-2 mt-4 mb-4">
+						{activeChallenges.map((bracketChallenge) => (
+							<Link
+								to={`/bracket-challenges/${bracketChallenge.slug}`}
+								key={bracketChallenge.id}
+							>
+								<div className="sm:grid md:grid-cols-2 px-3 py-2 space-y-1 border border-gray-400 bg-gray-800 hover:bg-gray-700 text-sm text-white rounded mb-1 shadow">
+									<Detail label="Name">{bracketChallenge.name}</Detail>
+									<Detail label="League">
+										{bracketChallenge.league == "NBA" && (
+											<span className="font-semibold bg-red-600 px-2 rounded text-white">
+												NBA
+											</span>
+										)}
+										{bracketChallenge.league == "PBA" && (
+											<span className="font-semibold bg-blue-600 px-2 rounded text-white">
+												PBA
+											</span>
+										)}
+									</Detail>
+									<Detail label="Start Date">
+										{displayLocalDate(bracketChallenge.start_date)}
+									</Detail>
+									<Detail label="End Date">
+										{displayLocalDate(bracketChallenge.end_date)}
+									</Detail>
+								</div>
+							</Link>
+						))}
 					</div>
-				</div>
+				) : (
+					<>
+						{isLoading ? (
+							<div className="mt-4 bg-gray-200 h-13">
+								<Spinner
+									colorTheme="dark"
+									alignment="horizontal"
+									size="sm"
+								/>
+							</div>
+						) : (
+							<div className="mt-4 py-2 px-3 bg-gray-200 rounded">
+								No open bracket challenges to display.
+							</div>
+						)}
+					</>
+				)}
 			</div>
 		</>
 	);

@@ -121,6 +121,8 @@ export interface BracketChallengeInfo {
 	updated_at: string;
 	entries: BracketChallengeEntryInfo[];
 	entries_count?: number;
+	votes: VotesInfo;
+	user_vote: "like" | "dislike" | null;
 }
 
 export interface BracketChallengeEntryInfo {
@@ -138,6 +140,8 @@ export interface BracketChallengeEntryInfo {
 	updated_at: string;
 	rank?: number;
 	is_current_user_entry?: boolean;
+	votes: VotesInfo;
+	user_vote: "like" | "dislike" | null;
 }
 
 //...

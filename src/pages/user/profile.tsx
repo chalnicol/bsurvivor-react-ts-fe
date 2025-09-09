@@ -40,31 +40,34 @@ const ProfilePage = () => {
 	};
 
 	return (
-		<ContentBase className="py-10 space-y-8 min-h-[calc(100dvh-96px)] px-4">
-			<div className="p-3 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
-				<h1 className="text-xl font-bold flex-1">
-					<FontAwesomeIcon icon="caret-right" /> User Profile
-				</h1>
-				<p className="text-sm font-medium my-1">
-					View and manage your profile information.
-				</p>
-				<div className="mt-5">
-					{success && (
-						<StatusMessage
-							type="success"
-							message={success}
-							onClose={() => clearMessages()}
-						/>
-					)}
-					{error && (
-						<StatusMessage
-							type="error"
-							message={error}
-							onClose={() => clearMessages()}
-						/>
-					)}
-					<div className="md:flex mt-2 bg-gray-800 text-white rounded min-h-100">
-						{/* <div
+		<>
+			<title>{`PROFILE | ${import.meta.env.VITE_APP_NAME}`}</title>
+
+			<ContentBase className="py-10 space-y-8 min-h-[calc(100dvh-96px)] px-4">
+				<div className="p-3 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
+					<h1 className="text-xl font-bold flex-1">
+						<FontAwesomeIcon icon="caret-right" /> User Profile
+					</h1>
+					<p className="text-sm font-medium my-1">
+						View and manage your profile information.
+					</p>
+					<div className="mt-5">
+						{success && (
+							<StatusMessage
+								type="success"
+								message={success}
+								onClose={() => clearMessages()}
+							/>
+						)}
+						{error && (
+							<StatusMessage
+								type="error"
+								message={error}
+								onClose={() => clearMessages()}
+							/>
+						)}
+						<div className="md:flex mt-2 bg-gray-800 text-white rounded min-h-100">
+							{/* <div
 							ref={parentMenuRef}
 							className="block md:hidden p-2 relative inline-block"
 						>
@@ -110,52 +113,53 @@ const ProfilePage = () => {
 								</div>
 							)}
 						</div> */}
-						<div className="block md:hidden border-b border-gray-300 px-3 py-1.5">
-							<MenuBar<Tab>
-								activeTab={tab}
-								tabs={tabs}
-								onClick={handleMenuClick}
-								isLoading={isLoading}
-								className="text-white"
-							/>
-						</div>
+							<div className="block md:hidden border-b border-gray-300 px-3 py-1.5">
+								<MenuBar<Tab>
+									activeTab={tab}
+									tabs={tabs}
+									onClick={handleMenuClick}
+									isLoading={isLoading}
+									className="text-white"
+								/>
+							</div>
 
-						<div className="flex-none hidden md:flex flex-col p-4 lg:p-5 text-white space-y-1.5 font-semibold text-sm border border-gray-600 min-w-50 lg:min-w-60">
-							{tabs.map((t) => (
-								<button
-									key={t.id}
-									className={`border border-gray-500 py-2 px-3 text-left font-semibold ${
-										tab == t.tab
-											? "text-amber-400"
-											: "bg-gray-600 hover:bg-gray-500 cursor-pointer"
-									}`}
-									onClick={() => handleMenuClick(t.tab)}
-									disabled={isLoading || tab == t.tab}
-								>
-									{t.label}
-									{t.type == "link" && (
-										<FontAwesomeIcon
-											icon="external-link"
-											size="sm"
-											className="ms-2"
-										/>
-									)}
-								</button>
-							))}
-							{/* <hr className="mt-2 mb-3.5 border-gray-400" /> */}
-						</div>
+							<div className="flex-none hidden md:flex flex-col p-4 lg:p-5 text-white space-y-1.5 font-semibold text-sm border border-gray-600 min-w-50 lg:min-w-60">
+								{tabs.map((t) => (
+									<button
+										key={t.id}
+										className={`border border-gray-500 py-2 px-3 text-left font-semibold ${
+											tab == t.tab
+												? "text-amber-400"
+												: "bg-gray-600 hover:bg-gray-500 cursor-pointer"
+										}`}
+										onClick={() => handleMenuClick(t.tab)}
+										disabled={isLoading || tab == t.tab}
+									>
+										{t.label}
+										{t.type == "link" && (
+											<FontAwesomeIcon
+												icon="external-link"
+												size="sm"
+												className="ms-2"
+											/>
+										)}
+									</button>
+								))}
+								{/* <hr className="mt-2 mb-3.5 border-gray-400" /> */}
+							</div>
 
-						<div className="flex-1 p-4 lg:p-5">
-							{tab == "edit" && <EditInfo />}
-							{tab == "password" && <ChangePassword />}
-							{tab == "delete" && <DeleteAccount />}
+							<div className="flex-1 p-4 lg:p-5">
+								{tab == "edit" && <EditInfo />}
+								{tab == "password" && <ChangePassword />}
+								{tab == "delete" && <DeleteAccount />}
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
 
-			<EndOfPage />
-		</ContentBase>
+				<EndOfPage />
+			</ContentBase>
+		</>
 	);
 };
 

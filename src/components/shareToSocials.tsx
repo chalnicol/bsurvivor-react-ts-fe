@@ -1,7 +1,11 @@
 import fbImage from "../assets/socials/fb.png";
 import xImage from "../assets/socials/x.png";
 
-const ShareToSocials = () => {
+interface ShareToSocialsProps {
+	className?: string;
+}
+
+const ShareToSocials = ({ className }: ShareToSocialsProps) => {
 	const handleShareToX = () => {
 		const text = encodeURIComponent(
 			"Check out my bracket predictions! #BracketChallenge"
@@ -22,18 +26,19 @@ const ShareToSocials = () => {
 	};
 
 	return (
-		<div className="flex items-center justify-end space-x-1 py-2">
-			{/* <span className="font-bold">SHARE</span> */}
+		<div
+			className={`inline-flex items-center space-x-3 bg-white border border-gray-400 shadow p-1 rounded-full ${className}`}
+		>
 			<img
 				src={fbImage}
 				alt="fb"
-				className="h-8 object-contain shadow border border-gray-400 rounded p-1 cursor-pointer hover:bg-gray-200"
+				className="h-7 aspect-square object-contain rounded-full cursor-pointer hover:opacity-80"
 				onClick={handleShareToFacebook}
 			/>
 			<img
 				src={xImage}
 				alt="x"
-				className="h-8 object-contain shadow border border-gray-400 rounded p-1 cursor-pointer hover:bg-gray-200"
+				className="h-7 aspect-square object-contain rounded-full cursor-pointer hover:opacity-80"
 				onClick={handleShareToX}
 			/>
 		</div>

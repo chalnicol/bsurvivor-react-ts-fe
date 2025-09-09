@@ -26,6 +26,7 @@ export interface AuthContextType {
 	login: (email: string, password: string) => Promise<boolean>;
 	register: (
 		username: string,
+		fullname: string,
 		email: string,
 		password: string,
 		password_confirmation: string

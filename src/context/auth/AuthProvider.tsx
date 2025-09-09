@@ -108,6 +108,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
 	const register = async (
 		username: string,
+		fullname: string,
 		email: string,
 		password: string,
 		password_confirmation: string
@@ -119,6 +120,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		try {
 			const response = await apiClient.post("/register", {
 				username,
+				fullname,
 				email,
 				password,
 				password_confirmation,

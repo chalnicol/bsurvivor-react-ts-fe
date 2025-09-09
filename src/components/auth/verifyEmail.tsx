@@ -5,7 +5,7 @@ import ContentBase from "../contentBase";
 import TransparentIcon from "../transparentIcon";
 
 const VerifyEmail = () => {
-	const { message, error, authLoading, verifyEmail, clearMessages } =
+	const { success, error, authLoading, verifyEmail, clearMessages } =
 		useAuth();
 
 	const navigate = useNavigate();
@@ -70,12 +70,17 @@ const VerifyEmail = () => {
 						<p className="text-sm font-medium">
 							Almost done! Just a moment while we confirm your details..
 						</p>
-						<p className="text-sm my-3 font-semibold border border-gray-500 bg-gray-900 px-3 py-1">
-							{error && <span className="text-red-400">{error}</span>}
-							{message && (
-								<span className="text-green-500">{message}</span>
-							)}
-						</p>
+
+						{error && (
+							<p className="text-red-400 mt-3 text-sm border-t border-gray-400 py-1 font-semibold">
+								{error}
+							</p>
+						)}
+						{success && (
+							<p className="text-red-400 mt-3 text-sm border-t border-gray-400 py-1 font-semibold">
+								{success}
+							</p>
+						)}
 					</div>
 				</div>
 			</div>

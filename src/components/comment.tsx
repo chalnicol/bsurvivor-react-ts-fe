@@ -6,7 +6,7 @@ import { getRelativeTime } from "../utils/dateTime";
 import gsap from "gsap";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import { useComments } from "../context/comment/CommentsProvider";
-import ReactionVote from "./reactions";
+import Reactions from "./reactions";
 import CommentForm from "./commentForm";
 import { Link } from "react-router-dom";
 
@@ -209,13 +209,14 @@ const Comment = ({ comment, className }: CommentProps) => {
 						</p>
 					)}
 					{/* reactions */}
-					<ReactionVote
+					<Reactions
 						likeableId={comment.id}
 						likeableParentId={comment.parent_id}
 						likesCount={comment.votes?.likes || 0}
 						dislikesCount={comment.votes?.dislikes || 0}
 						userVote={comment.user_vote}
 						onVote={commentVote}
+						size="xs"
 					/>
 					{/* reply form */}
 					{replyMode && (

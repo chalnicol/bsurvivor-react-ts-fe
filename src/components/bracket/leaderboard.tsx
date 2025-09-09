@@ -165,7 +165,7 @@ const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
 						{leaderboard.map((entry, rank) => (
 							<Link
 								to={`/bracket-challenge-entries/${entry.slug}`}
-								className={`flex items-center border-t last:border-b border-gray-500 ${
+								className={`flex items-center border-t last:border-b border-gray-500 hover:bg-gray-700 ${
 									user && entry.user_id == user.id && "bg-gray-700/60"
 								}`}
 								key={entry.id}
