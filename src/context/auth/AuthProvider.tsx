@@ -46,12 +46,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
 	const fetchUnreadCount = async () => {
 		try {
-			const response = await apiClient.get("/get-unread-count");
+			const response = await apiClient.get(
+				"/notifications/get-unread-count"
+			);
 			setUnreadCount(response.data.count);
 		} catch (error) {
 			console.error("Failed to fetch unread notification count:", error);
 		}
 	};
+	
 
 	const updateUnreadCount = (value: "increment" | "decrement" | number) => {
 		setUnreadCount((prevCount) => {
@@ -369,22 +372,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	const updateUser = (updatedUser: UserInfo) => {
 		setUser(updatedUser);
 	};
-
-	// const fetchNotifications = async (page: number): Promise<boolean> => {
-	// 	setIsLoading(true);
-	// 	try {
-	// 		const response = await apiClient.get(
-	// 			`/get-notifications?page=${page}`
-	// 		);
-	// 		setNotifications(response.data.data);
-	// 		return true;
-	// 	} catch (error: any) {
-	// 		console.error(error);
-	// 		return false;
-	// 	} finally {
-	// 		setIsLoading(false);
-	// 	}
-	// };
 
 	return (
 		<AuthContext.Provider

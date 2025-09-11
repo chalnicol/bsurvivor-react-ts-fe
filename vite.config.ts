@@ -11,11 +11,11 @@ export default defineConfig({
 			// Proxy requests from your frontend's /api path
 			"/api": {
 				// to your Laravel backend URL
-				target: "http://127.0.0.1:8000",
+				target: "http://localhost",
 				changeOrigin: true, // Required for virtual-hosted sites
 			},
 			"/sanctum/csrf-cookie": {
-				target: "http://127.0.0.1:8000",
+				target: "http://localhost",
 				changeOrigin: true,
 			},
 		},

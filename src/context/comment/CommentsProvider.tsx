@@ -311,7 +311,7 @@ export const CommentsProvider = ({
 		) => {
 			const is_like = voteType === "like";
 			try {
-				const response = await apiClient.post(`/likes/`, {
+				const response = await apiClient.post(`/likes`, {
 					is_like: is_like,
 					likeable_id: commentId,
 					model_name: "Comment",

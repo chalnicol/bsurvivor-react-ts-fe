@@ -3,14 +3,15 @@ import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { isElementInViewport } from "../utils/elements";
 interface ToDeleteProps {
-	name: string;
+	// name: string;
+	prompt: string;
 	onCancel: () => void;
 	onConfirm: () => void;
 }
 
 gsap.registerPlugin(ScrollToPlugin);
 
-const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
+const ToDelete = ({ prompt, onCancel, onConfirm }: ToDeleteProps) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const openAnim = () => {
@@ -18,7 +19,7 @@ const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
 			gsap.fromTo(
 				containerRef.current,
 				{ scaleY: 0 },
-				{ scaleY: 1, duration: 0.3, ease: "elastic.out(1, 0.8)" }
+				{ scaleY: 1, duration: 0.5, ease: "elastic.out(1, 0.8)" }
 			);
 		}
 	};
@@ -68,7 +69,7 @@ const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
 				gsap.killTweensOf(containerRef.current);
 			}
 		};
-	}, [name]);
+	}, [prompt]);
 
 	// const getShortenedName = (name: string): string => {
 	// 	return name.length > 30 ? name.slice(0, 30) + "..." : name;
@@ -80,7 +81,8 @@ const ToDelete = ({ name, onCancel, onConfirm }: ToDeleteProps) => {
 			className="px-3 py-2 rounded border border-gray-300 shadow mt-2 bg-amber-300 font-semibold md:flex items-center justify-between space-y-2 md:space-y-0"
 		>
 			<p className="text-sm">
-				<span>{`Are you sure you want to delete "${name}"?`}</span>
+				{prompt}
+				{/* <span>{`Are you sure you want to delete "${name}"?`}</span> */}
 			</p>
 			<div className="flex-none space-x-1 font-bold">
 				<button

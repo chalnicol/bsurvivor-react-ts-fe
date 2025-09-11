@@ -20,7 +20,7 @@ const CustomButton = ({
 	const clrClass = useCallback((): string => {
 		const btnClr = color ? color : "gray";
 		if (disabled) {
-			return `bg-gray-400 opacity-40`;
+			return `bg-gray-400 opacity-90`;
 		}
 		if (btnClr == "sky") {
 			return `bg-sky-500 hover:bg-sky-400 cursor-pointer`;

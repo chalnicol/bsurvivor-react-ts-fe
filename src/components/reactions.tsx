@@ -14,6 +14,7 @@ interface ReactionsProps {
 		vote: "like" | "dislike"
 	) => void;
 	className?: string;
+	isLoading: boolean;
 }
 const Reactions = ({
 	likeableId,
@@ -24,6 +25,7 @@ const Reactions = ({
 	onVote,
 	size,
 	className,
+	isLoading,
 }: ReactionsProps) => {
 	const { isAuthenticated } = useAuth();
 
@@ -39,7 +41,7 @@ const Reactions = ({
 		>
 			<ReactionButton
 				type="like"
-				disabled={!isAuthenticated}
+				disabled={!isAuthenticated || isLoading}
 				selected={(userVote && userVote == "like") || false}
 				count={likesCount}
 				onClick={() => handleVoteClick("like")}
@@ -47,7 +49,7 @@ const Reactions = ({
 			/>
 			<ReactionButton
 				type="dislike"
-				disabled={!isAuthenticated}
+				disabled={!isAuthenticated || isLoading}
 				selected={(userVote && userVote == "dislike") || false}
 				count={dislikesCount}
 				onClick={() => handleVoteClick("dislike")}

@@ -103,10 +103,12 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 							/>
 						))}
 						{isLoading ? (
-							<div className="mt-3 text-center">
-								<span className="text-gray-400 text-sm font-bold rounded mx-auto px-4 py-1">
-									LOADING...
-								</span>
+							<div className="bg-gray-300 py-3 rounded">
+								<Spinner
+									colorTheme="dark"
+									alignment="horizontal"
+									size="xs"
+								/>
 							</div>
 						) : (
 							<div className="mt-3 text-center">
@@ -129,7 +131,13 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 				) : (
 					<>
 						{isLoading ? (
-							<Spinner colorTheme="dark" />
+							<div className="bg-gray-300 py-3 rounded">
+								<Spinner
+									colorTheme="dark"
+									alignment="horizontal"
+									size="xs"
+								/>
+							</div>
 						) : (
 							<p className="border-t border-gray-300 py-2">
 								No comments to display.

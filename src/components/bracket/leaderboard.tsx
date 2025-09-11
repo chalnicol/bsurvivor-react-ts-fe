@@ -3,8 +3,9 @@ import StatusPills from "../statusPills";
 import { useAuth } from "../../context/auth/AuthProvider";
 import Detail from "../detail";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import apiClient from "../../utils/axiosConfig";
+import Spinner from "../spinner";
 
 type LeaderboardType = "global" | "friends";
 
@@ -14,12 +15,11 @@ interface LeaderboardProps {
 
 const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
 	const { isAuthenticated, user } = useAuth();
-
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [type, setType] = useState<LeaderboardType>("global");
 	const [leaderboard, setLeaderboard] = useState<BracketChallengeEntryInfo[]>(
 		[]
 	);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	const fetchLeaderboard = async () => {
 		setIsLoading(true);
@@ -137,6 +137,14 @@ const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
 	// 	},
 	// ];
 
+	const userEntry = useMemo((): BracketChallengeEntryInfo | null => {
+		return leaderboard.find((entry) => entry.rank) || null;
+	}, [leaderboard]);
+
+	const firstEntries = useMemo((): BracketChallengeEntryInfo[] => {
+		return leaderboard.filter((entry) => !entry.rank);
+	}, [leaderboard]);
+
 	return (
 		<div className="max-w-5xl mx-auto mb-6 block">
 			<h2 className="font-bold text-sm text-center text-xl">LEADERBOARD</h2>
@@ -160,9 +168,9 @@ const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
 				</button>
 			</div>
 			<div className="mt-3 h-[430px] overflow-y-auto">
-				{leaderboard.length > 0 ? (
-					<>
-						{leaderboard.map((entry, rank) => (
+				{firstEntries.length > 0 ? (
+					<div>
+						{firstEntries.map((entry, i) => (
 							<Link
 								to={`/bracket-challenge-entries/${entry.slug}`}
 								className={`flex items-center border-t last:border-b border-gray-500 hover:bg-gray-700 ${
@@ -171,7 +179,7 @@ const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
 								key={entry.id}
 							>
 								<p className="flex-none px-2 text-2xl font-bold w-15">
-									{rank < 10 ? `0${rank + 1}` : rank + 1}
+									{i < 10 ? `0${i + 1}` : i + 1}
 								</p>
 								<div className="flex-1 grid md:grid-cols-2 lg:grid-cols-3 px-3 py-2 space-y-1 text-sm text-white shadow">
 									<Detail label="Username">
@@ -194,10 +202,50 @@ const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
 								</div>
 							</Link>
 						))}
-					</>
+					</div>
 				) : (
-					<div className="bg-gray-700 text-white px-2 py-1 h-16 flex items-center justify-center rounded">
-						{isLoading ? "LOADING..." : "No leaderboard data found."}
+					<>
+						{isLoading ? (
+							<div className="h-20 mt-3">
+								<Spinner />
+							</div>
+						) : (
+							<div className="bg-gray-700 text-white px-2 py-1 h-16 flex items-center justify-center rounded">
+								No leaderboard data to display.
+							</div>
+						)}
+					</>
+				)}
+				{userEntry && (
+					<div className="mt-3">
+						<Link
+							to={`/bracket-challenge-entries/${userEntry.slug}`}
+							className={`flex items-center last:border-b border-t border-gray-500 hover:bg-gray-700 bg-gray-700/60`}
+							key={userEntry.id}
+						>
+							<p
+								className={`flex-none px-2 font-bold w-15 ${
+									userEntry.rank && userEntry.rank >= 1000
+										? "text-xl"
+										: "text-2xl"
+								}`}
+							>
+								{userEntry.rank}
+							</p>
+							<div className="flex-1 grid md:grid-cols-2 lg:grid-cols-3 px-3 py-2 space-y-1 text-sm text-white shadow">
+								<Detail label="Username">
+									<span className="text-yellow-500 font-semibold">
+										{userEntry.user.username}
+									</span>
+								</Detail>
+								<Detail label="Correct Predictions">
+									{userEntry.correct_predictions_count}
+								</Detail>
+								<Detail label="Status">
+									<StatusPills status={userEntry.status} />
+								</Detail>
+							</div>
+						</Link>
 					</div>
 				)}
 			</div>

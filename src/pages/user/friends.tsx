@@ -260,19 +260,9 @@ const FriendsList = () => {
 		}
 	};
 
-	// const handleRefreshListClick = async () => {
-	// 	if (searchTerm !== "") {
-	// 		await fetchSearchedUsers(searchTerm);
-	// 	}
-	// 	fetchFriends(activeTab);
-	// };
-
 	const handleTabCLick = (tab: FriendsTab) => {
 		// setActiveTab(tab);
 		setSearchParams({ tab: tab }, { replace: true });
-		// if (tab !== "search") {
-		// 	fetchFriends(tab);
-		// }
 	};
 
 	const getLabel = (tab: FriendsTabInfo): string => {
@@ -295,14 +285,6 @@ const FriendsList = () => {
 							Add friends and manage your existing friends list here.
 						</span>
 					</p>
-
-					{/* <RefreshButton
-					label="REFRESH LIST"
-					size="sm"
-					color="sky"
-					className="mt-2 mb-3 shadow"
-					onClick={handleRefreshListClick}
-				/> */}
 
 					<div className="mt-5">
 						{success && (
@@ -349,67 +331,74 @@ const FriendsList = () => {
 								))}
 							</div>
 							<div className="flex-1 p-3">
-								<div className="h-full overflow-y-auto">
+								<div className="h-full overflow-y-auto relative">
 									{activeTab !== "search" ? (
 										<>
-											{friends && friends.length > 0 ? (
-												<ul>
-													{friends.map((friend) => (
-														<li
-															key={friend.id}
-															className="odd:bg-gray-700  text-sm text-white px-3 py-0.5 flex items-center justify-between border-b border-gray-500"
-														>
-															<Link
-																to={`/users/${friend.username}`}
-																className="group flex items-center"
+											<div>
+												{friends && friends.length > 0 ? (
+													<ul>
+														{friends.map((friend) => (
+															<li
+																key={friend.id}
+																className="odd:bg-gray-700 even:bg-gray-700/50 text-sm text-white px-3 py-0.5 flex items-center justify-between border-t border-gray-500 last:border-b"
 															>
-																<div>
-																	<FontAwesomeIcon
-																		icon="user"
-																		size="lg"
-																		className="mr-2"
-																	/>
+																<Link
+																	to={`/users/${friend.username}`}
+																	className="group flex items-center"
+																>
+																	<div>
+																		<FontAwesomeIcon
+																			icon="user"
+																			size="lg"
+																			className="mr-2"
+																		/>
+																	</div>
+																	<div>
+																		<p className="group-hover:text-gray-300">
+																			{friend.fullname}
+																		</p>
+																		<p className="text-xs text-gray-300 group-hover:text-gray-400">
+																			{friend.username}
+																		</p>
+																	</div>
+																</Link>
+																<div className="space-x-1">
+																	{buttons.map((btn) => (
+																		<CustomButton
+																			key={btn}
+																			label={btn.toUpperCase()}
+																			color={getColorType(
+																				btn
+																			)}
+																			onClick={() =>
+																				friendQuery(
+																					btn,
+																					friend
+																				)
+																			}
+																			size="sm"
+																			className="shadow"
+																			disabled={isLoading}
+																		/>
+																	))}
 																</div>
-																<div>
-																	<p className="group-hover:text-gray-300">
-																		{friend.fullname}
-																	</p>
-																	<p className="text-xs text-gray-300 group-hover:text-gray-400">
-																		{friend.username}
-																	</p>
-																</div>
-															</Link>
-															<div className="space-x-1">
-																{buttons.map((btn) => (
-																	<CustomButton
-																		key={btn}
-																		label={btn.toUpperCase()}
-																		color={getColorType(btn)}
-																		onClick={() =>
-																			friendQuery(
-																				btn,
-																				friend
-																			)
-																		}
-																		size="sm"
-																		className="shadow"
-																		disabled={isLoading}
-																	/>
-																))}
-															</div>
-														</li>
-													))}
-												</ul>
-											) : (
-												<>
-													{isLoading ? (
-														<Spinner size="sm" />
-													) : (
-														<p className="px-3 py-2 bg-gray-600 text-white">
-															No users to display.
-														</p>
-													)}
-												</>
+															</li>
+														))}
+													</ul>
+												) : (
+													<>
+														{!isLoading && (
+															<p className="px-3 py-2 bg-gray-600 text-white">
+																No users to display.
+															</p>
+														)}
+													</>
+												)}
+											</div>
+											{isLoading && (
+												<div className="absolute w-full h-full top-0 right-0 bg-gray-800/50">
+													<Spinner size="sm" />
+												</div>
 											)}
 										</>
 									) : (
@@ -433,49 +422,55 @@ const FriendsList = () => {
 													</button>
 												)}
 											</div>
-											<div className="flex-1 mt-3 border border-gray-500 bg-gray-800 overflow-y-auto">
+											<div className="flex-1 mt-3 border border-gray-500 bg-gray-800 overflow-y-auto relative">
 												{searchedUsers.length > 0 ? (
-													<ul>
-														{searchedUsers.map((user) => (
-															<li
-																key={user.id}
-																className="odd:bg-gray-700/40 border-b border-gray-600 text-sm text-white px-2 py-1 flex items-center justify-between"
-															>
-																<Link
-																	to={`/users/${user.username}`}
-																	className="group flex items-center"
+													<>
+														<ul>
+															{searchedUsers.map((user) => (
+																<li
+																	key={user.id}
+																	className="odd:bg-gray-700/40 border-b border-gray-600 text-sm text-white px-2 py-1 flex items-center justify-between"
 																>
-																	<div>
-																		<FontAwesomeIcon
-																			icon="user"
-																			size="lg"
-																			className="mr-2"
-																		/>
-																	</div>
-																	<div>
-																		<p className="group-hover:text-gray-300">
-																			{user.fullname}
-																		</p>
-																		<p className="text-xs text-gray-300 group-hover:text-gray-400">
-																			{user.username}
-																		</p>
-																	</div>
-																</Link>
+																	<Link
+																		to={`/users/${user.username}`}
+																		className="group flex items-center"
+																	>
+																		<div>
+																			<FontAwesomeIcon
+																				icon="user"
+																				size="lg"
+																				className="mr-2"
+																			/>
+																		</div>
+																		<div>
+																			<p className="group-hover:text-gray-300">
+																				{user.fullname}
+																			</p>
+																			<p className="text-xs text-gray-300 group-hover:text-gray-400">
+																				{user.username}
+																			</p>
+																		</div>
+																	</Link>
 
-																{renderButton(user)}
-															</li>
-														))}
-													</ul>
+																	{renderButton(user)}
+																</li>
+															))}
+														</ul>
+													</>
 												) : (
 													<>
-														{isLoading ? (
-															<Spinner size="sm" />
-														) : (
+														{!isLoading && (
 															<p className="px-3 py-2 h-full text-gray-400">
 																No users to display.
 															</p>
 														)}
 													</>
+												)}
+
+												{isLoading && (
+													<div className="absolute w-full h-full top-0 right-0 bg-gray-800/50">
+														<Spinner size="sm" />
+													</div>
 												)}
 											</div>
 										</div>

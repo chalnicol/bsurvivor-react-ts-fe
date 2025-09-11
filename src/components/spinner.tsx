@@ -36,7 +36,7 @@ const Spinner = ({ text, alignment, size, colorTheme }: SpinnerProps) => {
 			case "lg":
 				return "text-lg font-bold";
 			default:
-				return "font-bold";
+				return "font-semibold";
 		}
 	};
 

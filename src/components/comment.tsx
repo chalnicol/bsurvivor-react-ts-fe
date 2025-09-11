@@ -217,6 +217,7 @@ const Comment = ({ comment, className }: CommentProps) => {
 						userVote={comment.user_vote}
 						onVote={commentVote}
 						size="xs"
+						isLoading={isLoading}
 					/>
 					{/* reply form */}
 					{replyMode && (

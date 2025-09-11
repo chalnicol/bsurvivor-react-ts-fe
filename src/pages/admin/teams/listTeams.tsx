@@ -159,7 +159,7 @@ const ListTeams = () => {
 
 				{toDelete && (
 					<ToDelete
-						name={`${toDelete.fname} ${toDelete.lname}`}
+						prompt={`Are you sure you want to delete "${toDelete.fname} ${toDelete.lname}"?`}
 						onConfirm={deleteTeam}
 						onCancel={() => setToDelete(null)}
 					/>

@@ -20,6 +20,7 @@ import { CommentsProvider } from "../context/comment/CommentsProvider";
 import gsap from "gsap";
 import ShareToSocials from "../components/shareToSocials";
 import Reactions from "../components/reactions";
+import EntriesModal from "../components/entriesModal";
 
 const BracketChallengePage = () => {
 	const { isAuthenticated, authLoading } = useAuth();
@@ -33,7 +34,9 @@ const BracketChallengePage = () => {
 	const [entrySlug, setEntrySlug] = useState<string | null>(null);
 	const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
 	const [isPast, setIsPast] = useState<boolean>(false);
-	const [totalCommentsCount, setTotalCommentsCount] = useState<number>(0);
+	// const [totalCommentsCount, setTotalCommentsCount] = useState<number>(0);
+
+	const [viewEntries, setViewEntries] = useState<boolean>(false);
 
 	const leaderboardRef = useRef<HTMLDivElement>(null);
 
@@ -44,17 +47,12 @@ const BracketChallengePage = () => {
 			try {
 				const response = await apiClient.get(`/bracket-challenges/${slug}`);
 
-				const {
-					bracketChallenge,
-					bracketEntrySlug,
-					isPast,
-					totalCommentsCount,
-				} = response.data;
+				const { bracketChallenge, bracketEntrySlug, isPast } =
+					response.data;
 
 				setBracketChallenge(bracketChallenge);
 				setEntrySlug(bracketEntrySlug);
 				setIsPast(isPast);
-				setTotalCommentsCount(totalCommentsCount);
 			} catch (error) {
 				console.error(error);
 			} finally {
@@ -86,7 +84,7 @@ const BracketChallengePage = () => {
 	}
 
 	//test comments
-	const bracketMode = () => {
+	const getBracketMode = () => {
 		if (entrySlug || isPast) {
 			return "preview";
 		}
@@ -146,7 +144,17 @@ const BracketChallengePage = () => {
 										{bracketChallenge.name}
 									</Detail>
 									<Detail label="Entries Submitted">
-										{bracketChallenge.entries_count}
+										{bracketChallenge.entries_count &&
+										bracketChallenge.entries_count > 0 ? (
+											<button
+												className="bg-blue-500 hover:bg-blue-400 text-white cursor-pointer px-3 py-0.5 rounded font-bold text-xs"
+												onClick={() => setViewEntries(true)}
+											>
+												VIEW ({bracketChallenge.entries_count})
+											</button>
+										) : (
+											<span>{bracketChallenge.entries_count}</span>
+										)}
 									</Detail>
 									<Detail label="Submission Opens">
 										{displayLocalDate(bracketChallenge.start_date)}
@@ -201,7 +209,7 @@ const BracketChallengePage = () => {
 								<div className="relative overflow-hidden">
 									<BracketProvider
 										bracketChallenge={bracketChallenge}
-										bracketMode={bracketMode()}
+										bracketMode={getBracketMode()}
 									>
 										<Bracket />
 									</BracketProvider>
@@ -255,6 +263,7 @@ const BracketChallengePage = () => {
 										userVote={bracketChallenge.user_vote}
 										onVote={handleBracketChallengeVote}
 										className="-ms-6"
+										isLoading={isLoading}
 									/>
 								</div>
 
@@ -273,7 +282,7 @@ const BracketChallengePage = () => {
 							<CommentsProvider
 								resource="challenges"
 								resourceId={bracketChallenge.id}
-								totalCount={totalCommentsCount}
+								totalCount={bracketChallenge.comments_count}
 								// comments={bracketChallenge.comments}
 							>
 								<CommentsSection />
@@ -286,6 +295,13 @@ const BracketChallengePage = () => {
 					)}
 				</div>
 				<EndOfPage />
+
+				{viewEntries && (
+					<EntriesModal
+						onClose={() => setViewEntries(false)}
+						bracketChallengeId={bracketChallenge?.id || 0}
+					/>
+				)}
 				{isLoading && <Loader />}
 			</ContentBase>
 		</>

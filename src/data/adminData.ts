@@ -123,6 +123,7 @@ export interface BracketChallengeInfo {
 	entries_count?: number;
 	votes: VotesInfo;
 	user_vote: "like" | "dislike" | null;
+	comments_count: number;
 }
 
 export interface BracketChallengeEntryInfo {
@@ -142,6 +143,7 @@ export interface BracketChallengeEntryInfo {
 	is_current_user_entry?: boolean;
 	votes: VotesInfo;
 	user_vote: "like" | "dislike" | null;
+	comments_count: number;
 }
 
 //...

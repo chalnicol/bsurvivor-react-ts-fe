@@ -31,16 +31,16 @@ const ReactionButton = ({
 	const getBgClass = () => {
 		if (!disabled) {
 			if (selected && type == "like") {
-				return "bg-green-700 hover:bg-green-600 cursor-pointer";
+				return "bg-green-700 hover:bg-green-600 text-amber-300 cursor-pointer";
 			} else if (selected && type == "dislike") {
-				return "bg-red-700 hover:bg-red-600 cursor-pointer";
+				return "bg-red-700 hover:bg-red-600 text-amber-300 cursor-pointer";
 			} else if (!selected && type == "like") {
-				return "bg-gray-500 hover:bg-green-600 cursor-pointer";
+				return "bg-green-700 hover:bg-green-600 text-white cursor-pointer";
 			} else if (!selected && type == "dislike") {
-				return "bg-gray-500 hover:bg-red-600 cursor-pointer";
+				return "bg-red-700 hover:bg-red-600 text-white cursor-pointer";
 			}
 		}
-		return "bg-gray-500";
+		return "bg-gray-400 text-white";
 	};
 
 	useEffect(() => {
@@ -65,7 +65,7 @@ const ReactionButton = ({
 	return (
 		<div className="relative">
 			<button
-				className={`rounded-full text-white aspect-square flex items-center justify-center px-1.5 transition-scale ease-in duration-100 ${getBgClass()}`}
+				className={`rounded-full aspect-square active:scale-95 flex items-center justify-center px-1.5 transition-scale ease-in duration-100 ${getBgClass()}`}
 				onClick={onClick}
 				disabled={disabled}
 			>

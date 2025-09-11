@@ -38,7 +38,7 @@ const Notification = ({
 		} else if (type == "BracketEntryUpdated") {
 			bgClass = "bg-rose-500 hover:bg-rose-400";
 			label = "ENTRY";
-		} else if (type == "CommentToEntry") {
+		} else if (type == "CommentToEntry" || type == "RepliedToComment") {
 			bgClass = "bg-orange-500 hover:bg-orange-400";
 			label = "COMMENT";
 		} else {

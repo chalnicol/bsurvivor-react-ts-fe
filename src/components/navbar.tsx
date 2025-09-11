@@ -46,13 +46,11 @@ const Navbar = () => {
 
 	const friendsTab = searchParams.get("tab") || "active";
 
-	const entriesPage = searchParams.get("page") || "1";
 	const entriesSearch = searchParams.get("search");
 
-	const bracketPage = searchParams.get("page") || "1";
 	const bracketSearch = searchParams.get("search");
-	const bracketUrl = `/bracket-challenges?page=${bracketPage}${
-		bracketSearch ? `&search=${bracketSearch}` : ""
+	const bracketUrl = `/bracket-challenges${
+		bracketSearch ? `?search=${bracketSearch}` : ""
 	}`;
 
 	const userLinks: LinksInfo[] = [
@@ -60,9 +58,7 @@ const Navbar = () => {
 		{
 			name: "entries",
 			label: "Entries",
-			route: `/entries?page=${entriesPage}${
-				entriesSearch ? `&search=${entriesSearch}` : ""
-			}`,
+			route: `/entries${entriesSearch ? `?search=${entriesSearch}` : ""}`,
 		},
 		{
 			name: "friends",

@@ -41,7 +41,7 @@ const StatusMessage = ({
 			gsap.fromTo(
 				containerRef.current,
 				{ scaleY: 0 },
-				{ scaleY: 1, duration: 0.3, ease: "elastic.out(1, 0.8)" }
+				{ scaleY: 1, duration: 0.5, ease: "elastic.out(1, 0.8)" }
 			);
 		}
 	};
@@ -96,7 +96,11 @@ const StatusMessage = ({
 	return (
 		<div
 			ref={containerRef}
-			className={`w-full my-2 relative flex items-start md:items-center justify-between gap-x-2 text-white font-semibold px-3 pt-2 pb-3 md:pb-2 rounded ${bgClr()}`}
+			className={`w-full my-2 relative flex justify-between gap-x-2 text-white rounded font-semibold px-3 pt-2 ${
+				children
+					? "pb-3 md:pb-2 items-start md:items-center"
+					: "pb-2 items-center"
+			} ${bgClr()}`}
 		>
 			<div className="md:flex items-center w-full space-y-1 md:space-y-0">
 				<p className="flex-1 text-sm">{message}</p>

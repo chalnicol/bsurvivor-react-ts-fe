@@ -2,11 +2,9 @@ import ContentBase from "../../components/contentBase";
 import { apiClient } from "../../utils/api";
 import {
 	type BracketChallengeEntryInfo,
-	type MetaInfo,
 	type PaginatedResponse,
 } from "../../data/adminData";
 import { useEffect, useState } from "react";
-import Pagination from "../../components/pagination";
 import Loader from "../../components/loader";
 
 // Import the custom debounce hook
@@ -15,7 +13,7 @@ import EndOfPage from "../../components/endOfPage";
 import FailPrompt from "../../components/failPrompt";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import BracketEntrySlot from "../../components/bracket/backetEntrySlot";
+import BracketEntrySlot from "../../components/bracket/bracketEntrySlot";
 import { useSearchParams } from "react-router-dom";
 
 const BracketEntriesList = () => {
@@ -26,16 +24,13 @@ const BracketEntriesList = () => {
 	const [bracketChallengeEntries, setBracketChallengeEntries] = useState<
 		BracketChallengeEntryInfo[]
 	>([]);
-	const [meta, setMeta] = useState<MetaInfo | null>(null);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [lastPage, setLastPage] = useState<number>(1);
+
+	// const [meta, setMeta] = useState<MetaInfo | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const currentPage = searchParams.get("page")
-		? parseInt(searchParams.get("page") as string)
-		: 1;
 	const searchTerm = searchParams.get("search") || "";
-
-	// const [currentPage, setCurrentPage] = useState<number>(1);
-	// const [searchTerm, setSearchTerm] = useState<string>("");
 
 	// Use the debounced value of searchTerm
 	const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
@@ -51,8 +46,26 @@ const BracketEntriesList = () => {
 				}`
 			);
 
-			setBracketChallengeEntries(response.data.data);
-			setMeta(response.data.meta);
+			const { data, meta } = response.data;
+
+			setBracketChallengeEntries((prevEntries) => {
+				if (page === 1) {
+					return data;
+				}
+
+				// Create a Set of all existing comment IDs for quick lookup
+				const existingIds = new Set(prevEntries.map((entry) => entry.id));
+
+				// Filter the new data to only include comments that are not already in our state
+				const newEntries = data.filter(
+					(entry) => !existingIds.has(entry.id)
+				);
+
+				// Combine the old and new comments
+				return [...prevEntries, ...newEntries];
+			});
+			setCurrentPage(meta.current_page);
+			setLastPage(meta.last_page);
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -60,20 +73,23 @@ const BracketEntriesList = () => {
 		}
 	};
 
+	// useEffect(() => {
+	// 	if (isAuthenticated) {
+	// 		fetchBracketChallengeEntries(currentPage, debouncedSearchTerm);
+	// 	}
+	// }, [currentPage, debouncedSearchTerm, isAuthenticated]);
+
 	useEffect(() => {
+		// Only fetch data when debouncedSearchTerm changes (user stopped typing)
 		if (isAuthenticated) {
-			fetchBracketChallengeEntries(currentPage, debouncedSearchTerm);
+			fetchBracketChallengeEntries(1, debouncedSearchTerm);
 		}
-	}, [currentPage, debouncedSearchTerm, isAuthenticated]);
+	}, [debouncedSearchTerm, isAuthenticated]);
 
-	const handlePageClick = (page: number) => {
-		// fetchBracketChallengeEntries(page);
-		// setCurrentPage(page);
-		const newSearchParams = new URLSearchParams(searchParams.toString());
-
-		newSearchParams.set("page", page.toString());
-		// Use replace: true to avoid creating new history entries for every keystroke
-		setSearchParams(newSearchParams);
+	const loadMoreEntries = () => {
+		if (currentPage < lastPage) {
+			fetchBracketChallengeEntries(currentPage + 1, debouncedSearchTerm);
+		}
 	};
 
 	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,27 +101,9 @@ const BracketEntriesList = () => {
 		} else {
 			newSearchParams.delete("search");
 		}
-		newSearchParams.set("page", "1");
 		// Use replace: true to avoid creating new history entries for every keystroke
 		setSearchParams(newSearchParams, { replace: true });
 	};
-
-	// We need a separate effect to reset the page when the debounced search term changes
-	// and it's different from the initial empty string (i.e., user actually typed something).
-	useEffect(() => {
-		// Only reset page to 1 if the debounced search term has changed
-		// and is not the initial empty string (unless you want to reset on initial load too)
-		if (
-			debouncedSearchTerm !== searchTerm &&
-			debouncedSearchTerm !== "" &&
-			currentPage > 1
-		) {
-			// setCurrentPage(1);
-			setSearchParams({ page: "1" }, { replace: true });
-		}
-		// Alternatively, just always reset to page 1 when the debounced search term changes
-		// setCurrentPage(1);
-	}, [debouncedSearchTerm]);
 
 	return (
 		<>
@@ -143,12 +141,25 @@ const BracketEntriesList = () => {
 											/>
 										))}
 									</div>
+									<div className="mt-3 text-center">
+										{currentPage < lastPage ? (
+											<button
+												className="bg-gray-700 hover:bg-gray-600 cursor-pointer text-white text-sm font-semibold px-4 py-1 rounded space-x-2"
+												onClick={loadMoreEntries}
+											>
+												<FontAwesomeIcon
+													icon="arrow-alt-circle-down"
+													size="sm"
+												/>
+												<span>LOAD MORE</span>
+											</button>
+										) : (
+											<span className="text-gray-400 text-sm font-bold rounded mx-auto px-4 select-none">
+												- END OF ENTRIES -
+											</span>
+										)}
+									</div>
 								</div>
-								<Pagination
-									meta={meta}
-									onPageChange={handlePageClick}
-									className="mt-6"
-								/>
 							</>
 						) : (
 							<div className="mt-3">

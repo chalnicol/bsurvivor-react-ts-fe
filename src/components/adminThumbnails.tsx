@@ -55,7 +55,7 @@ const AdminThumbs = ({
 				src={img}
 				alt="bgimg"
 				draggable="false"
-				className="absolute w-40 -right-8 -top-5 opacity-15 rotate-40"
+				className="absolute w-40 -right-8 -top-5 opacity-10 rotate-40"
 			/>
 			<div>
 				<h2 className="font-semibold">
