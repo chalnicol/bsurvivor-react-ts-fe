@@ -61,9 +61,9 @@ const Bracket = () => {
 				>
 					<Link
 						to="/entries"
-						className="text-white bg-green-800 hover:bg-green-700 rounded px-3 py-0.5 text-xs"
+						className="text-white bg-green-900 hover:bg-green-800 rounded px-3 py-1 text-xs"
 					>
-						VIEW ENTRIES PAGE
+						VIEW MY ENTRIES PAGE
 					</Link>
 				</StatusMessage>
 			)}

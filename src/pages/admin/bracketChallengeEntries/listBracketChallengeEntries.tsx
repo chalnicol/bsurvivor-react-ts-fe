@@ -162,7 +162,7 @@ const ListBracketChallengeEntries = () => {
 
 				{toDelete && (
 					<ToDelete
-						name={toDelete.name}
+						prompt={`Are you sure want to delete "${toDelete.name}"?`}
 						onConfirm={deleteBracketChallengeEntry}
 						onCancel={() => setToDelete(null)}
 					/>

@@ -15,6 +15,8 @@ import { useParams } from "react-router-dom";
 import StatusMessage from "../../../components/statusMessage";
 import SelectTeamModal from "../../../components/selectTeamModal";
 import ContentBase from "../../../components/contentBase";
+import { convertDateToFormFormat } from "../../../utils/dateTime";
+import SelectedTeamsList from "../../../components/form/selectedTeamsList";
 
 const EditBracketChallenge = () => {
 	const { id } = useParams<{ id: string }>();
@@ -80,8 +82,8 @@ const EditBracketChallenge = () => {
 			setLeague(bracketChallenge.league);
 			setName(bracketChallenge.name);
 			setDescription(bracketChallenge.description || "");
-			setStartDate(bracketChallenge.start_date);
-			setEndDate(bracketChallenge.end_date);
+			setStartDate(convertDateToFormFormat(bracketChallenge.start_date));
+			setEndDate(convertDateToFormFormat(bracketChallenge.end_date));
 			setIsPublic(bracketChallenge.is_public);
 			if (bracketChallenge.league === "NBA") {
 				setSelectedNbaTeamsData(
@@ -469,24 +471,6 @@ const EditBracketChallenge = () => {
 								<p className="text-xs text-amber-700 mt-1">
 									Note: The "League" input cannot be changed.
 								</p>
-								{/* <select
-										id="league"
-										value={league}
-										onChange={(e) => setLeague(e.target.value)}
-										className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-										disabled={isLoading}
-										required
-									>
-										<option value="">Select a league</option>
-										{leagues.map((league) => (
-											<option key={league.id} value={league.abbr}>
-												{league.abbr}
-											</option>
-										))}
-									</select>
-									{fieldErrors.league && (
-										<ErrorDisplay errors={fieldErrors.league} />
-									)} */}
 							</div>
 							<div className="mb-2">
 								<label htmlFor="challengeName" className="text-xs">
@@ -573,146 +557,55 @@ const EditBracketChallenge = () => {
 								</label>
 								<hr className="border-gray-400" />
 								{league === "NBA" && (
-									<>
-										<div className="mt-2 lg:flex gap-x-4 space-y-4 lg:space-y-0">
-											<div className="flex-1">
-												<div className="border border-gray-300 shadow-sm">
-													<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
-														<h3>East Teams</h3>
-														<button
-															type="button"
-															className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
-															onClick={() =>
-																handleOpenModalClick("EAST")
-															}
-														>
-															Change
-														</button>
-													</div>
-													<div className="h-37 lg:h-72 overflow-y-auto">
-														{selectedNBATeams &&
-														selectedNBATeams.east.length > 0 ? (
-															selectedNBATeams.east.map(
-																(team, index) => (
-																	<div
-																		key={index}
-																		className="p-2 even:bg-gray-200 hover:bg-blue-100 text-sm"
-																	>
-																		{index + 1}. {team.fname}{" "}
-																		{team.lname}
-																	</div>
-																)
-															)
-														) : (
-															<p className="p-3 text-sm text-gray-500">
-																No teams selected
-															</p>
-														)}
-													</div>
-												</div>
-												{fieldErrors["bracket_data.teams.east"] && (
-													<ErrorDisplay
-														errors={
-															fieldErrors[
-																"bracket_data.teams.east"
-															]
-														}
-													/>
-												)}
-											</div>
-											<div className="flex-1">
-												<div className="border border-gray-300 shadow-sm">
-													<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
-														<h3>West Teams</h3>
-														<button
-															type="button"
-															className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
-															onClick={() =>
-																handleOpenModalClick("WEST")
-															}
-														>
-															Change
-														</button>
-													</div>
-													<div className="h-37 lg:h-72 overflow-y-auto">
-														{selectedNBATeams &&
-														selectedNBATeams.west.length > 0 ? (
-															selectedNBATeams.west.map(
-																(team, index) => (
-																	<div
-																		key={index}
-																		className="p-2 even:bg-gray-200 hover:bg-blue-50 text-sm"
-																	>
-																		{index + 1}. {team.fname}{" "}
-																		{team.lname}
-																	</div>
-																)
-															)
-														) : (
-															<p className="p-3 text-sm text-gray-500">
-																No teams selected
-															</p>
-														)}
-													</div>
-												</div>
-												{fieldErrors["bracket_data.teams.west"] && (
-													<ErrorDisplay
-														errors={
-															fieldErrors[
-																"bracket_data.teams.west"
-															]
-														}
-													/>
-												)}
-											</div>
-										</div>
-									</>
-								)}
-								{league === "PBA" && (
-									<div className="mt-1">
-										<div className="">
-											<div className="border border-gray-300 shadow-sm mt-2">
-												<div className="flex items-center justify-between font-bold text-xs bg-gray-700 text-white p-2">
-													<h3>Teams</h3>
-													<button
-														type="button"
-														className="px-2 py-0.5 border rounded cursor-pointer hover:bg-gray-600"
-														onClick={() =>
-															handleOpenModalClick(null)
-														}
-													>
-														Change
-													</button>
-												</div>
-												<div className="h-37 lg:h-72 overflow-y-auto">
-													{selectedPBATeams &&
-													selectedPBATeams.length > 0 ? (
-														selectedPBATeams.map(
-															(team, index) => (
-																<div
-																	key={index}
-																	className="p-2 even:bg-gray-100 hover:bg-blue-50 text-sm"
-																>
-																	{index + 1}. {team.fname}{" "}
-																	{team.lname}
-																</div>
-															)
-														)
-													) : (
-														<p className="p-3 text-sm text-gray-500">
-															No teams selected
-														</p>
-													)}
-												</div>
-											</div>
-											{fieldErrors["bracket_data.teams"] && (
+									<div className="mt-2 lg:flex gap-x-4 space-y-4 lg:space-y-0">
+										<div className="flex-1">
+											<SelectedTeamsList
+												selectedTeams={selectedNBATeams?.east || []}
+												label="East Teams"
+												onChangeClick={() =>
+													handleOpenModalClick("EAST")
+												}
+											/>
+											{fieldErrors["bracket_data.teams.east"] && (
 												<ErrorDisplay
 													errors={
-														fieldErrors["bracket_data.teams"]
+														fieldErrors["bracket_data.teams.east"]
 													}
 												/>
 											)}
 										</div>
+										<div className="flex-1">
+											<SelectedTeamsList
+												selectedTeams={selectedNBATeams?.west || []}
+												label="West Teams"
+												onChangeClick={() =>
+													handleOpenModalClick("WEST")
+												}
+											/>
+											{fieldErrors["bracket_data.teams.west"] && (
+												<ErrorDisplay
+													errors={
+														fieldErrors["bracket_data.teams.west"]
+													}
+												/>
+											)}
+										</div>
+									</div>
+								)}
+								{league === "PBA" && (
+									<div className="mt-2">
+										<SelectedTeamsList
+											selectedTeams={selectedPBATeams || []}
+											label="Teams"
+											onChangeClick={() =>
+												handleOpenModalClick(null)
+											}
+										/>
+										{fieldErrors["bracket_data.teams"] && (
+											<ErrorDisplay
+												errors={fieldErrors["bracket_data.teams"]}
+											/>
+										)}
 									</div>
 								)}
 								{league === "" && (

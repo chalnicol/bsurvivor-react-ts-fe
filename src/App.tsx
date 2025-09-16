@@ -1,5 +1,4 @@
 // import { useState } from "react";
-import Navbar from "./components/navbar";
 import Register from "./components/auth/register";
 import Login from "./components/auth/login";
 import ForgotPassword from "./components/auth/forgotPassword";
@@ -28,7 +27,6 @@ import EdiLeague from "./pages/admin/leagues/editLeague";
 import EditTeam from "./pages/admin/teams/editTeam";
 import BracketChallengePage from "./pages/bracketChallengePage";
 import HomePage from "./pages/homePage";
-import Footer from "./components/footer";
 import TermsOfServicePage from "./pages/termsOfService";
 import PrivacyPolicyPage from "./pages/privacyPolicy";
 import ListBracketChallengeEntries from "./pages/admin/bracketChallengeEntries/listBracketChallengeEntries";
@@ -77,16 +75,29 @@ import {
 	faEnvelope,
 	faEnvelopeOpen,
 	faCircleQuestion,
+	faEye,
 } from "@fortawesome/free-solid-svg-icons";
 import {
 	faThumbsUp as farThumbsUp,
 	faThumbsDown as farThumbsDown,
 } from "@fortawesome/free-regular-svg-icons";
 
+import {
+	faGoogle as fabGoogle,
+	faFacebookF as fabFacebookF,
+	faInstagram as fabInstagram,
+	faXTwitter as fabXTwitter,
+	faYoutube as fabYoutube,
+} from "@fortawesome/free-brands-svg-icons";
+
 import FriendsList from "./pages/user/friends";
 import NotificationsList from "./pages/user/notificationsList";
 import BracketChallengesList from "./pages/bracketChallengesList";
 import PublicProfile from "./pages/user/publicProfile";
+import { useAuth } from "./context/auth/AuthProvider";
+import type React from "react";
+import GuestLayout from "./components/layouts/GuestLayout";
+import AuthenticatedLayout from "./components/layouts/AuthenticatedLayout";
 
 // import { fab } from "@fortawesome/free-brands-svg-icons"; // For all brand icons
 
@@ -125,163 +136,156 @@ library.add(
 	faEnvelope,
 	faEnvelopeOpen,
 	faCircleQuestion,
+	faEye,
 	farThumbsUp,
-	farThumbsDown
+	farThumbsDown,
+	fabGoogle,
+	fabFacebookF,
+	fabInstagram,
+	fabXTwitter,
+	fabYoutube
 );
 
 function App() {
-	return (
-		<>
-			<div className="w-full bg-gray-200">
-				<Navbar />
-				<div className="max-w-7xl mx-auto">
-					<ScrollToTop />
-					<Routes>
-						{/* Define your routes inside Routes */}
-						<Route path="/" element={<HomePage />} />
-						<Route path="/about" element={<About />} />
-						{/* <Route path="/nba" element={<NBAPage />} /> */}
-						{/* <Route path="/pba" element={<PBAPage />} /> */}
+	const { isAuthenticated } = useAuth();
 
-						<Route path="/users/:username" element={<PublicProfile />} />
+	const content = (): React.ReactNode => {
+		return (
+			<>
+				<ScrollToTop />
+				<Routes>
+					{/* Define your routes inside Routes */}
+					<Route path="/" element={<HomePage />} />
+					<Route path="/about" element={<About />} />
+					{/* <Route path="/nba" element={<NBAPage />} /> */}
+					{/* <Route path="/pba" element={<PBAPage />} /> */}
 
+					<Route path="/users/:username" element={<PublicProfile />} />
+
+					<Route
+						path="/bracket-challenges"
+						element={<BracketChallengesList />}
+					/>
+
+					<Route
+						path="/bracket-challenges/:slug"
+						element={<BracketChallengePage />}
+					/>
+					<Route
+						path="/bracket-challenge-entries/:slug"
+						element={<BracketChallengeEntryPage />}
+					/>
+					<Route
+						path="/terms-of-service"
+						element={<TermsOfServicePage />}
+					/>
+					<Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+					<Route path="/unauthorized" element={<Unauthorized />} />
+
+					<Route path="/verify" element={<VerifyEmail />} />
+
+					{/* Public routes */}
+					<Route element={<PublicOnlyRoute />}>
 						<Route
-							path="/bracket-challenges"
-							element={<BracketChallengesList />}
+							path="/email-verification-notice"
+							element={<EmailVerificationNotice />}
 						/>
 
-						<Route
-							path="/bracket-challenges/:slug"
-							element={<BracketChallengePage />}
-						/>
-						<Route
-							path="/bracket-challenge-entries/:slug"
-							element={<BracketChallengeEntryPage />}
-						/>
-						<Route
-							path="/terms-of-service"
-							element={<TermsOfServicePage />}
-						/>
-						<Route
-							path="/privacy-policy"
-							element={<PrivacyPolicyPage />}
-						/>
-						<Route path="/unauthorized" element={<Unauthorized />} />
-
-						<Route path="/register" element={<Register />} />
 						<Route path="/login" element={<Login />} />
+						<Route path="/register" element={<Register />} />
+						<Route path="/forgot-password" element={<ForgotPassword />} />
+						<Route path="/reset-password" element={<ResetPassword />} />
+					</Route>
 
-						{/* <Route path="/email-verified" element={<EmailVerified />} /> */}
+					{/* Optional: A "Not Found" route */}
+					<Route path="*" element={<PageNotFound />} />
+					<Route element={<ProtectedRoute />}>
+						<Route path="/profile" element={<ProfilePage />} />
+						<Route path="/entries" element={<BracketEntriesList />} />
+						<Route path="/friends" element={<FriendsList />} />
+						<Route
+							path="/notifications"
+							element={<NotificationsList />}
+						/>
 
-						<Route path="/verify" element={<VerifyEmail />} />
+						<Route element={<ProtectedRoute requiredRoles="admin" />}>
+							<Route path="/admin" element={<AdminDashboard />} />
 
-						{/* Public routes */}
-						<Route element={<PublicOnlyRoute />}>
+							{/* bracket challenge entries routes */}
 							<Route
-								path="/email-verification-notice"
-								element={<EmailVerificationNotice />}
+								path="/admin/bracket-challenge-entries/"
+								element={<ListBracketChallengeEntries />}
+							/>
+							<Route
+								path="/admin/bracket-challenge-entries/:id"
+								element={<ViewBracketChallengeEntry />}
 							/>
 
+							{/* bracket challenge routes */}
 							<Route
-								path="/forgot-password"
-								element={<ForgotPassword />}
+								path="/admin/bracket-challenges/"
+								element={<ListBracketChallenges />}
+							/>
+							<Route
+								path="/admin/bracket-challenges/:id"
+								element={<ViewBracketChallenge />}
+							/>
+							<Route
+								path="/admin/bracket-challenges/create"
+								element={<CreateBracketChallenge />}
+							/>
+							<Route
+								path="/admin/bracket-challenges/:id/edit"
+								element={<EditBracketChallenge />}
 							/>
 
+							{/* league routes */}
+							<Route path="/admin/leagues/" element={<ListLeagues />} />
 							<Route
-								path="/reset-password"
-								element={<ResetPassword />}
+								path="/admin/leagues/create"
+								element={<CreateLeague />}
 							/>
+							<Route
+								path="/admin/leagues/:id"
+								element={<ViewLeague />}
+							/>
+							<Route
+								path="/admin/leagues/:id/edit"
+								element={<EdiLeague />}
+							/>
+
+							{/* team routes */}
+							<Route path="/admin/teams/" element={<ListTeams />} />
+							<Route path="/admin/teams/:id" element={<ViewTeam />} />
+							<Route
+								path="/admin/teams/:id/edit"
+								element={<EditTeam />}
+							/>
+							<Route
+								path="/admin/teams/create"
+								element={<CreateTeam />}
+							/>
+
+							{/* users routes */}
+							<Route path="/admin/users/" element={<ListUsers />} />
+							<Route path="/admin/users/:id" element={<ViewUser />} />
 						</Route>
 
-						{/* Optional: A "Not Found" route */}
-						<Route path="*" element={<PageNotFound />} />
-						<Route element={<ProtectedRoute />}>
-							<Route path="/profile" element={<ProfilePage />} />
-							<Route path="/entries" element={<BracketEntriesList />} />
-							<Route path="/friends" element={<FriendsList />} />
-							<Route
-								path="/notifications"
-								element={<NotificationsList />}
-							/>
-
-							<Route element={<ProtectedRoute requiredRoles="admin" />}>
-								<Route path="/admin" element={<AdminDashboard />} />
-
-								{/* bracket challenge entries routes */}
-								<Route
-									path="/admin/bracket-challenge-entries/"
-									element={<ListBracketChallengeEntries />}
-								/>
-								<Route
-									path="/admin/bracket-challenge-entries/:id"
-									element={<ViewBracketChallengeEntry />}
-								/>
-
-								{/* bracket challenge routes */}
-								<Route
-									path="/admin/bracket-challenges/"
-									element={<ListBracketChallenges />}
-								/>
-								<Route
-									path="/admin/bracket-challenges/:id"
-									element={<ViewBracketChallenge />}
-								/>
-								<Route
-									path="/admin/bracket-challenges/create"
-									element={<CreateBracketChallenge />}
-								/>
-								<Route
-									path="/admin/bracket-challenges/:id/edit"
-									element={<EditBracketChallenge />}
-								/>
-
-								{/* league routes */}
-								<Route
-									path="/admin/leagues/"
-									element={<ListLeagues />}
-								/>
-								<Route
-									path="/admin/leagues/create"
-									element={<CreateLeague />}
-								/>
-								<Route
-									path="/admin/leagues/:id"
-									element={<ViewLeague />}
-								/>
-								<Route
-									path="/admin/leagues/:id/edit"
-									element={<EdiLeague />}
-								/>
-
-								{/* team routes */}
-								<Route path="/admin/teams/" element={<ListTeams />} />
-								<Route path="/admin/teams/:id" element={<ViewTeam />} />
-								<Route
-									path="/admin/teams/:id/edit"
-									element={<EditTeam />}
-								/>
-								<Route
-									path="/admin/teams/create"
-									element={<CreateTeam />}
-								/>
-
-								{/* users routes */}
-								<Route path="/admin/users/" element={<ListUsers />} />
-								<Route path="/admin/users/:id" element={<ViewUser />} />
-							</Route>
-
-							{/* <Route element={<ProtectedRoute requiredPermissions="delete_users" />}>
+						{/* <Route element={<ProtectedRoute requiredPermissions="delete_users" />}>
 									<Route path="/user-delete-tool" element={<UserDeleteToolPage />} />
 							</Route> */}
 
-							{/* Add other routes that require authentication here */}
-						</Route>
-					</Routes>
-				</div>
-				<Footer />
-			</div>
-		</>
-	);
+						{/* Add other routes that require authentication here */}
+					</Route>
+				</Routes>
+			</>
+		);
+	};
+
+	if (!isAuthenticated) {
+		return <GuestLayout>{content()}</GuestLayout>;
+	}
+	return <AuthenticatedLayout>{content()}</AuthenticatedLayout>;
 }
 
 export default App;

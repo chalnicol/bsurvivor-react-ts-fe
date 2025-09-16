@@ -25,7 +25,7 @@ const SelectTeamModal = ({
 }: SelectTeamModalProps) => {
 	return (
 		<ModalBase>
-			<div className="w-11/12 max-w-xl bg-white border border-gray-300 rounded-lg p-4 shadow-lg relative">
+			<div className="w-11/12 max-w-xl bg-white m-auto border border-gray-300 rounded-lg p-4 shadow-lg relative">
 				<button
 					className="absolute top-5 right-5 border rounded font-bold bg-amber-600 text-white px-1.5 py-0.5 text-xs cursor-pointer hover:bg-amber-500 cursor-pointer"
 					onClick={onClose}

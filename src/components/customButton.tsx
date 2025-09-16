@@ -2,19 +2,20 @@ import { useCallback } from "react";
 import type { ColorType } from "../data/adminData";
 
 interface CustomButtonProps {
-	label: string;
+	// label: string;
 	size?: "sm" | "lg" | "xl";
 	color?: ColorType;
 	onClick: () => void;
 	className?: string;
 	disabled?: boolean;
+	children: React.ReactNode;
 }
 const CustomButton = ({
 	className,
 	size,
 	color,
 	disabled,
-	label,
+	children,
 	onClick,
 }: CustomButtonProps) => {
 	const clrClass = useCallback((): string => {
@@ -63,9 +64,9 @@ const CustomButton = ({
 	if (disabled) {
 		return (
 			<p
-				className={`inline-block select-none text-white font-bold rounded ${clrClass()} ${sizeClass()} ${className}`}
+				className={`inline-block select-none text-white text-center font-bold rounded ${clrClass()} ${sizeClass()} ${className}`}
 			>
-				{label}
+				{children}
 			</p>
 		);
 	}
@@ -75,7 +76,7 @@ const CustomButton = ({
 			className={`text-white font-bold rounded ${clrClass()} ${sizeClass()} ${className}`}
 			onClick={onClick}
 		>
-			{label}
+			{children}
 		</button>
 	);
 };

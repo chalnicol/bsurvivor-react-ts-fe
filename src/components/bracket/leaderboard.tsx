@@ -206,8 +206,8 @@ const Leaderboard = ({ bracketChallengeId }: LeaderboardProps) => {
 				) : (
 					<>
 						{isLoading ? (
-							<div className="h-20 mt-3">
-								<Spinner />
+							<div className="h-20 mt-1 bg-gray-700 rounded">
+								<Spinner alignment="horizontal" />
 							</div>
 						) : (
 							<div className="bg-gray-700 text-white px-2 py-1 h-16 flex items-center justify-center rounded">

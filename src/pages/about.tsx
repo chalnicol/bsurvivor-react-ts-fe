@@ -1,10 +1,14 @@
 import ContentBase from "../components/contentBase";
 import EndOfPage from "../components/endOfPage";
-import img from "../assets/about.jpg";
 import { useState } from "react";
 import apiClient from "../utils/axiosConfig";
 import StatusMessage from "../components/statusMessage";
 import Loader from "../components/loader";
+import Icon from "../components/icon";
+import Detail from "../components/detail";
+import Header from "../components/header";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const About = () => {
 	const [email, setEmail] = useState("");
@@ -36,23 +40,28 @@ const About = () => {
 		}
 	};
 
+	const about = {
+		socials: [
+			{ id: 1, icon: "facebook-f", link: "https://www.facebook.com" },
+			{ id: 2, icon: "instagram", link: "https://www.instagram.com" },
+			{ id: 3, icon: "x-twitter", link: "https://www.twitter.com" },
+			{ id: 4, icon: "youtube", link: "https://www.youtube.com" },
+		],
+		details: [
+			{ id: 1, label: "Email", value: import.meta.env.VITE_APP_EMAIL },
+			{ id: 2, label: "Mobile #", value: import.meta.env.VITE_APP_MOBILE },
+			{ id: 3, label: "Landline", value: import.meta.env.VITE_APP_LANDLINE },
+			{ id: 4, label: "Address", value: import.meta.env.VITE_APP_ADDRESS },
+		],
+	};
+
 	return (
 		<>
 			<title>{`ABOUT | ${import.meta.env.VITE_APP_NAME}`}</title>
 			<ContentBase className="p-4">
-				<div className="border border-gray-400 bg-gray-100 p-4 mt-3 mb-6 rounded-lg shadow">
+				<div className="border border-gray-400 bg-gray-100 p-2 md:p-3 mt-3 mb-6 rounded-lg shadow">
 					{/* <h1 className="text-3xl font-bold mb-3">About Us Page</h1> */}
-					<div className="h-30 overflow-hidden rounded-t flex items-center justify-center relative">
-						<img
-							src={img}
-							alt="about"
-							className="object-cover w-full mb-4"
-						/>
-						<div className="w-full h-full absolute bg-gray-900 opacity-50"></div>
-						<div className="absolute z-10 text-white text-3xl font-bold">
-							About Page
-						</div>
-					</div>
+					<Header title="About Us" />
 					<div className="bg-gray-800 text-white rounded-b px-6 py-6 pb-12">
 						<p className="font-medium mb-5">
 							Welcome to the ultimate hub for basketball fanatics and
@@ -135,58 +144,101 @@ const About = () => {
 						</p>
 
 						<hr className="my-6 border-gray-400" />
-						{error && (
-							<StatusMessage
-								type="error"
-								onClose={() => setError(null)}
-								message={error}
-							></StatusMessage>
-						)}
-						{success && (
-							<StatusMessage
-								type="success"
-								onClose={() => setSuccess(null)}
-								message={success}
-							></StatusMessage>
-						)}
-						<h4 className="text-xl font-bold mb-2">Leave A Message</h4>
-						<form onSubmit={leaveMessage} className="space-y-3">
-							<input
-								type="name"
-								id="name"
-								value={name}
-								className="w-full px-3 py-2 text-white border autofill:bg-gray-800 placeholder-gray-400 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-300 focus:border-gray-300"
-								onChange={(e) => setName(e.target.value)}
-								disabled={isLoading}
-								placeholder="Name"
-								required
-							/>
-							<input
-								type="email"
-								id="email"
-								value={email}
-								className="w-full px-3 py-2 text-white border fill:bg-gray-800 placeholder-gray-400 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-300 focus:border-gray-300"
-								onChange={(e) => setEmail(e.target.value)}
-								disabled={isLoading}
-								placeholder="Email"
-								required
-							/>
-							<textarea
-								id="message"
-								value={message}
-								className="w-full px-3 py-2 text-white border h-36 bg-gray-800 placeholder-gray-400 border-gray-30 rounded-md h-26 focus:outline-none focus:ring-gray-300 focus:border-gray-300"
-								onChange={(e) => setMessage(e.target.value)}
-								disabled={isLoading}
-								required
-								placeholder="Message"
-							></textarea>
-							<button
-								className={`px-3 py-2 bg-gray-500 rounded hover:bg-gray-600 text-white font-semibold cursor-pointer`}
-								disabled={isLoading}
-							>
-								{isLoading ? "SENDING..." : "SEND MESSAGE"}
-							</button>
-						</form>
+
+						<div className="lg:flex gap-x-6 space-y-10 lg:space-y-0">
+							<div className="flex-none w-80">
+								<div>
+									<Icon className="w-full max-w-45" />
+									<h2 className="text-lg font-bold mb-2">
+										Basketball Survivor PH
+									</h2>
+									{/* <hr className="my-2 border-gray-400" /> */}
+									<div className="space-y-2 mt-6">
+										{about.details.map((detail) => (
+											<Detail
+												key={detail.id}
+												label={detail.label}
+												size="xs"
+											>
+												{detail.value}
+											</Detail>
+										))}
+									</div>
+									<div className="flex items-center gap-x-2 mt-8">
+										{about.socials.map((social) => (
+											<a
+												key={social.id}
+												href={social.link}
+												target="_blank"
+												rel="noreferrer"
+												className="w-9 flex-none aspect-square border border-gray-400 shadow shadow shadow-gray-500 rounded-full flex items-center justify-center text-gray-300 hover:bg-gray-600"
+											>
+												<FontAwesomeIcon
+													icon={["fab", social.icon] as IconProp}
+												/>
+											</a>
+										))}
+									</div>
+								</div>
+							</div>
+
+							<div className="flex-1">
+								<h4 className="text-xl font-bold mb-2">
+									Leave A Message
+								</h4>
+								{error && (
+									<StatusMessage
+										type="error"
+										onClose={() => setError(null)}
+										message={error}
+									></StatusMessage>
+								)}
+								{success && (
+									<StatusMessage
+										type="success"
+										onClose={() => setSuccess(null)}
+										message={success}
+									></StatusMessage>
+								)}
+								<form onSubmit={leaveMessage} className="space-y-3">
+									<input
+										type="name"
+										id="name"
+										value={name}
+										className="w-full px-3 py-2 text-white border autofill:bg-gray-800 placeholder-gray-400 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-300 focus:border-gray-300"
+										onChange={(e) => setName(e.target.value)}
+										disabled={isLoading}
+										placeholder="Name"
+										required
+									/>
+									<input
+										type="email"
+										id="email"
+										value={email}
+										className="w-full px-3 py-2 text-white border fill:bg-gray-800 placeholder-gray-400 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-300 focus:border-gray-300"
+										onChange={(e) => setEmail(e.target.value)}
+										disabled={isLoading}
+										placeholder="Email"
+										required
+									/>
+									<textarea
+										id="message"
+										value={message}
+										className="w-full px-3 py-2 text-white border h-36 bg-gray-800 placeholder-gray-400 border-gray-30 rounded-md h-26 focus:outline-none focus:ring-gray-300 focus:border-gray-300"
+										onChange={(e) => setMessage(e.target.value)}
+										disabled={isLoading}
+										required
+										placeholder="Message"
+									></textarea>
+									<button
+										className={`px-3 py-2 bg-gray-500 rounded hover:bg-gray-600 text-white font-semibold cursor-pointer`}
+										disabled={isLoading}
+									>
+										{isLoading ? "SENDING..." : "SEND MESSAGE"}
+									</button>
+								</form>
+							</div>
+						</div>
 					</div>
 				</div>
 				{isLoading && <Loader />}

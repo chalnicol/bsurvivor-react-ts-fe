@@ -170,6 +170,7 @@ export interface UserInfo extends UserMiniInfo {
 	roles: string[]; // Array of role names
 	permissions: string[]; // Array of permission names
 	is_blocked: boolean;
+	social_user: boolean;
 }
 
 export interface SearchedUserInfo extends UserMiniInfo {
@@ -297,6 +298,27 @@ export interface TabInfo<T> {
 	tab: T;
 	type: "button" | "link";
 }
+
+export const userDetailsRules = {
+	username: [
+		"Min. of 5 characters",
+		"Max. of 15 characters",
+		"Only letter and numbers are allowed",
+		"Must contain letters, not just numbers",
+	],
+	fullname: [
+		"Must be at least 5 characters long.",
+		"No special characters except spaces are allowed.",
+	],
+	email: ["Must be a valid email address"],
+	password: [
+		"Must be at least 8 characters long",
+		"Must have at least 1 lowercase letter",
+		"Must have at least 1 uppercase letters",
+		"Must have at least 1 number",
+		"Must have at least 1 special character",
+	],
+};
 
 // export interface GeneralApiErrorResponse {
 // 	message: string;

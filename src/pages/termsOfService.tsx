@@ -1,15 +1,16 @@
+import { Link } from "react-router-dom";
 import ContentBase from "../components/contentBase";
 import EndOfPage from "../components/endOfPage";
+import Header from "../components/header";
 
 const TermsOfServicePage = () => {
 	return (
 		<>
 			<title>{`TERMS OF SERVICE | ${import.meta.env.VITE_APP_NAME}`}</title>
 			<ContentBase className="p-4">
-				<div className="border border-gray-400 bg-gray-100 p-4 mt-4 mb-7 rounded-lg shadow">
-					<div className="h-24 flex items-center justify-center bg-gray-900 text-white rounded-t">
-						<h1 className="text-4xl font-bold">Terms of Service</h1>
-					</div>
+				<div className="border border-gray-400 bg-gray-100 p:2 md:p-3 mt-4 mb-7 rounded-lg shadow">
+					<Header title="Terms of Service" />
+
 					<div className="bg-gray-800 text-white rounded-b px-8 py-6">
 						<p className="mb-2">
 							Welcome to BasketballSurvivor! These Terms of Service
@@ -122,16 +123,16 @@ const TermsOfServicePage = () => {
 							7. Limitation of Liability
 						</h2>
 						<p className="mb-4">
-							In no event shall BasketballSurvivor, nor its directors,
-							employees, partners, agents, suppliers, or affiliates, be
-							liable for any indirect, incidental, special,
-							consequential, or punitive damages, including without
-							limitation, loss of profits, data, use, goodwill, or other
-							intangible losses, resulting from (i) your access to or use
-							of or inability to access or use the Service; (ii) any
-							conduct or content of any third party on the Service; (iii)
-							any content obtained from the Service; and (iv)
-							unauthorized access, use or alteration of your
+							In no event shall {import.meta.env.VITE_APP_NAME}, nor its
+							directors, employees, partners, agents, suppliers, or
+							affiliates, be liable for any indirect, incidental,
+							special, consequential, or punitive damages, including
+							without limitation, loss of profits, data, use, goodwill,
+							or other intangible losses, resulting from (i) your access
+							to or use of or inability to access or use the Service;
+							(ii) any conduct or content of any third party on the
+							Service; (iii) any content obtained from the Service; and
+							(iv) unauthorized access, use or alteration of your
 							transmissions or content, whether based on warranty,
 							contract, tort (including negligence) or any other legal
 							theory, whether or not we have been informed of the
@@ -151,8 +152,13 @@ const TermsOfServicePage = () => {
 							9. Contact Us
 						</h2>
 						<p className="mb-4">
-							If you have any questions about these Terms, please contact
-							us at chalnicol@gmail.com.
+							If you have any questions about these Terms, you may
+							contact us at any of the following contact details found on
+							this{" "}
+							<Link to="/about" className="underline">
+								page
+							</Link>
+							.
 						</p>
 
 						<p className="text-sm text-gray-400 mt-8">

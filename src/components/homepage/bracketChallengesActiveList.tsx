@@ -24,21 +24,22 @@ const BracketChallengeActiveList = () => {
 	return (
 		<>
 			<div className="w-full">
-				<div className="flex flex-wrap items-center gap-x-3 ">
+				<div className="flex flex-row items-center gap-x-5 space-y-2 md:space-y-0">
 					<h3 className="font-bold text-xl">
 						<FontAwesomeIcon icon="caret-right" /> Open Bracket Challenges
 					</h3>
+
 					<RefreshButton
-						label="REFRESH"
 						color="amber"
 						size="sm"
 						delay={3}
-						className="shadow"
+						className="px-2 flex-none"
 						onClick={() => fetchBracketChallenges("active")}
 						disabled={isLoading}
-					/>
+					>
+						REFRESH LIST
+					</RefreshButton>
 				</div>
-
 				<p className="text-sm mt-1">
 					Take a look of the open bracket challenges and submit your
 					bracket challenge entry. Hurry up before the end date!

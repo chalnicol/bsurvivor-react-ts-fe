@@ -3,10 +3,8 @@ interface ModalBaseProps {
 }
 const ModalBase = ({ children }: ModalBaseProps) => {
 	return (
-		<div className="fixed left-0 bottom-0 w-full min-h-[calc(100dvh-56px)] z-10 absolute bg-gray-900/80">
-			<div className="absolute top-0 left-0 flex items-center justify-center h-full w-full">
-				{children}
-			</div>
+		<div className="fixed left-0 bottom-0 w-full h-[calc(100dvh-56px)] flex items-center justify-center overflow-x-hidden overflow-y-auto z-10 bg-gray-900/80 p-6">
+			{children}
 		</div>
 	);
 };

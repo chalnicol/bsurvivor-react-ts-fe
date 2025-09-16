@@ -70,13 +70,14 @@ const CommentsSection = ({ className }: CommentsSectionProps) => {
 				<h2 className="font-bold text-lg">Comments {commentsCount}</h2>
 				{isAuthenticated && (
 					<CustomButton
-						label="ADD COMMENT"
 						onClick={handleAddComment}
 						size="sm"
 						disabled={addCommentMode}
 						color="amber"
 						className="shadow"
-					/>
+					>
+						ADD COMMENT
+					</CustomButton>
 				)}
 			</div>
 

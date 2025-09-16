@@ -45,11 +45,18 @@ apiClient.interceptors.response.use(
 				// A 401 response means the session is invalid. The user should be
 				// considered logged out. Your app should clear its user state.
 				throw {
-					type: "general",
+					type: "unauthorized",
 					errors: data.errors,
 					message: data.message,
 				};
 				//window.location.href = '/login';
+			} else if (status === 403) {
+				// Forbidden
+				throw {
+					type: "forbidden",
+					message: data.message,
+					errors: data.errors,
+				};
 			} else if (status === 422) {
 				// Validation Errors
 				throw {

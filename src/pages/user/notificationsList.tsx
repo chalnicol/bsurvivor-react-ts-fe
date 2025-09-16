@@ -72,9 +72,7 @@ const NotificationsList = () => {
 	const markAsRead = async (id: string) => {
 		setIsLoading(true);
 		try {
-			await apiClient.put("/mark-as-read-notification", {
-				notification_id: id,
-			});
+			await apiClient.put(`/notifications/${id}/mark-as-read`);
 			updateNotifications(id);
 			updateUnreadCount("decrement");
 			setToView(id);
@@ -89,7 +87,7 @@ const NotificationsList = () => {
 		if (!toDelete) return;
 		setIsLoading(true);
 		try {
-			await apiClient.delete(`/delete-notification/${toDelete.id}`);
+			await apiClient.delete(`/notifications/${toDelete.id}`);
 			setSuccess("Notification deleted successfully.");
 			setNotifications((prev) =>
 				prev.filter((notif) => notif.id !== toDelete.id)
@@ -203,6 +201,7 @@ const NotificationsList = () => {
 					};
 				});
 			});
+			fetchUnreadCount();
 		} catch (error: any) {
 			setError(error.message);
 		} finally {
@@ -284,29 +283,32 @@ const NotificationsList = () => {
 					<div className="mt-4 overflow-x-auto">
 						<div className="space-x-1.5">
 							<CustomButton
-								label="REFRESH LIST"
 								onClick={refreshList}
 								disabled={isLoading || !hasNewNotifications}
 								size="sm"
 								color="sky"
 								className="px-2"
-							/>
+							>
+								REFRESH LIST
+							</CustomButton>
 							<CustomButton
-								label={`MARK ALL AS READ ${getUnreadCountString()}`}
 								onClick={markAllAsRead}
 								disabled={isLoading || unreadCount === 0}
 								size="sm"
 								color="teal"
 								className="px-2"
-							/>
+							>
+								{`MARK ALL AS READ ${getUnreadCountString()}`}
+							</CustomButton>
 							<CustomButton
-								label={`DELETE ALL ${getNotificationsCountString()}`}
 								onClick={handleBatchDelete}
 								disabled={isLoading || notifications.length === 0}
 								size="sm"
 								color="red"
 								className="px-2"
-							/>
+							>
+								{`DELETE ALL ${getNotificationsCountString()}`}
+							</CustomButton>
 						</div>
 
 						{success && (

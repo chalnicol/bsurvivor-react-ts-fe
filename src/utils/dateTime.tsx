@@ -66,3 +66,19 @@ export const getRelativeTime = (dateString: string) => {
 	if (Math.abs(months) < 12) return rtf.format(months, "month");
 	return rtf.format(years, "year");
 };
+
+export const convertDateToFormFormat = (timestamp: string): string => {
+	//const timestamp = "2025-09-16T00:00:00.000000Z";
+
+	// Create a new Date object from the timestamp
+	const date = new Date(timestamp);
+
+	// Extract the year, month, and day
+	const year = date.getFullYear();
+	// Add 1 to get the correct month (Date.getMonth() is 0-indexed)
+	const month = (date.getMonth() + 1).toString().padStart(2, "0");
+	const day = date.getDate().toString().padStart(2, "0");
+
+	// Format the date into the required "yyyy-MM-dd" string
+	return `${year}-${month}-${day}`;
+};

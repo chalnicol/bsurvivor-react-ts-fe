@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
+import FormRules from "../formRules";
+import { userDetailsRules } from "../../data/adminData";
 
 const ChangePassword = () => {
 	const { updatePassword, isLoading } = useAuth();
@@ -45,9 +47,16 @@ const ChangePassword = () => {
 					/>
 				</div>
 				<div>
-					<p className="font-semibold text-sm border-b py-1">
+					{/* <p className="font-semibold text-sm border-b py-1">
 						New Password
-					</p>
+					</p> */}
+					<div className="flex items-center font-semibold text-sm border-b py-1 space-x-1">
+						<p>New Password</p>
+						<FormRules
+							colorTheme="light"
+							rules={userDetailsRules.password}
+						/>
+					</div>
 					<input
 						type="password"
 						value={password}

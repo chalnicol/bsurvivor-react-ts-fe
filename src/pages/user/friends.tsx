@@ -55,12 +55,29 @@ const FriendsList = () => {
 	// Use the debounced value of searchTerm
 	const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
 
+	const fetchFriends = async (type: string) => {
+		setIsLoading(true);
+		setFriends([]);
+		try {
+			const response = await apiClient.get(`/user/friends?type=${type}`);
+			const { friends, count } = response.data;
+			setFriends(friends);
+			setFriendsCount(count);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	const fetchSearchedUsers = async (term: string) => {
 		// setIsLoading(true);
 		setIsLoading(true);
 		setSearchedUsers([]);
 		try {
-			const response = await apiClient.get(`/search-users?search=${term}`);
+			const response = await apiClient.get(
+				`/user/friends-search?search=${term}`
+			);
 			setSearchedUsers(response.data.users);
 		} catch (error) {
 			console.error(error);
@@ -72,25 +89,6 @@ const FriendsList = () => {
 	useEffect(() => {
 		fetchSearchedUsers(debouncedSearchTerm);
 	}, [debouncedSearchTerm]);
-
-	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSearchTerm(e.target.value);
-	};
-
-	const fetchFriends = async (type: string) => {
-		setIsLoading(true);
-		setFriends([]);
-		try {
-			const response = await apiClient.get(`/get-friends?type=${type}`);
-			const { friends, count } = response.data;
-			setFriends(friends);
-			setFriendsCount(count);
-		} catch (error) {
-			console.error(error);
-		} finally {
-			setIsLoading(false);
-		}
-	};
 
 	useEffect(() => {
 		if (activeTab == "active") {
@@ -109,15 +107,6 @@ const FriendsList = () => {
 		}
 	}, [activeTab]);
 
-	// useEffect(() => {
-	// 	// Check if the 'page' parameter is missing from the URL
-	// 	if (!searchParams.get("tab")) {
-	// 		// If it's missing, add it to the URL with the default value of '1'
-	// 		// The { replace: true } option ensures a new history entry is NOT created
-	// 		setSearchParams({ tab: "active" }, { replace: true });
-	// 	}
-	// }, [searchParams, setSearchParams]);
-
 	const tabs: FriendsTabInfo[] = [
 		{ id: 1, label: "FRIENDS", tab: "active", type: "button" },
 		{ id: 2, label: "REQUEST SENT", tab: "sent", type: "button" },
@@ -125,12 +114,16 @@ const FriendsList = () => {
 		{ id: 4, label: "FRIENDS SEARCH", tab: "search", type: "button" },
 	];
 
+	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchTerm(e.target.value);
+	};
+
 	const friendQuery = async (action: string, user: UserMiniInfo) => {
 		setIsLoading(true);
 		setError(null);
 		setSuccess(null);
 		try {
-			const response = await apiClient.post("/friends-action", {
+			const response = await apiClient.post("/user/friends", {
 				user_id: user.id,
 				action: action,
 			});
@@ -146,15 +139,6 @@ const FriendsList = () => {
 	};
 
 	const updateFriends = (action: string, user: UserMiniInfo) => {
-		//update
-		// if (action == "add") {
-		// 	if (activeTab == "sent") {
-		// 		setFriends((prev) => {
-		// 			return [...prev, user];
-		// 		});
-		// 	}
-		// }
-
 		if (action !== "add") {
 			setFriends((prev) => {
 				return prev.filter((newUser) => newUser.id !== user.id);
@@ -220,13 +204,14 @@ const FriendsList = () => {
 		if (user.status == "not_friends") {
 			return (
 				<CustomButton
-					label="ADD FRIEND"
 					color="blue"
 					onClick={() => friendQuery("add", user)}
 					size="sm"
 					className="px-4"
 					disabled={isLoading}
-				/>
+				>
+					ADD FRIEND
+				</CustomButton>
 			);
 		}
 		if (user.status == "request_sent") {
@@ -366,7 +351,6 @@ const FriendsList = () => {
 																	{buttons.map((btn) => (
 																		<CustomButton
 																			key={btn}
-																			label={btn.toUpperCase()}
 																			color={getColorType(
 																				btn
 																			)}
@@ -379,7 +363,9 @@ const FriendsList = () => {
 																			size="sm"
 																			className="shadow"
 																			disabled={isLoading}
-																		/>
+																		>
+																			{btn.toUpperCase()}{" "}
+																		</CustomButton>
 																	))}
 																</div>
 															</li>

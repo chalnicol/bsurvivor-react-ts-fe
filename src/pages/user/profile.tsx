@@ -10,6 +10,7 @@ import EditInfo from "../../components/profile/editInfo";
 import { useNavigate } from "react-router-dom";
 import MenuBar from "../../components/menuBar";
 import type { TabInfo } from "../../data/adminData";
+import LoadAuth from "../../components/auth/loadAuth";
 
 type Tab = "edit" | "password" | "delete" | "profile";
 
@@ -39,11 +40,15 @@ const ProfilePage = () => {
 		}
 	};
 
+	if (!user) {
+		return <LoadAuth />;
+	}
+
 	return (
 		<>
 			<title>{`PROFILE | ${import.meta.env.VITE_APP_NAME}`}</title>
 
-			<ContentBase className="py-10 space-y-8 min-h-[calc(100dvh-96px)] px-4">
+			<ContentBase className="py-8 space-y-8 min-h-[calc(100dvh-96px)] px-4">
 				<div className="p-3 bg-gray-100 border rounded-lg shadow-sm border-gray-400 overflow-x-hidden">
 					<h1 className="text-xl font-bold flex-1">
 						<FontAwesomeIcon icon="caret-right" /> User Profile
@@ -150,7 +155,13 @@ const ProfilePage = () => {
 
 							<div className="flex-1 p-4 lg:p-5">
 								{tab == "edit" && <EditInfo />}
-								{tab == "password" && <ChangePassword />}
+								{tab == "password" &&
+									(user.social_user ? (
+										<p>Not available for social login users.</p>
+									) : (
+										<ChangePassword />
+									))}
+
 								{tab == "delete" && <DeleteAccount />}
 							</div>
 						</div>

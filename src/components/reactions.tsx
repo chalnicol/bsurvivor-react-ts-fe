@@ -1,9 +1,11 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/auth/AuthProvider";
 import ReactionButton from "./reactionButton";
+import useDebounce from "../hooks/useDebounce";
 
 interface ReactionsProps {
 	likeableId: number;
-	likeableParentId?: number | null;
+	likeableParentId: number | null;
 	userVote: "like" | "dislike" | null;
 	likesCount: number;
 	dislikesCount: number;
@@ -29,8 +31,60 @@ const Reactions = ({
 }: ReactionsProps) => {
 	const { isAuthenticated } = useAuth();
 
-	const handleVoteClick = (vote: "like" | "dislike") => {
-		onVote(likeableId, likeableParentId || null, vote);
+	const [vote, setVote] = useState<"like" | "dislike" | null>(null);
+	const [likes, setLikes] = useState<number>(0);
+	const [dislikes, setDislikes] = useState<number>(0);
+
+	const [userVoteState, setUserVoteState] = useState<{
+		id: number;
+		parent_id: number | null;
+		vote: "like" | "dislike";
+	} | null>(null);
+
+	const debouncedVote = useDebounce(userVoteState, 3000);
+
+	useEffect(() => {
+		setVote(userVote);
+		setLikes(likesCount);
+		setDislikes(dislikesCount);
+	}, [userVote, likesCount, dislikesCount]);
+
+	useEffect(() => {
+		if (debouncedVote) {
+			const { id, parent_id, vote } = debouncedVote;
+			onVote(id, parent_id, vote);
+		}
+	}, [debouncedVote]);
+
+	const handleVoteClick = (newVote: "like" | "dislike") => {
+		setUserVoteState({
+			id: likeableId,
+			parent_id: likeableParentId,
+			vote: newVote,
+		});
+		if (!isAuthenticated) return;
+
+		if (newVote === vote) {
+			setVote(null);
+			if (newVote === "like") {
+				setLikes((prev) => prev - 1);
+			} else {
+				setDislikes((prev) => prev - 1);
+			}
+		} else {
+			setVote(newVote);
+			if (newVote === "like" && vote === "dislike") {
+				setLikes((prev) => prev + 1);
+				setDislikes((prev) => prev - 1);
+			} else if (newVote === "dislike" && vote === "like") {
+				setDislikes((prev) => prev + 1);
+				setLikes((prev) => prev - 1);
+			} else if (newVote === "like" && vote === null) {
+				setLikes((prev) => prev + 1);
+			} else if (newVote === "dislike" && vote === null) {
+				setDislikes((prev) => prev + 1);
+			}
+		}
 	};
 
 	const sizeProps = size && { size };
@@ -39,7 +93,7 @@ const Reactions = ({
 		<div
 			className={`inline-flex items-center gap-x-9 bg-white border border-gray-400 shadow rounded-full p-1 ${className}`}
 		>
-			<ReactionButton
+			{/* <ReactionButton
 				type="like"
 				disabled={!isAuthenticated || isLoading}
 				selected={(userVote && userVote == "like") || false}
@@ -52,6 +106,22 @@ const Reactions = ({
 				disabled={!isAuthenticated || isLoading}
 				selected={(userVote && userVote == "dislike") || false}
 				count={dislikesCount}
+				onClick={() => handleVoteClick("dislike")}
+				{...sizeProps}
+			/> */}
+			<ReactionButton
+				type="like"
+				disabled={!isAuthenticated || isLoading}
+				selected={(vote && vote == "like") || false}
+				count={likes}
+				onClick={() => handleVoteClick("like")}
+				{...sizeProps}
+			/>
+			<ReactionButton
+				type="dislike"
+				disabled={!isAuthenticated || isLoading}
+				selected={(vote && vote == "dislike") || false}
+				count={dislikes}
 				onClick={() => handleVoteClick("dislike")}
 				{...sizeProps}
 			/>

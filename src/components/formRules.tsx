@@ -6,8 +6,9 @@ import { useOutsideClick } from "../hooks/useOutsideClick";
 interface FormRulesProps {
 	rules: string[];
 	className?: string;
+	colorTheme?: "light" | "dark";
 }
-const FormRules = ({ rules, className }: FormRulesProps) => {
+const FormRules = ({ rules, className, colorTheme }: FormRulesProps) => {
 	const [showDialog, setShowDialog] = useState(false);
 
 	const contRef = useRef<HTMLDivElement>(null);
@@ -16,6 +17,27 @@ const FormRules = ({ rules, className }: FormRulesProps) => {
 		// 2. Callback function: close the dropdown when an outside click occurs
 		setShowDialog(false);
 	});
+
+	const getPopupBgColorClass = () => {
+		switch (colorTheme) {
+			case "light":
+				return "bg-white/70 text-gray-800";
+			case "dark":
+				return "bg-gray-800/70 text-white";
+			default:
+				return "bg-gray-800/70 text-white";
+		}
+	};
+	const getButtonBgColorClass = () => {
+		switch (colorTheme) {
+			case "light":
+				return "text-gray-300";
+			case "dark":
+				return "text-gray-800";
+			default:
+				return "text-gray-800";
+		}
+	};
 
 	useEffect(() => {
 		if (showDialog && contRef.current) {
@@ -43,7 +65,7 @@ const FormRules = ({ rules, className }: FormRulesProps) => {
 		<div ref={parentRef} className={`relative ${className}`}>
 			<button
 				type="button"
-				className="cursor-pointer text-gray-800"
+				className={`cursor-pointer ${getButtonBgColorClass()}`}
 				onClick={() => setShowDialog((prev) => !prev)}
 				tabIndex={-1}
 			>
@@ -52,7 +74,7 @@ const FormRules = ({ rules, className }: FormRulesProps) => {
 			{showDialog && (
 				<div
 					ref={contRef}
-					className="z-10 px-4 py-2.5 rounded rounded border border-gray-400 font-semibold bg-gray-800/70 text-white top-full left-0 absolute shadow-lg overflow-hidden"
+					className={`z-10 px-4 py-2.5 rounded rounded border border-gray-400 font-semibold top-full left-0 absolute shadow-lg overflow-hidden ${getPopupBgColorClass()}`}
 				>
 					<ul className="list-disc text-xs list-inside text-left space-y-1 whitespace-nowrap min-w-47">
 						{rules.map((rule) => (

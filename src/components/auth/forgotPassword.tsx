@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
-import ContentBase from "../contentBase";
 import TransparentIcon from "../transparentIcon";
+import AuthFormBase from "../authFormBase";
 
 const ForgotPassword = () => {
 	const [email, setEmail] = useState("");
-	const { forgotPassword, isLoading, error, message, clearMessages } =
+	const { forgotPassword, isLoading, error, success, clearMessages } =
 		useAuth();
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -24,8 +24,8 @@ const ForgotPassword = () => {
 	}, []);
 
 	return (
-		<ContentBase className="flex items-center justify-center p-4">
-			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md border border-gray-400 relative overflow-hidden">
+		<AuthFormBase>
+			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full m-auto max-w-md border border-gray-400 relative overflow-hidden">
 				<TransparentIcon className="absolute w-60 opacity-10 rotate-30 -right-10 -top-10 z-0" />
 				<div className="relative z-10">
 					<h2 className="text-2xl font-bold mb-4 text-center">
@@ -69,13 +69,13 @@ const ForgotPassword = () => {
 							SEND RESET LINK
 						</button>
 					</form>
-					{message && (
-						<p className="text-green-600 text-sm my-3">{message}</p>
+					{success && (
+						<p className="text-green-600 text-sm my-3">{success}</p>
 					)}
 					{error && <p className="text-red-500 text-sm my-3">{error}</p>}
 				</div>
 			</div>
-		</ContentBase>
+		</AuthFormBase>
 	);
 };
 export default ForgotPassword;

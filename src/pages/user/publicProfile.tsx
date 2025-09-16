@@ -16,6 +16,8 @@ import StatusPills from "../../components/statusPills";
 import Loader from "../../components/loader";
 import CustomButton from "../../components/customButton";
 import StatusMessage from "../../components/statusMessage";
+// import LoadAuth from "../../components/auth/loadAuth";
+import { useAuth } from "../../context/auth/AuthProvider";
 
 interface FriendsButtonInfo {
 	label: string;
@@ -32,11 +34,13 @@ interface FriendsType {
 }
 
 const PublicProfile = () => {
+	const { authLoading } = useAuth();
+
 	const { username } = useParams<{ username: string }>();
 
 	const [user, setUser] = useState<UserMiniInfo | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
-	const [isProcessing, setIsProcessing] = useState(false);
+	// const [isProcessing, setIsProcessing] = useState(false);
 
 	const [entries, setEntries] = useState<BracketChallengeEntryInfo[]>([]);
 	const [friendshipStatus, setFriendshipStatus] = useState<string | null>(
@@ -48,9 +52,11 @@ const PublicProfile = () => {
 	const fetchUser = async () => {
 		setIsLoading(true);
 		try {
-			const response = await apiClient.get(`/users/${username}`);
+			const response = await apiClient.get(
+				`/user/profile?username=${username}`
+			);
+			// console.log(response.data);
 			const { user, entries, friendshipStatus } = response.data;
-
 			setFriendshipStatus(friendshipStatus);
 			setUser(user);
 			setEntries(entries);
@@ -62,9 +68,9 @@ const PublicProfile = () => {
 	};
 
 	const friendQuery = async (action: string, user: UserMiniInfo) => {
-		setIsProcessing(true);
+		setIsLoading(true);
 		try {
-			await apiClient.post("/friends-action", {
+			await apiClient.post("/user/friends", {
 				user_id: user.id,
 				action: action,
 			});
@@ -79,13 +85,14 @@ const PublicProfile = () => {
 		} catch (error: any) {
 			console.error(error);
 		} finally {
-			setIsProcessing(false);
+			setIsLoading(false);
 		}
 	};
 
 	useEffect(() => {
+		if (authLoading) return;
 		fetchUser();
-	}, [username]);
+	}, [username, authLoading]);
 
 	useEffect(() => {
 		if (!friendshipStatus) return;
@@ -95,7 +102,7 @@ const PublicProfile = () => {
 	}, [friendshipStatus]);
 
 	const friendship: FriendsType = {
-		none: {
+		not_friends: {
 			buttons: [{ label: "ADD FRIEND", color: "blue", action: "add" }],
 			info: "You are not friends with this user.",
 		},
@@ -119,6 +126,10 @@ const PublicProfile = () => {
 			info: "You are viewing your own profile.",
 		},
 	};
+
+	// if (authLoading) {
+	// 	return <LoadAuth />;
+	// }
 
 	return (
 		<>
@@ -144,21 +155,21 @@ const PublicProfile = () => {
 									fixed={true}
 									onClose={() => setInfo(null)}
 								>
-									<div className="space-x-1.5">
-										{buttons.map((btn) => (
-											<CustomButton
-												key={btn.action}
-												label={btn.label.toUpperCase()}
-												color={btn.color}
-												onClick={() =>
-													friendQuery(btn.action, user)
-												}
-												size="sm"
-												className="px-4"
-												disabled={isProcessing}
-											/>
-										))}
-									</div>
+									{buttons.map((btn) => (
+										<CustomButton
+											key={btn.action}
+											color={btn.color}
+											onClick={() => friendQuery(btn.action, user)}
+											size="sm"
+											className="px-4"
+											disabled={isLoading}
+										>
+											{btn.label.toUpperCase()}
+										</CustomButton>
+										// <button className="text-sm bg-gray-500 px-2 rounded text-white hover:bg-gray-600 font-semibold">
+										// 	{btn.label.toUpperCase()}
+										// </button>
+									))}
 								</StatusMessage>
 							)}
 

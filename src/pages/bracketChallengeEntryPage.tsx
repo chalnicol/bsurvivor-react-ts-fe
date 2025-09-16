@@ -21,7 +21,7 @@ import ShareToSocials from "../components/shareToSocials";
 // import { useAuth } from "../context/auth/AuthProvider";
 
 const BracketChallengeEntryPage = () => {
-	const { isAuthenticated, user } = useAuth();
+	const { isAuthenticated, user, authLoading } = useAuth();
 	const { slug } = useParams<{ slug: string }>();
 
 	const [bracketChallengeEntry, setBracketChallengeEnry] =
@@ -48,12 +48,9 @@ const BracketChallengeEntryPage = () => {
 	};
 
 	useEffect(() => {
-		if (!slug) {
-			setIsLoading(false);
-			return;
-		}
+		if (authLoading) return;
 		fetchBracketChallengeEntry();
-	}, [slug]);
+	}, [slug, authLoading]);
 
 	const getEntryUsername = useCallback((): string => {
 		if (bracketChallengeEntry) {
@@ -97,6 +94,10 @@ const BracketChallengeEntryPage = () => {
 			console.log(error);
 		}
 	};
+
+	// if (authLoading) {
+	// 	return <LoadAuth />;
+	// }
 
 	return (
 		<>
@@ -199,12 +200,14 @@ const BracketChallengeEntryPage = () => {
 									</p>
 									<Reactions
 										likeableId={bracketChallengeEntry.id}
+										likeableParentId={null}
 										likesCount={bracketChallengeEntry.votes.likes}
 										dislikesCount={
 											bracketChallengeEntry.votes.dislikes
 										}
 										userVote={bracketChallengeEntry.user_vote}
 										onVote={handleBracketChallengeEntryVote}
+										isLoading={isLoading}
 										className="-ms-6"
 									/>
 								</div>

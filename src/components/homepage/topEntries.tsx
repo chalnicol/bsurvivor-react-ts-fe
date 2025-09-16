@@ -28,18 +28,20 @@ const TopEntries = () => {
 					Entries
 				</h3>
 				<RefreshButton
-					label="REFRESH"
 					color="amber"
 					size="sm"
 					delay={3}
-					className="shadow"
+					className="px-2"
 					onClick={() => fetchBracketChallenges("ongoing")}
 					disabled={isLoading}
-				/>
+				>
+					REFRESH LIST
+				</RefreshButton>
 			</div>
 
 			<p className="text-sm">
-				This is the list of ongoing bracket challenges.
+				This is the list of ongoing bracket challenges and their top
+				entries.
 			</p>
 
 			{ongoingChallenges.length > 0 ? (

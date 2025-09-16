@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
+import FormRules from "../formRules";
+import { userDetailsRules } from "../../data/adminData";
+
 const EditInfo = () => {
 	const { user, isLoading, updateProfile } = useAuth();
 	// const navigate = useNavigate();
@@ -32,7 +35,14 @@ const EditInfo = () => {
 		<div>
 			<form className="space-y-2" onSubmit={handleSubmit}>
 				<div>
-					<p className="font-semibold text-sm border-b py-1">Full Name</p>
+					<div className="flex items-center font-semibold text-sm border-b py-1 space-x-1">
+						<p>Full Name</p>
+						<FormRules
+							colorTheme="light"
+							rules={userDetailsRules.fullname}
+						/>
+					</div>
+
 					<input
 						type="text"
 						value={fullname}
@@ -44,7 +54,14 @@ const EditInfo = () => {
 					/>
 				</div>
 				<div>
-					<p className="font-semibold text-sm border-b py-1">Username</p>
+					<div className="flex items-center font-semibold text-sm border-b py-1 space-x-1">
+						<p>Username</p>
+						<FormRules
+							colorTheme="light"
+							rules={userDetailsRules.username}
+						/>
+					</div>
+
 					<input
 						type="text"
 						value={username}
@@ -56,7 +73,13 @@ const EditInfo = () => {
 					/>
 				</div>
 				<div>
-					<p className="font-semibold text-sm border-b py-1">E-mail</p>
+					<div className="flex items-center font-semibold text-sm border-b py-1 space-x-1">
+						<p>E-mail</p>
+						<FormRules
+							colorTheme="light"
+							rules={userDetailsRules.email}
+						/>
+					</div>
 					<input
 						type="text"
 						value={email}

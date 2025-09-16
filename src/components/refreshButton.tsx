@@ -3,7 +3,7 @@ import CustomButton from "./customButton";
 import type { ColorType } from "../data/adminData";
 
 interface RefreshButtonProps {
-	label: string;
+	children: React.ReactNode;
 	delay?: number;
 	size?: "sm" | "lg" | "xl";
 	color?: ColorType;
@@ -12,7 +12,7 @@ interface RefreshButtonProps {
 	className?: string;
 }
 const RefreshButton = ({
-	label,
+	children,
 	delay,
 	color,
 	size,
@@ -24,10 +24,10 @@ const RefreshButton = ({
 
 	const timeDelay = delay ? delay : 10;
 
-	const addedProps = { label, className, size, color };
+	const addedProps = { className, size, color };
 
 	useEffect(() => {
-		let timer: number;
+		let timer: NodeJS.Timeout;
 		if (isDisabled) {
 			timer = setTimeout(() => setIsDisabled(false), timeDelay * 1000);
 		}
@@ -46,7 +46,9 @@ const RefreshButton = ({
 			{...addedProps}
 			onClick={handleClick}
 			disabled={disabled || isDisabled}
-		/>
+		>
+			{children}
+		</CustomButton>
 	);
 };
 export default RefreshButton;

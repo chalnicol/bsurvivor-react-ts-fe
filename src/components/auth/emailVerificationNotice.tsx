@@ -1,12 +1,12 @@
-import ContentBase from "../contentBase";
 import { useAuth } from "../../context/auth/AuthProvider";
+import AuthFormBase from "../authFormBase";
 
 const EmailVerificationNotice = () => {
-	const { isLoading, error, message, sendVerificationEmail } = useAuth();
+	const { isLoading, error, success, sendVerificationEmail } = useAuth();
 
 	return (
-		<ContentBase className="flex items-center justify-center p-4">
-			<div className="border border-gray-400 bg-white p-8 pt-6 rounded shadow-md w-full max-w-md text-center">
+		<AuthFormBase>
+			<div className="border border-gray-400 bg-white p-8 pt-6 rounded shadow-md m-auto w-full max-w-md text-center">
 				<h1 className="text-2xl font-bold mb-1">Email Verification</h1>
 				<p>
 					A verification link has been sent to your email address. Please
@@ -24,10 +24,12 @@ const EmailVerificationNotice = () => {
 					CLICK HERE TO RESEND VERIFICATION LINK
 				</button>
 
-				{message && <p className="my-3 text-green-500">{message}</p>}
-				{error && <p className="my-3 text-red-500">{error}</p>}
+				{success && (
+					<p className="my-4 text-green-600 text-sm">{success}</p>
+				)}
+				{error && <p className="my-4 text-red-600 text-sm">{error}</p>}
 			</div>
-		</ContentBase>
+		</AuthFormBase>
 	);
 };
 

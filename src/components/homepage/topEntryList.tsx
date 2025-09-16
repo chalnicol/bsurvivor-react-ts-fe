@@ -28,7 +28,7 @@ const TopEntryList = ({ bracketChallenge }: topEntryListProps) => {
 					</p>
 					<Link
 						to={`/bracket-challenges/${bracketChallenge.slug}`}
-						className="text-white text-xs border-b font-semibold hover:text-gray-300"
+						className="text-white text-xs border-b font-semibold hover:text-gray-200"
 					>
 						{bracketChallenge.name}
 						<FontAwesomeIcon

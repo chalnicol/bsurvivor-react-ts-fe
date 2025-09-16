@@ -1,15 +1,15 @@
 import ContentBase from "../components/contentBase";
 import EndOfPage from "../components/endOfPage";
+import Header from "../components/header";
 
 const PrivacyPolicyPage = () => {
 	return (
 		<>
 			<title>{`PRIVACY POLICY | ${import.meta.env.VITE_APP_NAME}`}</title>
 			<ContentBase className="p-4">
-				<div className="border border-gray-400 bg-gray-100 p-4 mt-4 mb-7 rounded-lg shadow">
-					<div className="h-24 flex items-center justify-center bg-gray-900 text-white rounded-t">
-						<h1 className="text-4xl font-bold">Privacy Policy</h1>
-					</div>
+				<div className="border border-gray-400 bg-gray-100 p-2 md:p-3 mt-4 mb-7 rounded-lg shadow">
+					<Header title="Privacy Policy" />
+
 					<div className="bg-gray-800 text-white rounded-b px-8 py-6">
 						<p className="mb-2">
 							Your privacy is important to us. This Privacy Policy

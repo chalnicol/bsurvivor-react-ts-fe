@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
-import ContentBase from "../contentBase";
 import TransparentIcon from "../transparentIcon";
+import AuthFormBase from "../authFormBase";
 
 const resetPassword = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { resetPassword, isLoading, error, message, clearMessages } =
+	const { resetPassword, isLoading, error, success, clearMessages } =
 		useAuth(); // Destructure from context
 
 	const [email, setEmail] = useState("");
@@ -71,8 +71,8 @@ const resetPassword = () => {
 
 	if (isInvalid) {
 		return (
-			<ContentBase className="flex items-center justify-center p-4">
-				<div className="border bg-white border-gray-500 p-3 rounded max-w-lg shadow-lg mx-auto">
+			<AuthFormBase>
+				<div className="border bg-white border-gray-500 p-3 m-auto rounded max-w-lg shadow-lg">
 					<h2 className="font-bold text-lg">Invalid Link</h2>
 					<p className="text-sm mt-2 mb-6">
 						The password reset link is invalid or has expired. Please
@@ -86,13 +86,13 @@ const resetPassword = () => {
 						REQUEST NEW LINK
 					</button>
 				</div>
-			</ContentBase>
+			</AuthFormBase>
 		);
 	}
 
 	return (
-		<ContentBase className="flex items-center justify-center p-4">
-			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md border border-gray-400 overflow-hidden relative">
+		<AuthFormBase>
+			<div className="bg-white p-8 pt-6 rounded-lg shadow-md w-full m-auto max-w-md border border-gray-400 overflow-hidden relative">
 				<TransparentIcon className="absolute w-60 opacity-15 rotate-30 -right-10 -top-10 z-0" />
 				<div className="relative z-10">
 					<h2 className="text-2xl font-bold mb-4 text-center">
@@ -162,13 +162,13 @@ const resetPassword = () => {
 							UPDATE PASSWORD
 						</button>
 					</form>
-					{message && (
-						<p className="text-green-600 text-sm my-3">{message}</p>
+					{success && (
+						<p className="text-green-600 text-sm my-3">{success}</p>
 					)}
 					{error && <p className="text-red-500 text-sm my-3">{error}</p>}
 				</div>
 			</div>
-		</ContentBase>
+		</AuthFormBase>
 	);
 };
 export default resetPassword;

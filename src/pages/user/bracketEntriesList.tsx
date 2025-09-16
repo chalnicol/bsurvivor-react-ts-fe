@@ -73,12 +73,6 @@ const BracketEntriesList = () => {
 		}
 	};
 
-	// useEffect(() => {
-	// 	if (isAuthenticated) {
-	// 		fetchBracketChallengeEntries(currentPage, debouncedSearchTerm);
-	// 	}
-	// }, [currentPage, debouncedSearchTerm, isAuthenticated]);
-
 	useEffect(() => {
 		// Only fetch data when debouncedSearchTerm changes (user stopped typing)
 		if (isAuthenticated) {

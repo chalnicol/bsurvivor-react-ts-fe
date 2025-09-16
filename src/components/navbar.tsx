@@ -14,7 +14,11 @@ interface LinksInfo {
 	label: string;
 	route: string;
 }
-const Navbar = () => {
+
+interface NavbarProps {
+	className?: string;
+}
+const Navbar = ({ className }: NavbarProps) => {
 	const [searchParams] = useSearchParams();
 
 	const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -22,6 +26,7 @@ const Navbar = () => {
 	const [showMenuDropDown, setShowMenuDropDown] = useState<boolean>(false);
 
 	const {
+		authLoading,
 		user,
 		isAuthenticated,
 		hasRole,
@@ -43,6 +48,8 @@ const Navbar = () => {
 		// 2. Callback function: close the dropdown when an outside click occurs
 		setShowDropdown(false);
 	});
+
+	const isLoadedRef = useRef<boolean>(false);
 
 	const friendsTab = searchParams.get("tab") || "active";
 
@@ -170,7 +177,34 @@ const Navbar = () => {
 		};
 	}, [showMenuDropDown]);
 
+	// useEffect(() => {
+	// 	const handleResize = () =>
+	// 		setShowDropdown(false);
+
+	// 		if (window.innerWidth >= 768) {
+	// 			setShowMenu(false);
+	// 			setShowMenuDropDown(false);
+	// 		}
+	// 	};
+	// 	window.addEventListener("resize", handleResize);
+
+	// 	return () => {
+	// 		window.removeEventListener("resize", handleResize);
+	// 	};
+	// }, []);
+
 	useEffect(() => {
+		if (!user || authLoading) return;
+
+		fetchUnreadCount();
+
+		// console.log("this is me");
+
+		window.Echo.private(`users.${user.id}`).notification((data: any) => {
+			console.log("unreadCount", data.unread_count);
+			updateUnreadCount(data.unread_count);
+		});
+
 		const handleResize = () => {
 			setShowDropdown(false);
 
@@ -179,27 +213,19 @@ const Navbar = () => {
 				setShowMenuDropDown(false);
 			}
 		};
+
 		window.addEventListener("resize", handleResize);
 
 		return () => {
+			window.Echo.leaveChannel(`users.${user.id}`);
 			window.removeEventListener("resize", handleResize);
 		};
-	}, []);
-
-	useEffect(() => {
-		if (!user) return;
-		fetchUnreadCount();
-		window.Echo.private(`users.${user.id}`).notification((data: any) => {
-			console.log("unreadCount", data.unread_count);
-			updateUnreadCount(data.unread_count);
-		});
-		return () => {
-			window.Echo.leaveChannel(`users.${user.id}`);
-		};
-	}, [user]);
+	}, [user, authLoading, isLoadedRef]);
 
 	return (
-		<nav className="bg-gray-800 border-b border-gray-500 h-14 sticky top-0 z-20">
+		<nav
+			className={`bg-gray-800 border-b border-gray-500 h-14 sticky top-0 z-20 ${className}`}
+		>
 			<div className="max-w-7xl mx-auto flex justify-between items-center gap-x-6 h-full px-4">
 				<Link to="/" className="text-lg text-white font-bold">
 					{/* <FontAwesomeIcon icon="basketball" /> BBSurvivor */}

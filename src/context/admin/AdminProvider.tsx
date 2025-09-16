@@ -90,24 +90,24 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 	}, [areTeamsAndLeaguesPopulated]);
 
 	const fetchBracketChallenges = useCallback(
-		async (type: "active" | "ongoing") => {
-			if (type == "active") {
+		async (status: "active" | "ongoing") => {
+			if (status == "active") {
 				setActiveChallenges([]);
 				setIsLoading(true);
 			}
-			if (type == "ongoing") {
+			if (status == "ongoing") {
 				setIsOngoingLoading(true);
 				setOngoingChallenges([]);
 			}
 			try {
 				const response = await apiClient.get(
-					`/get-bracket-challenges/${type}`
+					`/bracket-challenges/status?status=${status}`
 				);
-				if (type == "active") {
+				if (status == "active") {
 					setActiveChallenges(response.data.challenges);
 					setActiveChallengesFetched(true);
 				}
-				if (type == "ongoing") {
+				if (status == "ongoing") {
 					setOngoingChallenges(response.data.challenges);
 					setOngoingChallengesFetched(true);
 				}

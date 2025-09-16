@@ -140,7 +140,7 @@ const Notification = ({
 				</div>
 			</div>
 			<button
-				className="flex-nonehover:text-gray-700 cursor-pointer ms-auto px-1 w-6 aspect-square rounded-full border bg-gray-300 text-gray-600"
+				className="flex-none hover:bg-gray-400 cursor-pointer ms-auto px-1 w-6 aspect-square rounded-full border bg-gray-300 text-gray-600"
 				onClick={() => onDelete(notification)}
 			>
 				<FontAwesomeIcon icon="trash" size="xs" />

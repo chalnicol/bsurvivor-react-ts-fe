@@ -1,11 +1,12 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import ContentBase from "../contentBase";
 import ErrorDisplay from "../errorDisplay";
 import TransparentIcon from "../transparentIcon";
 import FormRules from "../formRules";
+import AuthFormBase from "../authFormBase";
+import { userDetailsRules } from "../../data/adminData";
 
 interface FormRulesInfo {
 	isOpen: false;
@@ -17,7 +18,7 @@ interface FormRules {
 }
 
 const Register = () => {
-	const location = useLocation();
+	// const location = useLocation();
 
 	const [username, setUsername] = useState("");
 	const [fullName, setFullName] = useState("");
@@ -29,13 +30,13 @@ const Register = () => {
 		error,
 		fieldErrors,
 		isLoading,
-		isAuthenticated,
+		// isAuthenticated,
 		register,
 		clearMessages,
 	} = useAuth();
 	const navigate = useNavigate();
 
-	const from = location.state?.from?.pathname || "/"; // Default to /dashboard
+	// const from = location.state?.from?.pathname || "/"; // Default to /dashboard
 
 	useEffect(() => {
 		// clearMessages();
@@ -44,11 +45,11 @@ const Register = () => {
 		};
 	}, []);
 
-	useEffect(() => {
-		if (isAuthenticated) {
-			navigate(from, { replace: true });
-		}
-	}, [isAuthenticated, navigate, from]);
+	// useEffect(() => {
+	// 	if (isAuthenticated) {
+	// 		navigate(from, { replace: true });
+	// 	}
+	// }, [isAuthenticated, navigate, from]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -65,31 +66,31 @@ const Register = () => {
 		}
 	};
 
-	const formRules = {
-		username: [
-			"Min. of 5 characters",
-			"Max. of 15 characters",
-			"No spaces and special characters",
-		],
-		fullname: [
-			"Must be at least 5 characters long.",
-			"Only hyphens and spaces are allowed.",
-		],
-		email: ["Must be a valid email address"],
-		password: [
-			"Must be at least 8 characters long",
-			"Must have at least 1 lowercase letter",
-			"Must have at least 1 uppercase letters",
-			"Must have at least 1 number",
-			"Must have at least 1 special character",
-		],
-	};
+	// const formRules = {
+	// 	username: [
+	// 		"Min. of 5 characters",
+	// 		"Max. of 15 characters",
+	// 		"No spaces and special characters",
+	// 	],
+	// 	fullname: [
+	// 		"Must be at least 5 characters long.",
+	// 		"Only hyphens and spaces are allowed.",
+	// 	],
+	// 	email: ["Must be a valid email address"],
+	// 	password: [
+	// 		"Must be at least 8 characters long",
+	// 		"Must have at least 1 lowercase letter",
+	// 		"Must have at least 1 uppercase letters",
+	// 		"Must have at least 1 number",
+	// 		"Must have at least 1 special character",
+	// 	],
+	// };
 
 	return (
 		<>
 			<title>{`REGISTER | ${import.meta.env.VITE_APP_NAME}`}</title>
-			<ContentBase className="flex items-center justify-center p-4">
-				<div className="border border-gray-400 bg-white p-8 pt-6 rounded-lg shadow-md w-full max-w-md overflow-hidden relative">
+			<AuthFormBase>
+				<div className="border border-gray-400 bg-white p-8 pt-6 rounded-lg shadow-md m-auto w-full max-w-md overflow-hidden relative">
 					<TransparentIcon className="absolute w-60 opacity-10 rotate-30 -right-12 -top-12 z-0" />
 					<div className="relative z-10">
 						<h2 className="text-2xl font-bold mb-6 text-center">
@@ -102,7 +103,7 @@ const Register = () => {
 									<label className="text-sm font-medium text-gray-700">
 										Username
 									</label>
-									<FormRules rules={formRules.username} />
+									<FormRules rules={userDetailsRules.username} />
 								</div>
 								<input
 									type="text"
@@ -122,13 +123,13 @@ const Register = () => {
 									<label className="block text-sm font-medium text-gray-700">
 										Full Name
 									</label>
-									<FormRules rules={formRules.fullname} />
+									<FormRules rules={userDetailsRules.fullname} />
 								</div>
 								<input
 									type="text"
 									value={fullName}
 									onChange={(e) => setFullName(e.target.value)}
-									maxLength={15}
+									maxLength={40}
 									className="w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 									disabled={isLoading}
 									required
@@ -139,9 +140,12 @@ const Register = () => {
 							</div>
 
 							<div className="mb-4">
-								<label className="block text-sm font-medium text-gray-700 mb-1">
-									Email
-								</label>
+								<div className="flex items-center gap-x-1.5 mb-1">
+									<label className="block text-sm font-medium text-gray-700">
+										Email
+									</label>
+									<FormRules rules={userDetailsRules.email} />
+								</div>
 								<input
 									type="email"
 									value={email}
@@ -159,7 +163,7 @@ const Register = () => {
 									<label className="block text-sm font-medium text-gray-700">
 										Password
 									</label>
-									<FormRules rules={formRules.password} />
+									<FormRules rules={userDetailsRules.password} />
 								</div>
 								<input
 									type="password"
@@ -220,7 +224,7 @@ const Register = () => {
 						</div>
 					</div>
 				</div>
-			</ContentBase>
+			</AuthFormBase>
 		</>
 	);
 };

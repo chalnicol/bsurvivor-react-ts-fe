@@ -3,6 +3,16 @@ import { AuthContext } from "./AuthContext";
 import { apiClient, getCsrfToken } from "../../utils/api"; // Import your configured axios instance
 import { type ProfileWindow, type UserInfo } from "../../data/adminData";
 
+import {
+	// onAuthStateChanged,
+	signInWithPopup,
+	GoogleAuthProvider,
+	FacebookAuthProvider,
+	type User,
+	signOut,
+} from "firebase/auth";
+import { auth } from "../../firebase";
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	children,
 }) => {
@@ -19,8 +29,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	const [profileWindow, setProfileWindow] = useState<ProfileWindow>(null);
 	const [unreadCount, setUnreadCount] = useState<number>(0);
 	const [isToVerifyEmail, setIsToVerifyEmail] = useState<boolean>(false);
-
-	// Function to fetch user data if a token exists (on app load/refresh)
+	const [socialAuthUser, setSocialAuthUser] = useState<User | null>(null);
+	const [socialAuthLoading, setSocialAuthLoading] = useState<boolean>(true);
 
 	const fetchUser = async () => {
 		if (!user) {
@@ -32,6 +42,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				console.log(error);
 				setUser(null);
 				setIsAuthenticated(false);
+
+				if (socialAuthUser) {
+					await signOut(auth);
+					setSocialAuthUser(null);
+					setSocialAuthLoading(false);
+				}
 			} finally {
 				setAuthLoading(false);
 			}
@@ -42,6 +58,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
 	useEffect(() => {
 		fetchUser();
+
+		// This function subscribes to the user's authentication state
+		// const unsubscribe = onAuthStateChanged(auth, async (socialUser) => {
+		// 	if (socialUser) {
+		// 		// await fetchUser();
+		// 		setSocialAuthUser(socialUser);
+		// 		setSocialAuthLoading(false);
+		// 	}
+		// });
+
+		// // Clean up the subscription on unmount
+		// return unsubscribe;
 	}, []);
 
 	const fetchUnreadCount = async () => {
@@ -54,7 +82,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			console.error("Failed to fetch unread notification count:", error);
 		}
 	};
-	
 
 	const updateUnreadCount = (value: "increment" | "decrement" | number) => {
 		setUnreadCount((prevCount) => {
@@ -71,20 +98,63 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		});
 	};
 
-	const processErrors = (error: any, errorMessage?: string) => {
+	const processErrors = async (error: any, errorMessage?: string) => {
 		if (error.type === "validation") {
 			setFieldErrors(error.errors);
-			setError(error.message || errorMessage); // Often 'The given data was invalid.'
+			// setError(error.message || errorMessage); // Often 'The given data was invalid.'
 		} else if (
 			error.type === "server" ||
 			error.type === "general" ||
 			error.type === "network" ||
 			error.type === "client"
 		) {
-			setError(error.message);
+			setError(error.message || errorMessage);
 		} else {
 			// Fallback for any other unexpected error type
 			setError("An unknown error occurred.");
+		}
+	};
+
+	// --- Authentication Actions ---
+	const socialSignin = async (socialType: "google" | "facebook") => {
+		const provider =
+			socialType === "google"
+				? new GoogleAuthProvider()
+				: new FacebookAuthProvider();
+
+		setIsLoading(true);
+		setError(null);
+		setSuccess(null);
+		try {
+			await getCsrfToken();
+			const result = await signInWithPopup(auth, provider);
+			const user = result.user;
+			setSocialAuthUser(user);
+			setSocialAuthLoading(false);
+
+			const idToken = await user.getIdToken();
+			const response = await apiClient.post("/social-login", {
+				provider: socialType,
+				idToken: idToken,
+				// uid: user.uid,
+				// email: user.email,
+				// name: user.displayName,
+				// photo_url: user.photoURL,
+			});
+
+			setUser(response.data.user);
+			setIsAuthenticated(true);
+			setSuccess("Social Sign in successful! Redirecting...");
+		} catch (error: any) {
+			console.error("Social Sign in failed:", error);
+			processErrors(error, "Social Sign in failed");
+
+			//user is blocked or unauthorsized..
+			if (error.type == "unathorized" || "forbidden") {
+				await signOut(auth);
+			}
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -145,6 +215,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		token: string
 	): Promise<boolean> => {
 		setIsLoading(true);
+		setError(null);
+		setSuccess(null);
 		try {
 			const response = await apiClient.post("/email/verify", {
 				email,
@@ -167,12 +239,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		setIsLoading(true);
 		try {
 			await apiClient.post("/logout");
+			if (socialAuthUser) {
+				await signOut(auth);
+			}
 			return true;
 		} catch (error) {
 			console.error("Logout failed on server:", error);
 			return false;
 		} finally {
 			setUser(null);
+			setSocialAuthUser(null);
 			setIsAuthenticated(false);
 			setSuccess(null);
 			setError(null);
@@ -385,6 +461,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				profileWindow,
 				unreadCount,
 				isToVerifyEmail,
+				socialAuthUser,
+				socialAuthLoading,
+				isLoading,
+				authLoading,
 				fetchUnreadCount,
 				updateUnreadCount,
 				verifyEmail,
@@ -401,8 +481,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				updateUser,
 				hasRole,
 				can,
-				isLoading,
-				authLoading,
+				socialSignin,
 			}}
 		>
 			{children}

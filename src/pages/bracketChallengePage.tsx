@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { type BracketChallengeInfo } from "../data/adminData";
 import { apiClient } from "../utils/api";
@@ -12,7 +12,6 @@ import ContentBase from "../components/contentBase";
 import { useAuth } from "../context/auth/AuthProvider";
 import Detail from "../components/detail";
 import { Link } from "react-router-dom";
-import LoadAuth from "../components/auth/loadAuth";
 import EndOfPage from "../components/endOfPage";
 import Leaderboard from "../components/bracket/leaderboard";
 import CommentsSection from "../components/commentsSection";
@@ -31,7 +30,6 @@ const BracketChallengePage = () => {
 		useState<BracketChallengeInfo | null>(null);
 
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const [entrySlug, setEntrySlug] = useState<string | null>(null);
 	const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
 	const [isPast, setIsPast] = useState<boolean>(false);
 	// const [totalCommentsCount, setTotalCommentsCount] = useState<number>(0);
@@ -41,17 +39,18 @@ const BracketChallengePage = () => {
 	const leaderboardRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
+		if (authLoading) return;
 		//fetch bracket challenge..
 		const fetchBracketChallenge = async () => {
 			setIsLoading(true);
 			try {
-				const response = await apiClient.get(`/bracket-challenges/${slug}`);
+				const response = await apiClient.get(
+					`/bracket-challenges/${slug}/show`
+				);
 
-				const { bracketChallenge, bracketEntrySlug, isPast } =
-					response.data;
+				const { bracketChallenge, isPast } = response.data;
 
 				setBracketChallenge(bracketChallenge);
-				setEntrySlug(bracketEntrySlug);
 				setIsPast(isPast);
 			} catch (error) {
 				console.error(error);
@@ -62,7 +61,7 @@ const BracketChallengePage = () => {
 		if (slug) {
 			fetchBracketChallenge();
 		}
-	}, [slug]);
+	}, [slug, authLoading]);
 
 	useEffect(() => {
 		if (!leaderboardRef.current) return;
@@ -79,9 +78,14 @@ const BracketChallengePage = () => {
 		};
 	}, [showLeaderboard]);
 
-	if (authLoading) {
-		return <LoadAuth />;
-	}
+	const entrySlug = useMemo(() => {
+		if (bracketChallenge) {
+			if (bracketChallenge.entries && bracketChallenge.entries.length > 0) {
+				return bracketChallenge.entries[0].slug;
+			}
+		}
+		return null;
+	}, [bracketChallenge]);
 
 	//test comments
 	const getBracketMode = () => {
@@ -98,6 +102,7 @@ const BracketChallengePage = () => {
 	) => {
 		//.
 		console.log(id, parent_id, vote);
+
 		try {
 			const response = await apiClient.post("/likes", {
 				is_like: vote === "like",
@@ -143,17 +148,17 @@ const BracketChallengePage = () => {
 									<Detail label="Challenge Name">
 										{bracketChallenge.name}
 									</Detail>
-									<Detail label="Entries Submitted">
+									<Detail label="Submitted Entries">
 										{bracketChallenge.entries_count &&
 										bracketChallenge.entries_count > 0 ? (
 											<button
-												className="bg-blue-500 hover:bg-blue-400 text-white cursor-pointer px-3 py-0.5 rounded font-bold text-xs"
+												className="bg-blue-500 hover:bg-blue-400  space-x-1 min-w-10 text-white cursor-pointer px-3 py-0.5 rounded font-bold text-xs"
 												onClick={() => setViewEntries(true)}
 											>
-												VIEW ({bracketChallenge.entries_count})
+												{bracketChallenge.entries_count}
 											</button>
 										) : (
-											<span>{bracketChallenge.entries_count}</span>
+											<span>0</span>
 										)}
 									</Detail>
 									<Detail label="Submission Opens">
@@ -258,6 +263,7 @@ const BracketChallengePage = () => {
 									</p>
 									<Reactions
 										likeableId={bracketChallenge.id}
+										likeableParentId={null}
 										likesCount={bracketChallenge.votes.likes}
 										dislikesCount={bracketChallenge.votes.dislikes}
 										userVote={bracketChallenge.user_vote}
@@ -277,7 +283,7 @@ const BracketChallengePage = () => {
 								</div>
 							</div>
 
-							<hr className="mt-2 mb-4 border-gray-400 shadow" />
+							<hr className="my-2 border-gray-400 shadow" />
 
 							<CommentsProvider
 								resource="challenges"
@@ -298,10 +304,11 @@ const BracketChallengePage = () => {
 
 				{viewEntries && (
 					<EntriesModal
-						onClose={() => setViewEntries(false)}
 						bracketChallengeId={bracketChallenge?.id || 0}
+						onClose={() => setViewEntries(false)}
 					/>
 				)}
+
 				{isLoading && <Loader />}
 			</ContentBase>
 		</>

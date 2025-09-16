@@ -1,5 +1,6 @@
 import React from "react";
 import type { ProfileWindow, UserInfo } from "../../data/adminData";
+import type { User } from "firebase/auth";
 
 // export interface User {
 // 	id: number;
@@ -61,6 +62,9 @@ export interface AuthContextType {
 	updateUnreadCount: (method: "increment" | "decrement" | number) => void;
 	unreadCount: number;
 	isToVerifyEmail: boolean;
+	socialSignin: (socialType: "google" | "facebook") => Promise<void>;
+	socialAuthUser: User | null;
+	socialAuthLoading: boolean;
 }
 
 export const AuthContext = React.createContext<AuthContextType | undefined>(

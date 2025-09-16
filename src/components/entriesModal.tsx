@@ -16,15 +16,10 @@ import useDebounce from "../hooks/useDebounce";
 
 interface EntriesProps {
 	bracketChallengeId: number;
-	className?: string;
 	onClose: () => void;
 }
 
-const EntriesModal = ({
-	bracketChallengeId,
-	className,
-	onClose,
-}: EntriesProps) => {
+const EntriesModal = ({ bracketChallengeId, onClose }: EntriesProps) => {
 	const { isAuthenticated, user } = useAuth();
 
 	const [entries, setEntries] = useState<BracketChallengeEntryInfo[]>([]);
@@ -83,8 +78,8 @@ const EntriesModal = ({
 		if (contRef.current) {
 			gsap.fromTo(
 				contRef.current,
-				{ scale: 0 },
-				{ scale: 1, duration: 0.8, ease: "elastic.out(1, 0.8)" }
+				{ scaleY: 0 },
+				{ scaleY: 1, duration: 0.6, ease: "elastic.out(1, 0.8)" }
 			);
 		}
 	};
@@ -92,8 +87,8 @@ const EntriesModal = ({
 	const closeAnim = () => {
 		if (contRef.current) {
 			gsap.to(contRef.current, {
-				scale: 0,
-				duration: 0.8,
+				scaleY: 0,
+				duration: 0.6,
 				ease: "elastic.in(1, 0.8)",
 				onComplete: onClose,
 			});
@@ -122,13 +117,10 @@ const EntriesModal = ({
 
 	return (
 		<ModalBase>
-			<div
-				ref={contRef}
-				className={`w-full max-w-6xl mx-auto px-6 h-140 ${className}`}
-			>
-				<div className="relative w-full h-full flex flex-col space-y-4 px-4 py-3 bg-gray-800 text-white rounded border-2 border-white">
+			<div ref={contRef} className={`w-full max-w-6xl m-auto h-140`}>
+				<div className="relative w-full h-full flex flex-col space-y-4 px-4 py-3 bg-gray-900 text-white rounded border-2 border-white">
 					<button
-						className="z-10 absolute -top-3.5 -right-3.5 w-6 h-6 flex items-center justify-center text-black bg-white rounded-full hover:bg-gray-200 cursor-pointer "
+						className="z-10 absolute -top-3.5 -right-3.5 w-6 aspect-square flex items-center justify-center text-black bg-white rounded-full hover:bg-gray-300 cursor-pointer "
 						onClick={closeAnim}
 					>
 						<FontAwesomeIcon icon="xmark" />
@@ -159,9 +151,9 @@ const EntriesModal = ({
 											<Link
 												to={`/bracket-challenge-entries/${entry.slug}`}
 												key={entry.id}
-												className=" text-sm border-t border-gray-500 last:border-b block flex items-center justify-center gap-x-3 hover:bg-gray-700"
+												className=" text-sm border-t border-gray-600 last:border-b block flex items-center justify-center gap-x-3 hover:bg-gray-700/30 even:bg-gray-600/40"
 											>
-												<div className="flex-1 grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 px-1 py-2 space-y-1 font-semibold">
+												<div className="flex-1 grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 px-1 py-2 space-y-1 font-semibold">
 													<Detail label="User" size="xs">
 														<span
 															className={`${
@@ -205,7 +197,7 @@ const EntriesModal = ({
 											</button>
 										) : (
 											<span className="text-gray-400 text-sm font-bold rounded mx-auto px-4 select-none">
-												- END OF NOTIFICATIONS -
+												- END OF ENTRIES -
 											</span>
 										)}
 									</div>

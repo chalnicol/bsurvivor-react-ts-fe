@@ -118,14 +118,15 @@ const Matchup = ({ matchup, roundIndex, conference }: MatchupProps) => {
 
 	const flexClass = alignment == "right" ? "flex-row-reverse" : "flex-row";
 
-	const borderClass = alignment == "right" ? "border-l pl-2" : "border-r pr-2";
+	// const borderClass = alignment == "right" ? "border-l pl-2" : "border-r pr-2";
+	// const borderClass = "";
 
 	if (!matchup) return;
 
 	return (
 		<>
 			<div>
-				<div className={`space-y-1.5 border-gray-500 ${borderClass}`}>
+				<div className={`border-gray-500 space-y-2 relative`}>
 					<TeamSlot
 						team={team1}
 						// slot={1}

@@ -15,8 +15,11 @@ import { displayLocalDate } from "../utils/dateTime";
 import EndOfPage from "../components/endOfPage";
 import FailPrompt from "../components/failPrompt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAuth } from "../context/auth/AuthProvider";
 
 const BracketChallengesList = () => {
+	const { authLoading } = useAuth();
+
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const [bracketChallenges, setBracketChallenges] = useState<
@@ -69,8 +72,9 @@ const BracketChallengesList = () => {
 
 	useEffect(() => {
 		// Only fetch data when debouncedSearchTerm changes (user stopped typing)
+		if (authLoading) return;
 		fetchBracketChallenges(1, debouncedSearchTerm);
-	}, [debouncedSearchTerm]);
+	}, [debouncedSearchTerm, authLoading]);
 
 	const loadModeChallenges = () => {
 		if (currentPage < lastPage) {

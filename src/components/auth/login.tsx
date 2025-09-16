@@ -1,38 +1,39 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/auth/AuthProvider";
-import { useNavigate } from "react-router-dom";
-import ContentBase from "../contentBase";
+// import { useNavigate } from "react-router-dom";
 import LoadAuth from "./loadAuth";
 import TransparentIcon from "../transparentIcon";
+import AuthFormBase from "../authFormBase";
+import SocialAuthButtons from "./socialAuthButtons";
 
 const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const {
 		authLoading,
-		isAuthenticated,
+		// isAuthenticated,
 		isLoading,
 		error,
 		login,
 		clearMessages,
 	} = useAuth();
-	const navigate = useNavigate();
-	const location = useLocation();
+	// const navigate = useNavigate();
+	// const location = useLocation();
 
-	const from = location.state?.from?.pathname || "/"; // Default to /dashboard
+	// const from = location.state?.from?.pathname || "/"; // Default to /dashboard
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const success = await login(email, password);
-		if (success) navigate(from, { replace: true });
+		await login(email, password);
+		// if (success) navigate(from, { replace: true });
 	};
 
-	useEffect(() => {
-		if (isAuthenticated) {
-			navigate(from, { replace: true });
-		}
-	}, [isAuthenticated, navigate, from]);
+	// useEffect(() => {
+	// 	if (isAuthenticated) {
+	// 		navigate(from, { replace: true });
+	// 	}
+	// }, [isAuthenticated, navigate, from]);
 
 	useEffect(() => {
 		return () => {
@@ -47,11 +48,17 @@ const Login = () => {
 	return (
 		<>
 			<title>{`LOGIN | ${import.meta.env.VITE_APP_NAME}`}</title>
-			<ContentBase className="flex items-center justify-center p-4">
-				<div className="border border-gray-400 bg-white px-8 pt-6 pb-8 rounded shadow-md overflow-hidden w-full max-w-md relative">
+			<AuthFormBase>
+				<div className="border border-gray-400 bg-white m-auto px-8 pt-6 pb-8 rounded w-full shadow-md overflow-hidden w-full max-w-md relative">
 					<TransparentIcon className="absolute w-60 opacity-10 rotate-30 -right-12 -top-12 z-0" />
 					<div className="relative z-10">
 						<h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+						{error && (
+							<div>
+								<p className="my-3 text-red-500">{error}</p>
+							</div>
+						)}
+
 						<form onSubmit={handleSubmit}>
 							<div className="mb-4">
 								<label
@@ -100,12 +107,6 @@ const Login = () => {
 							</button>
 						</form>
 
-						{error && (
-							<div>
-								<p className="my-3 text-red-500">{error}</p>
-							</div>
-						)}
-
 						<div className="mt-3">
 							{isLoading ? (
 								<span className="text-sm	text-gray-700 ">
@@ -120,9 +121,11 @@ const Login = () => {
 								</Link>
 							)}
 						</div>
+
+						<SocialAuthButtons />
 					</div>
 				</div>
-			</ContentBase>
+			</AuthFormBase>
 		</>
 	);
 };
